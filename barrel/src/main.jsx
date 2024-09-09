@@ -35,7 +35,7 @@ class GameScene extends Phaser.Scene {
     this.textScore
     this.keyD
     this.keyA
-    this.bullets 
+    this.bullets
   }
 
   // load the assets for start the game.
@@ -44,7 +44,7 @@ class GameScene extends Phaser.Scene {
     this.load.image("bg", "/assets/bg2.png")
     this.load.image("plane", "/assets/basket.png")
     this.load.image("barrel", "/assets/apple.png")
-    this.load.image("bulet","/assets/apple.png")
+    this.load.image("bulet", "/assets/apple.png")
   }
 
   // create the game with the preloaded assets
@@ -66,7 +66,7 @@ class GameScene extends Phaser.Scene {
     this.physics.add.overlap(this.target, this.player, this.targetHit, null, this)
 
     this.cursor = this.input.keyboard.createCursorKeys();
- this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
     this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
@@ -115,7 +115,7 @@ const config = {
   type: Phaser.WEBGL,
   width: sizes.width,
   height: sizes.height,
-  canvas: gameCanvas,
+  canvas: gameCanvas    ,
   physics: {
     default: "arcade",
     arcade: {
