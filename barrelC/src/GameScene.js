@@ -200,8 +200,10 @@ class GameScene extends Phaser.Scene {
                 //     headers: {
                 //         "Content-Type": "application/json",
                 //     },
-                //     body: JSON.stringify({message: "Boom!"}),
-                // })
+                //     body: JSON.stringify({message: "Boom!"})
+
+                
+
                 axios
                 .post("http://localhost:8080", {data: "boom"})
                 // .then((res) => res.json())
