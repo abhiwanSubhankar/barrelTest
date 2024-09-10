@@ -1,21 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Phaser from 'phaser';
 import GameScene from './GameScene';
 
 function App() {
+  const [gameState, setGameState] = useState()
 
   const sizes = {
     height: 500,
     width: 500,
-  }                                                                                                 
-
+  }
 
   useEffect(() => {
+
     const config = {
-      type: Phaser.AUTO,
+      type: Phaser.WEBGL,
       width: sizes.height,
       height: sizes.width,
-      // canvas: gameCanvas,
+      canvas: gameCanvas,
       physics: {
         default: 'arcade',
         arcade: {
@@ -24,11 +25,11 @@ function App() {
         }
       },
       scene: [GameScene]
-    }; 
-
-
-
+    };
     const game = new Phaser.Game(config);
+
+    setGameState(game);
+    console.log(game)
 
     return () => {
       game.destroy(true);
@@ -36,14 +37,22 @@ function App() {
   }, []);
 
 
+  // useEffect(()=>{
+  //   console.log(gameState)
 
-  return (
-    <div className="App">
-      {/* <h1>Barrel Shooter Game</h1> */}
-      <canvas id='gameCanvas'></canvas>
-      <div id="phaser-scene" />
-    </div>
+  // },[gameState])
+
+  return (<>
+    <h1>Barrel Shooter Game</h1>
+    <canvas id='gameCanvas'></canvas>
+    {/* <div id="phaser-scene" /> */}
+    {/* <div className="App">
+     </div> */}
+  </>
   );
+  // return <>
+  //   <canvas id='gameCanvas'></canvas>
+  // </>
 }
 
 export default App;

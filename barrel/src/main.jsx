@@ -115,7 +115,7 @@ const config = {
   type: Phaser.WEBGL,
   width: sizes.width,
   height: sizes.height,
-  canvas: gameCanvas    ,
+  canvas: gameCanvas ,
   physics: {
     default: "arcade",
     arcade: {

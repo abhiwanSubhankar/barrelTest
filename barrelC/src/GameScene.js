@@ -17,12 +17,26 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // add Background
+        // Player score and balance
+        this.score = 0;
+        this.multiplier = 0;
+        this.balance = 100; // Example initial balance
 
+        // add score text
+        this.textS = this.add
+        .text(0, 20, `Score :- ${this.score}`, {
+            fontSize: "16px",
+            fill: "red",
+            fontStyle: "bold",
+        })
+        .setOrigin(0, 0)
+        .setDepth(1);
+
+        // add Background
         this.add.image(0, 0, "bg").setOrigin(0, 0);
 
         // Add player sprite
-        this.player = this.physics.add.image(200, 500, "player").setCollideWorldBounds(true).setOrigin(0, 0);
+        this.player = this.physics.add.image(200, 500, "player").setCollideWorldBounds(true);
 
         // Create barrel group
         this.barrels = this.physics.add.group();
@@ -45,11 +59,6 @@ class GameScene extends Phaser.Scene {
         // Setup bullets
         this.bullets = this.physics.add.group().setOrigin(0, 0);
 
-        // Player score and balance
-        this.score = 0;
-        this.multiplier = 0;
-        this.balance = 100; // Example initial balance
-
         // Barrels falling logic
         this.time.addEvent({
             delay: 1000, // Adjust as needed
@@ -66,6 +75,8 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
+        console.log(this.score);
+
         // Player movement
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-160);
@@ -118,7 +129,10 @@ class GameScene extends Phaser.Scene {
         // Create the barrel
         let barrel = this.barrels.create(x, 0, "barrel");
         barrel.setVelocityY(200); // Adjust falling speed
-        barrel.strength = Phaser.Math.Between(1, 5); // Random strength between 1 and 5
+
+        let barrelStrength = Phaser.Math.Between(0.01, 0.99);
+        barrel.strength = barrelStrength; // Random strength between 0.01 and 0.99
+        barrel.value = barrelStrength;
         barrel.multiplier = Phaser.Math.FloatBetween(0.1, 0.25); // Random multiplier between 0.1x and 0.25x
 
         // Create a text object to display the strength
@@ -163,7 +177,7 @@ class GameScene extends Phaser.Scene {
         bullet.destroy();
 
         // Decrease barrel strength by 1
-        barrel.strength -= 1;
+        barrel.strength -= 0.01;
 
         // Update the strength text
         barrel.strengthText.setText(barrel.strength);
@@ -171,7 +185,7 @@ class GameScene extends Phaser.Scene {
         // Check if the barrel should be destroyed
         if (barrel.strength <= 0) {
             // Add barrel's multiplier to player's score
-            this.score += barrel.multiplier;
+            this.score += barrel.value;
 
             // Destroy the barrel and the text
             barrel.destroy();
@@ -179,7 +193,7 @@ class GameScene extends Phaser.Scene {
 
             // Optional: Display an explosion or multiplier added effect
             this.add.text(barrel.x, barrel.y, "Boom!", {fontSize: "32px", color: "#FF0000"});
-
+            this.textS.setText(this.score);
             try {
                 // {
                 //     method: "POST",
