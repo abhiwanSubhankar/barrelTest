@@ -42,6 +42,8 @@ function App() {
 
   // },[gameState])
 
+  console.log(gameState?.score);
+
   return (<>
     <h1>Barrel Shooter Game</h1>
     <canvas id='gameCanvas'></canvas>

@@ -4,16 +4,20 @@ import axios from "axios";
 class GameScene extends Phaser.Scene {
     constructor() {
         super({key: "GameScene"});
+        this.setVelocityY = 100;
+        this.playerVelocity = 200;
+        this.keyD;
+        this.keyA;
     }
 
     preload() {
-        // Load assets here
+        // Load game objects assets here
         this.load.image("bg", "/bg2.png");
-        this.load.image("barrel", "ff/apple.png"); // Replace with actual path
-        this.load.image("player", "ff/player1.svg");
-        this.load.image("bullet", "ff/bullet.png");
-        this.load.image("cashpot", "ff/cashpot.png");
-        this.load.image("bomb", "ff/bomb.png");
+        this.load.image("barrel", "barrel.svg");
+        this.load.image("player", "player.svg");
+        this.load.image("bullet", "bullet.svg");
+        this.load.image("cashpot", "cash.svg");
+        this.load.image("bomb", "bomb.svg");
     }
 
     create() {
@@ -41,8 +45,8 @@ class GameScene extends Phaser.Scene {
         // Create barrel group
         this.barrels = this.physics.add.group();
 
-        // // Create cash pot group
-        // this.cashPots = this.physics.add.group();
+        // Create cash pot group
+        this.cashPots = this.physics.add.group();
 
         // // Create bomb group
         // this.bombs = this.physics.add.group();
@@ -50,6 +54,9 @@ class GameScene extends Phaser.Scene {
         // Add controls
         this.cursors = this.input.keyboard.createCursorKeys();
         this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+        this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
         // Cooldown bar setup
         this.cooldown = 100;
@@ -61,8 +68,8 @@ class GameScene extends Phaser.Scene {
 
         // Barrels falling logic
         this.time.addEvent({
-            delay: 1000, // Adjust as needed
-            callback: this.spawnBarrel,
+            delay: 1000, // Adjust the delay of appring barrel/cp/bomb as needed in ms
+            callback: this.spawnEntry,
             callbackScope: this,
             loop: true,
         });
@@ -75,13 +82,11 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
-        console.log(this.score);
-
         // Player movement
-        if (this.cursors.left.isDown) {
-            this.player.setVelocityX(-160);
-        } else if (this.cursors.right.isDown) {
-            this.player.setVelocityX(160);
+        if (this.cursors.left.isDown || this.keyA.isDown) {
+            this.player.setVelocityX(-this.playerVelocity);
+        } else if (this.cursors.right.isDown || this.keyD.isDown) {
+            this.player.setVelocityX(this.playerVelocity);
         } else {
             this.player.setVelocityX(0);
         }
@@ -107,6 +112,14 @@ class GameScene extends Phaser.Scene {
                 barrel.strengthText.y = barrel.y;
             }
         });
+
+        // updating the text position for the every cash pod
+        this.cashPots.children.iterate((cashpod) => {
+            if (cashpod && cashpod.strengthText) {
+                cashpod.strengthText.x = cashpod.x;
+                cashpod.strengthText.y = cashpod.y;
+            }
+        });
     }
 
     shootBullet() {
@@ -123,14 +136,86 @@ class GameScene extends Phaser.Scene {
 
     //     barrel.multiplier = Phaser.Math.FloatBetween(0.1, 0.25); // Random multiplier
     // }
+
+    spawnEntry() {
+        // between 1 to 10 getting 1 is 10% chance
+        //  if want to increase the chance modyfy the range accordingly
+        let spawnCashPot = Phaser.Math.Between(1, 10);
+
+        // Bomb has appear more friquent than cashpods
+        let spawnBomb = Phaser.Math.Between(1, 5);
+
+        if (spawnCashPot === 1) {
+            this.spawnCashPot();
+        } else if (spawnBomb === 1) {
+            this.spawnBomb();
+        } else {
+            this.spawnBarrel();
+        }
+    }
+
+    spawnCashPot() {
+        let x = Phaser.Math.Between(50, 450);
+
+        // Create the cashPot
+        let cashPot = this.cashPots.create(x, 0, "cashpot");
+        cashPot.setVelocityY(this.setVelocityY); // Adjust falling speed
+
+        function getRandomNumber() {
+            // Generate a random number between 0 and 1
+            let randomNum = Math.random();
+
+            // Scale it to the range [0.01, 0.25]
+            return 0.01 + randomNum * (0.25 - 0.01);
+        }
+
+        // Phaser.Math.Between(0.01, 0.25);
+        let cashPotValue = getRandomNumber().toFixed(2);
+
+        cashPot.strength = cashPotValue; // Random value
+        cashPot.value = cashPotValue;
+        cashPot.multiplier = Phaser.Math.FloatBetween(0.1, 0.25); // Random multiplier between 0.1x and 0.25x
+
+        // Create a text object to display the strength
+        // Store the text object inside the cashPot for easy updating
+        cashPot.strengthText = this.add
+        .text(cashPot.x, cashPot.y, cashPot.strength, {
+            fontSize: "16px",
+            fill: "#ffffff",
+            fontStyle: "bold",
+        })
+        .setOrigin(0.5);
+
+        // Ensures the text appears on top of the barrel
+        cashPot.strengthText.setDepth(1);
+    }
+
+    spawnBomb() {
+        let x = Phaser.Math.Between(50, 450);
+
+        // Create the bomb
+        let bomb = this.cashPots.create(x, 0, "bomb");
+        bomb.setVelocityY(this.setVelocityY); // Adjust falling speed
+    }
+
     spawnBarrel() {
-        let x = Phaser.Math.Between(50, 750);
+        let x = Phaser.Math.Between(50, 450);
 
         // Create the barrel
         let barrel = this.barrels.create(x, 0, "barrel");
-        barrel.setVelocityY(200); // Adjust falling speed
+        barrel.setVelocityY(this.setVelocityY); // Adjust falling speed
 
-        let barrelStrength = Phaser.Math.Between(0.01, 0.99);
+        function getRandomNumber() {
+            // Generate a random number between 0 and 1
+            let randomNum = Math.random();
+
+            // Scale it to the range [0.01, 0.25]
+            return 0.01 + randomNum * (0.25 - 0.01);
+        }
+
+        let barrelStrength = getRandomNumber().toFixed(2);
+
+        // Phaser.Math.Between(0.01, 0.99);
         barrel.strength = barrelStrength; // Random strength between 0.01 and 0.99
         barrel.value = barrelStrength;
         barrel.multiplier = Phaser.Math.FloatBetween(0.1, 0.25); // Random multiplier between 0.1x and 0.25x
@@ -147,13 +232,6 @@ class GameScene extends Phaser.Scene {
         // Store the text object inside the barrel for easy updating
         barrel.strengthText.setDepth(1); // Ensures the text appears on top of the barrel
     }
-
-    // hitBarrel(bullet, barrel) {
-    //     this.score += barrel.multiplier; // Add multiplier to score
-    //     barrel.destroy();
-    //     bullet.destroy();
-    //     // Increase difficulty over time
-    // }
 
     hitBarrel(bullet, barrel) {
         // bullet.destroy(); // Destroy the bullet upon collision
@@ -177,7 +255,7 @@ class GameScene extends Phaser.Scene {
         bullet.destroy();
 
         // Decrease barrel strength by 1
-        barrel.strength -= 0.01;
+        barrel.strength = (barrel.strength - 0.01).toFixed(2);
 
         // Update the strength text
         barrel.strengthText.setText(barrel.strength);
@@ -185,7 +263,10 @@ class GameScene extends Phaser.Scene {
         // Check if the barrel should be destroyed
         if (barrel.strength <= 0) {
             // Add barrel's multiplier to player's score
-            this.score += barrel.value;
+            // this.score += +barrel.value;
+            // this.textS.setText(this.score);
+
+            this.updateScore(barrel.value);
 
             // Destroy the barrel and the text
             barrel.destroy();
@@ -193,7 +274,7 @@ class GameScene extends Phaser.Scene {
 
             // Optional: Display an explosion or multiplier added effect
             this.add.text(barrel.x, barrel.y, "Boom!", {fontSize: "32px", color: "#FF0000"});
-            this.textS.setText(this.score);
+
             try {
                 // {
                 //     method: "POST",
@@ -201,8 +282,6 @@ class GameScene extends Phaser.Scene {
                 //         "Content-Type": "application/json",
                 //     },
                 //     body: JSON.stringify({message: "Boom!"})
-
-                
 
                 axios
                 .post("http://localhost:8080", {data: "boom"})
@@ -220,14 +299,27 @@ class GameScene extends Phaser.Scene {
     }
 
     hitCashPot(bullet, cashPot) {
-        this.score += Phaser.Math.FloatBetween(0.5, 1.0); // Add to score
+        // this.score += Phaser.Math.FloatBetween(0.5, 1.0); // Add to score
+
+        // add and update the score
+        // this.score += +cashPot.value;
+        // this.textS.setText(this.score);
+        this.updateScore(cashPot.value);
+
+        // removing all the element from canvas
         cashPot.destroy();
         bullet.destroy();
+        cashPot.strengthText.destroy();
     }
 
     hitBomb(bullet, bomb) {
         // End game logic
         this.gameOver();
+    }
+
+    updateScore(updatedScore) {
+        this.score +=Number(( +updatedScore).toFixed(2)) ;
+        this.textS.setText(`Score :- ${this.score}`);
     }
 
     gameOver() {
