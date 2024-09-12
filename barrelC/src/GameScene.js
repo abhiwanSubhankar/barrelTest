@@ -8,6 +8,23 @@ class GameScene extends Phaser.Scene {
         this.playerVelocity = 200;
         this.keyD;
         this.keyA;
+        this.textS; // store score text
+
+        // Cooldown bar setup
+        this.cooldown = 100;
+        this.shooting = false;
+        this.cooldownTimer = 0;
+
+        // Variables for shooting and magazine management
+        this.magazineSize = 100; // Starting magazine size
+        this.bulletsRemaining = this.magazineSize; // Current bullets available
+        this.canShoot = true; // Whether the player can shoot
+        this.reloadSpeed = 5; // Speed of reload (adjust as needed)
+
+        // Player score and balance
+        this.score = 0;
+        this.multiplier = 0;
+        this.balance = 100; // Example initial balance
     }
 
     preload() {
@@ -21,14 +38,9 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // Player score and balance
-        this.score = 0;
-        this.multiplier = 0;
-        this.balance = 100; // Example initial balance
-
         // add score text
         this.textS = this.add
-        .text(0, 20, `Score :- ${this.score}`, {
+        .text(0, 25, `Score :- ${this.score}`, {
             fontSize: "16px",
             fill: "red",
             fontStyle: "bold",
@@ -36,37 +48,43 @@ class GameScene extends Phaser.Scene {
         .setOrigin(0, 0)
         .setDepth(1);
 
+        // Create the magazine bar
+        this.magazineBar = this.add.graphics().setDepth(1).fillStyle(0xff8c00).fillRect(2, 2, 200, 20);
+
         // add Background
-        this.add.image(0, 0, "bg").setOrigin(0, 0);
+        this.add.image(0, 0, "bg").setOrigin(0, 0).setScale(1);
 
         // Add player sprite
         this.player = this.physics.add.image(200, 500, "player").setCollideWorldBounds(true);
 
+        this.player.setCircle(26);
+        this.player.setCircle(28, this.player.width / 2 - 26, this.player.height / 2 - 26);
+
         // Create barrel group
         this.barrels = this.physics.add.group();
+
+        // .setSize(this.barrels.width / 4, this.barrels.height / 4)
+        // .setOffset(this.barrels.width / 10, this.barrels.height / 10);
 
         // Create cash pot group
         this.cashPots = this.physics.add.group();
 
-        // // Create bomb group
-        // this.bombs = this.physics.add.group();
+        // Create bomb group
+        this.bombs = this.physics.add.group();
 
         // Add controls
+        // for arrow keys , shift , ctrl
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
+        // spacebar, A nad D buttons
+        this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-
-        // Cooldown bar setup
-        this.cooldown = 100;
-        this.shooting = false;
-        this.cooldownTimer = 0;
 
         // Setup bullets
         this.bullets = this.physics.add.group().setOrigin(0, 0);
 
-        // Barrels falling logic
+        // Barrels, cashpod and bombs falling logic
         this.time.addEvent({
             delay: 1000, // Adjust the delay of appring barrel/cp/bomb as needed in ms
             callback: this.spawnEntry,
@@ -74,9 +92,9 @@ class GameScene extends Phaser.Scene {
             loop: true,
         });
 
-        // Shooting and collision logic
+        // Shooting and collision / overlap logic
         this.physics.add.overlap(this.bullets, this.barrels, this.hitBarrel, null, this);
-        this.physics.add.overlap(this.player, this.barrels, this.gameOver, null, this);
+        this.physics.add.collider(this.player, this.barrels, this.gameOver, null, this);
         this.physics.add.overlap(this.bullets, this.cashPots, this.hitCashPot, null, this);
         this.physics.add.overlap(this.bullets, this.bombs, this.hitBomb, null, this);
     }
@@ -123,8 +141,17 @@ class GameScene extends Phaser.Scene {
     }
 
     shootBullet() {
-        let bullet = this.bullets.create(this.player.x, this.player.y - 20, "bullet");
-        bullet.setVelocityY(-400); // Adjust speed
+        if (this.bulletsRemaining > 0 && this.canShoot) {
+            this.bulletsRemaining -= 1;
+            this.updateMagazineBar();
+
+            let bullet = this.bullets.create(this.player.x, this.player.y - 20, "bullet");
+            bullet.setVelocityY(-400); // Adjust speed
+        }
+
+        if (this.bulletsRemaining <= 0) {
+            this.canShoot = false;
+        }
     }
 
     // spawnBarrel() {
@@ -161,6 +188,9 @@ class GameScene extends Phaser.Scene {
         let cashPot = this.cashPots.create(x, 0, "cashpot");
         cashPot.setVelocityY(this.setVelocityY); // Adjust falling speed
 
+        cashPot.setCircle(27);
+        cashPot.setCircle(27, cashPot.width / 2 - 27, cashPot.height / 2 - 27);
+
         function getRandomNumber() {
             // Generate a random number between 0 and 1
             let randomNum = Math.random();
@@ -194,8 +224,12 @@ class GameScene extends Phaser.Scene {
         let x = Phaser.Math.Between(50, 450);
 
         // Create the bomb
-        let bomb = this.cashPots.create(x, 0, "bomb");
+        let bomb = this.bombs.create(x, 0, "bomb");
         bomb.setVelocityY(this.setVelocityY); // Adjust falling speed
+
+        bomb.setCircle(26);
+        bomb.setCircle(26, bomb.width / 2 - 26, bomb.height / 2 - 26);
+        bomb.setOffset(10, 3);
     }
 
     spawnBarrel() {
@@ -204,6 +238,11 @@ class GameScene extends Phaser.Scene {
         // Create the barrel
         let barrel = this.barrels.create(x, 0, "barrel");
         barrel.setVelocityY(this.setVelocityY); // Adjust falling speed
+        // barrel.setScale(0.9,0.8);
+        // barrel.setOffset(-5,-10)
+        // this.player.setSize(this.player.width / 4, this.player.height / 4).setOffset(this.player.width / 10, this.player.height / 10)
+        barrel.setCircle(25);
+        barrel.setCircle(25, barrel.width / 2 - 25, barrel.height / 2 - 25);
 
         function getRandomNumber() {
             // Generate a random number between 0 and 1
@@ -223,7 +262,7 @@ class GameScene extends Phaser.Scene {
         // Create a text object to display the strength
         barrel.strengthText = this.add
         .text(barrel.x, barrel.y, barrel.strength, {
-            fontSize: "16px",
+            fontSize: "20px",
             fill: "#ffffff",
             fontStyle: "bold",
         })
@@ -275,26 +314,26 @@ class GameScene extends Phaser.Scene {
             // Optional: Display an explosion or multiplier added effect
             this.add.text(barrel.x, barrel.y, "Boom!", {fontSize: "32px", color: "#FF0000"});
 
-            try {
-                // {
-                //     method: "POST",
-                //     headers: {
-                //         "Content-Type": "application/json",
-                //     },
-                //     body: JSON.stringify({message: "Boom!"})
+            // try {
+            //     // {
+            //     //     method: "POST",
+            //     //     headers: {
+            //     //         "Content-Type": "application/json",
+            //     //     },
+            //     //     body: JSON.stringify({message: "Boom!"})
 
-                axios
-                .post("http://localhost:8080", {data: "boom"})
-                // .then((res) => res.json())
-                .then((res) => {
-                    console.log("return data", res);
-                })
-                .catch((er) => {
-                    console.log(er);
-                });
-            } catch (error) {
-                console.log(error);
-            }
+            //     axios
+            //     .post("http://localhost:8080", {data: "boom"})
+            //     // .then((res) => res.json())
+            //     .then((res) => {
+            //         console.log("return data", res);
+            //     })
+            //     .catch((er) => {
+            //         console.log(er);
+            //     });
+            // } catch (error) {
+            //     console.log(error);
+            // }
         }
     }
 
@@ -314,11 +353,30 @@ class GameScene extends Phaser.Scene {
 
     hitBomb(bullet, bomb) {
         // End game logic
+
         this.gameOver();
     }
 
+    // Update the visual representation of the magazine bar
+    updateMagazineBar() {
+        // Clear previous graphics
+        this.magazineBar.clear();
+
+        // Calculate the width of the bar based on the remaining bullets
+        let barWidth = 200 * (this.bulletsRemaining / this.magazineSize); // Full width is 200px
+        let barHeight = 20;
+
+        // Draw the magazine bar background (empty state)
+        this.magazineBar.fillStyle(0x808080); // Grey background
+        this.magazineBar.fillRect(2, 2, 200, barHeight);
+
+        // Draw the magazine bar (filled state)
+        this.magazineBar.fillStyle(0xff8c00); // Green for remaining bullets
+        this.magazineBar.fillRect(2, 2, barWidth, barHeight);
+    }
+
     updateScore(updatedScore) {
-        this.score +=Number(( +updatedScore).toFixed(2)) ;
+        this.score += Number((+updatedScore).toFixed(2));
         this.textS.setText(`Score :- ${this.score}`);
     }
 

@@ -37,12 +37,12 @@ function App() {
   }, []);
 
 
-  // useEffect(()=>{
-  //   console.log(gameState)
+  useEffect(() => {
+    console.log(gameState)
 
-  // },[gameState])
+  }, [gameState])
 
-  console.log(gameState?.score);
+  console.log("game State>>>>", gameState);
 
   return (<>
     <h1>Barrel Shooter Game</h1>
