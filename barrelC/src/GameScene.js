@@ -16,10 +16,14 @@ class GameScene extends Phaser.Scene {
         this.cooldownTimer = 0;
 
         // Variables for shooting and magazine management
-        this.magazineSize = 100; // Starting magazine size
+        this.magazineSize = 20; // Starting magazine size
         this.bulletsRemaining = this.magazineSize; // Current bullets available
         this.canShoot = true; // Whether the player can shoot
-        this.reloadSpeed = 5; // Speed of reload (adjust as needed)
+        this.reloadSpeed = 1; // Speed of reload (adjust as needed)
+        this.reloadDelay = 1000; // Delay before starting reload (1 second)
+        // reload VB
+        this.lastShotTime = 0; // To track when the last shot was fired
+        this.isReloading = false; // To track if the player is reloading
 
         // Player score and balance
         this.score = 0;
@@ -38,6 +42,9 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+        this.userNameField = document.getElementById("txtName");
+        // this.userNameField.style.display = "block";
+
         // add score text
         this.textS = this.add
         .text(0, 25, `Score :- ${this.score}`, {
@@ -92,6 +99,15 @@ class GameScene extends Phaser.Scene {
             loop: true,
         });
 
+        // create time event to check for reload bullets
+
+        this.time.addEvent({
+            delay: 100, // Check every 100ms
+            loop: true,
+            callback: this.checkReload,
+            callbackScope: this,
+        });
+
         // Shooting and collision / overlap logic
         this.physics.add.overlap(this.bullets, this.barrels, this.hitBarrel, null, this);
         this.physics.add.collider(this.player, this.barrels, this.gameOver, null, this);
@@ -138,6 +154,8 @@ class GameScene extends Phaser.Scene {
                 cashpod.strengthText.y = cashpod.y;
             }
         });
+
+        this.textS.setText(`Score :- ${this.score}`);
     }
 
     shootBullet() {
@@ -151,6 +169,30 @@ class GameScene extends Phaser.Scene {
 
         if (this.bulletsRemaining <= 0) {
             this.canShoot = false;
+        }
+
+        // Update the last shot time
+        this.lastShotTime = this.time.now;
+        this.isReloading = false; // Stop reload if player shootss
+    }
+
+    // Check if we need to start reloading
+    checkReload() {
+        // If 1 second has passed since the last shot and we're not reloading
+        if (this.time.now - this.lastShotTime > this.reloadDelay && !this.isReloading) {
+            this.isReloading = true; // Start reloading
+        }
+
+        // Reload bullets if we're in the reloading state
+        if (this.isReloading && this.bulletsRemaining < this.magazineSize) {
+            this.bulletsRemaining += this.reloadSpeed; // Gradually reload bullets
+            this.bulletsRemaining = Math.min(this.bulletsRemaining, this.magazineSize); // Max limit is the magazine size
+            this.updateMagazineBar();
+
+            // Allow shooting again if bullets have been reloaded
+            if (this.bulletsRemaining > 0) {
+                this.canShoot = true;
+            }
         }
     }
 
@@ -377,11 +419,24 @@ class GameScene extends Phaser.Scene {
 
     updateScore(updatedScore) {
         this.score += Number((+updatedScore).toFixed(2));
-        this.textS.setText(`Score :- ${this.score}`);
     }
 
     gameOver() {
-        this.scene.restart(); // Restart the game or show "Game Over" screen
+        // Restart the game or show "Game Over" screen
+
+        //  reset the game screen
+
+        // this.scene.restart();
+        // this.score = 0;
+        // // resetting magazine Size.
+        // this.magazineSize = 20;
+        // this.bulletsRemaining = this.magazineSize; // Current bullets available
+        // this.canShoot = true;
+        // this.lastShotTime = 0; // To track when the last shot was fired
+        // this.isReloading = false;
+
+        // move to game over screen
+        this.scene.start("End", {totalScore: this.score});
     }
 }
 

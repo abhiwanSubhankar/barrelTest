@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Phaser from 'phaser';
 import GameScene from './GameScene';
+import EndScene from './scenes/gameOver';
 
 function App() {
   const [gameState, setGameState] = useState()
@@ -27,6 +28,7 @@ function App() {
       scene: [GameScene]
     };
     const game = new Phaser.Game(config);
+    game.scene.add("End", EndScene);
 
     setGameState(game);
     console.log(game)
