@@ -4,19 +4,22 @@ import GameScene from './GameScene';
 import EndScene from './scenes/gameOver';
 
 function App() {
-  const [gameState, setGameState] = useState()
+  const [gameState, setGameState] = useState();
 
-  const sizes = {
-    height: 500,
-    width: 500,
-  }
+
+
+
+  const [sizes, setSizes] = useState({
+    height: window.innerHeight,
+    width: window.innerWidth,
+  });
 
   useEffect(() => {
 
     const config = {
       type: Phaser.WEBGL,
-      width: sizes.height,
-      height: sizes.width,
+      width: sizes.width,
+      height: sizes.height,
       canvas: gameCanvas,
       physics: {
         default: 'arcade',
@@ -40,19 +43,26 @@ function App() {
 
 
   useEffect(() => {
-    console.log(gameState)
+    // console.log(gameState)
 
-  }, [gameState])
+  }, [])
+  window.addEventListener("resize", () => {
+    console.log("window height and width ", window.innerWidth, window.innerHeight)
+    setSizes({
+      height: window.innerHeight - 500,
+      width: window.innerWidth - 500,
+    })
+  })
 
   console.log("game State>>>>", gameState);
 
-  return (<>
-    <h1>Barrel Shooter Game</h1>
+  return (<div>
+    {/* <h1>Barrel Shooter Game</h1> */}
     <canvas id='gameCanvas'></canvas>
     {/* <div id="phaser-scene" /> */}
     {/* <div className="App">
      </div> */}
-  </>
+  </div>
   );
   // return <>
   //   <canvas id='gameCanvas'></canvas>

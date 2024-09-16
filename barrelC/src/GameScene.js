@@ -39,9 +39,25 @@ class GameScene extends Phaser.Scene {
         this.load.image("bullet", "bullet.svg");
         this.load.image("cashpot", "cash.svg");
         this.load.image("bomb", "bomb.svg");
+        this.load.spritesheet(
+            "explosion", // spiteSheet name
+            "/explosion.png", // spite sheet asset path
+            {
+                frameWidth: 16, // Width of each frame
+                frameHeight: 16, // Height of each frame
+                // endFrame: 23, // Total frames in the sprite sheet
+            } // info for the spiteSheet.
+        );
+
+        // buttons
+        this.load.image("blueButton1", "/blue_button02.png");
+        this.load.image("blueButton2", "/blue_button03.png");
     }
 
     create() {
+        // add Background
+        this.add.image(0, 0, "bg").setOrigin(0, 0).setScale(2);
+
         this.userNameField = document.getElementById("txtName");
         // this.userNameField.style.display = "block";
 
@@ -55,14 +71,28 @@ class GameScene extends Phaser.Scene {
         .setOrigin(0, 0)
         .setDepth(1);
 
+        //  Creating explosion animation
+        // this.add.sprite(400, 300, "explosion").setScale(2).displayHeight = 80;
+
+        this.anims.create({
+            key: "explode", // this create animation key not the pre load invock key.
+            frames: this.anims.generateFrameNumbers(
+                "explosion"
+                // {start: 0, end: 23}
+            ),
+            frameRate: 20,
+            hideOnComplete: true,
+            // repeat: 0,
+            // duration: 2000,
+        });
+
         // Create the magazine bar
         this.magazineBar = this.add.graphics().setDepth(1).fillStyle(0xff8c00).fillRect(2, 2, 200, 20);
 
-        // add Background
-        this.add.image(0, 0, "bg").setOrigin(0, 0).setScale(1);
-
         // Add player sprite
-        this.player = this.physics.add.image(200, 500, "player").setCollideWorldBounds(true);
+        this.player = this.physics.add
+        .image(this.game.config.width - this.game.config.width / 2, this.game.config.height - 80, "player")
+        .setCollideWorldBounds(true);
 
         this.player.setCircle(26);
         this.player.setCircle(28, this.player.width / 2 - 26, this.player.height / 2 - 26);
@@ -116,6 +146,8 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
+        // console.log("exp",this);
+
         // Player movement
         if (this.cursors.left.isDown || this.keyA.isDown) {
             this.player.setVelocityX(-this.playerVelocity);
@@ -211,20 +243,22 @@ class GameScene extends Phaser.Scene {
         //  if want to increase the chance modyfy the range accordingly
         let spawnCashPot = Phaser.Math.Between(1, 10);
 
+        let width = this.game.config.width - 100;
+
         // Bomb has appear more friquent than cashpods
         let spawnBomb = Phaser.Math.Between(1, 5);
 
         if (spawnCashPot === 1) {
-            this.spawnCashPot();
+            this.spawnCashPot(width);
         } else if (spawnBomb === 1) {
-            this.spawnBomb();
+            this.spawnBomb(width);
         } else {
-            this.spawnBarrel();
+            this.spawnBarrel(width);
         }
     }
 
-    spawnCashPot() {
-        let x = Phaser.Math.Between(50, 450);
+    spawnCashPot(width) {
+        let x = Phaser.Math.Between(30, width);
 
         // Create the cashPot
         let cashPot = this.cashPots.create(x, 0, "cashpot");
@@ -262,8 +296,8 @@ class GameScene extends Phaser.Scene {
         cashPot.strengthText.setDepth(1);
     }
 
-    spawnBomb() {
-        let x = Phaser.Math.Between(50, 450);
+    spawnBomb(width) {
+        let x = Phaser.Math.Between(30, width);
 
         // Create the bomb
         let bomb = this.bombs.create(x, 0, "bomb");
@@ -274,8 +308,8 @@ class GameScene extends Phaser.Scene {
         bomb.setOffset(10, 3);
     }
 
-    spawnBarrel() {
-        let x = Phaser.Math.Between(50, 450);
+    spawnBarrel(width) {
+        let x = Phaser.Math.Between(30, width);
 
         // Create the barrel
         let barrel = this.barrels.create(x, 0, "barrel");
@@ -355,6 +389,10 @@ class GameScene extends Phaser.Scene {
 
             // Optional: Display an explosion or multiplier added effect
             this.add.text(barrel.x, barrel.y, "Boom!", {fontSize: "32px", color: "#FF0000"});
+
+            this.explosion = this.add.sprite(barrel.x, barrel.y, "explosion");
+
+            this.explosion.play("explode");
 
             // try {
             //     // {
