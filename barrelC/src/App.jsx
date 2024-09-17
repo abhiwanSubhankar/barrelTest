@@ -2,19 +2,25 @@ import React, { useEffect, useState } from 'react';
 import Phaser from 'phaser';
 import GameScene from './GameScene';
 import EndScene from './scenes/gameOver';
+import "./App.css";
 
 function App() {
   const [gameState, setGameState] = useState();
 
+  const [currentCoins, setCurrentCoins] = useState(524);
+  const [betAmount, setBetAmount] = useState(0);
+  const [currentWinnings, setCurrentWinnings] = useState(0);
 
 
-
+  // game window size
   const [sizes, setSizes] = useState({
     height: window.innerHeight,
     width: window.innerWidth,
   });
 
   useEffect(() => {
+
+    let gameCanvas = document.getElementById("gameCanvas")
 
     const config = {
       type: Phaser.WEBGL,
@@ -28,10 +34,16 @@ function App() {
           debug: true
         }
       },
-      scene: [GameScene]
+      scene: [GameScene, EndScene],
+      updfn: {
+        setGameCurrentCoins: function (score) {
+          setCurrentCoins(score)
+        }
+      }
     };
+
     const game = new Phaser.Game(config);
-    game.scene.add("End", EndScene);
+    // game.scene.add("End", EndScene);
 
     setGameState(game);
     console.log(game)
@@ -39,30 +51,50 @@ function App() {
     return () => {
       game.destroy(true);
     };
-  }, []);
+  }, [sizes]);
 
 
   useEffect(() => {
     // console.log(gameState)
-
-  }, [])
-  window.addEventListener("resize", () => {
-    console.log("window height and width ", window.innerWidth, window.innerHeight)
-    setSizes({
-      height: window.innerHeight - 500,
-      width: window.innerWidth - 500,
+    window.addEventListener("resize", () => {
+      console.log("window height and width ", window.innerWidth, window.innerHeight)
+      setSizes({
+        height: window.innerHeight,
+        width: window.innerWidth,
+      })
     })
-  })
+
+    return () => {
+      window.removeEventListener("resize")
+    }
+  }, [])
+
 
   console.log("game State>>>>", gameState);
 
-  return (<div>
-    {/* <h1>Barrel Shooter Game</h1> */}
-    <canvas id='gameCanvas'></canvas>
-    {/* <div id="phaser-scene" /> */}
-    {/* <div className="App">
-     </div> */}
-  </div>
+  return (
+    <div className="App">
+      <div>
+        <h1>Barrel Shooter Game</h1>
+
+        <div>
+          <div>
+            <h3>Current coin</h3>
+            <h4>{currentCoins}</h4>
+
+            <h3>Current Bet</h3>
+            <h4>{betAmount}</h4>
+
+
+          </div>
+          <input type="number" placeholder='Enter Bet aMOUNT' onChange={(e) => {
+            setBetAmount(e.target.value)
+          }} />
+          <button >Bet</button>
+        </div>
+      </div>
+      <canvas id='gameCanvas'></canvas>
+    </div>
   );
   // return <>
   //   <canvas id='gameCanvas'></canvas>

@@ -1,4 +1,15 @@
 .cc{
     color: #ff8c00 ;
 }
+.App{
+    display: flex;
+}
+.App>div{
+    width: 16rem;
+    /* height: 100vh; */
+}
+canvas {
+width:calc(100% - 16rem);
+height: 100vh;
+}
 

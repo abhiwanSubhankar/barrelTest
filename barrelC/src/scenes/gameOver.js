@@ -18,7 +18,7 @@ export default class EndScene extends Phaser.Scene {
     create() {
         // this.model = this.sys.game.globals.model;
         // submitScore(this.model.userName, this.score);
-        // this.bgImage = this.add.image(100, 100, 'game-over');
+        this.bgImage = this.add.image(0, -150, 'game-over').setOrigin(0,0);
 
         this.add.text(120, 50, `Your Score : ${this.score}`, {fontSize: 18});
 

@@ -4,11 +4,12 @@ import axios from "axios";
 class GameScene extends Phaser.Scene {
     constructor() {
         super({key: "GameScene"});
-        this.setVelocityY = 100;
-        this.playerVelocity = 200;
+        this.setVelocityY = 80;
+        this.playerVelocity = 300;
         this.keyD;
         this.keyA;
         this.textS; // store score text
+        this.levelText;
 
         // Cooldown bar setup
         this.cooldown = 100;
@@ -29,6 +30,11 @@ class GameScene extends Phaser.Scene {
         this.score = 0;
         this.multiplier = 0;
         this.balance = 100; // Example initial balance
+
+        //  game Lavel
+        this.gameLevel = 1;
+        this.gameSpeed = 50;
+        this.spawnSpeed = 1000;
     }
 
     preload() {
@@ -65,6 +71,16 @@ class GameScene extends Phaser.Scene {
         this.textS = this.add
         .text(0, 25, `Score :- ${this.score}`, {
             fontSize: "16px",
+            fill: "red",
+            fontStyle: "bold",
+        })
+        .setOrigin(0, 0)
+        .setDepth(1);
+
+        // // add score text
+        this.levelText = this.add
+        .text(this.game.config.width - 150, 25, `Lavel :- ${this.gameLevel}`, {
+            fontSize: "20px",
             fill: "red",
             fontStyle: "bold",
         })
@@ -123,7 +139,7 @@ class GameScene extends Phaser.Scene {
 
         // Barrels, cashpod and bombs falling logic
         this.time.addEvent({
-            delay: 1000, // Adjust the delay of appring barrel/cp/bomb as needed in ms
+            delay: this.spawnSpeed, // Adjust the delay of appring barrel/cp/bomb as needed in ms
             callback: this.spawnEntry,
             callbackScope: this,
             loop: true,
@@ -146,8 +162,8 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
-        // console.log("exp",this);
-
+        console.log(">>>>>>>>>>>>>>>>>>>>>",this.game.config);
+        
         // Player movement
         if (this.cursors.left.isDown || this.keyA.isDown) {
             this.player.setVelocityX(-this.playerVelocity);
@@ -188,6 +204,12 @@ class GameScene extends Phaser.Scene {
         });
 
         this.textS.setText(`Score :- ${this.score}`);
+        this.levelText.setText(`Lavel :- ${this.gameLevel}`);
+
+        if (this.spawnSpeed > 200) {
+            // console.log(this.spawnSpeed);
+            // this.spawnSpeed = this.spawnSpeed;
+        }
     }
 
     shootBullet() {
@@ -228,19 +250,10 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    // spawnBarrel() {
-    //     let x = Phaser.Math.Between(50, 750);
-    //     let barrel = this.barrels.create(x, 0, "barrel");
-    //     barrel.setVelocityY(200); // Speed increases over time
-
-    //     barrel.strength = Phaser.Math.Between(1, 5);
-
-    //     barrel.multiplier = Phaser.Math.FloatBetween(0.1, 0.25); // Random multiplier
-    // }
-
     spawnEntry() {
         // between 1 to 10 getting 1 is 10% chance
         //  if want to increase the chance modyfy the range accordingly
+        console.log("spawn speed", this, this.delay);
         let spawnCashPot = Phaser.Math.Between(1, 10);
 
         let width = this.game.config.width - 100;
@@ -254,6 +267,54 @@ class GameScene extends Phaser.Scene {
             this.spawnBomb(width);
         } else {
             this.spawnBarrel(width);
+        }
+    }
+
+    updateLavel() {
+        if (this.score >= 0 && this.score < 0.1) {
+            this.gameLevel = 1;
+            this.setVelocityY += this.gameSpeed;
+            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        } else if (this.score >= 0.1 && this.score < 0.2) {
+            this.gameLevel = 2;
+            this.setVelocityY += this.gameSpeed;
+            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        } else if (this.score >= 0.2 && this.score < 0.3) {
+            this.gameLevel = 3;
+            this.setVelocityY += this.gameSpeed;
+            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        } else if (this.score >= 0.3 && this.score < 0.4) {
+            this.gameLevel = 4;
+            this.setVelocityY += this.gameSpeed;
+            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        } else if (this.score >= 0.4 && this.score < 0.5) {
+            this.gameLevel = 5;
+            this.setVelocityY += this.gameSpeed;
+            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        } else if (this.score >= 0.5 && this.score < 0.6) {
+            this.gameLevel = 6;
+            this.setVelocityY += this.gameSpeed;
+            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        } else if (this.score >= 0.6 && this.score < 0.7) {
+            this.gameLevel = 7;
+            this.setVelocityY += this.gameSpeed;
+            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        } else if (this.score >= 0.7 && this.score < 0.8) {
+            this.gameLevel = 8;
+            this.setVelocityY += this.gameSpeed;
+            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 4;
+        } else if (this.score >= 0.8 && this.score < 0.9) {
+            this.gameLevel = 9;
+            this.setVelocityY += this.gameSpeed;
+            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 4;
+        } else if (this.score >= 0.9 && this.score <= 1) {
+            this.gameLevel = 10;
+            this.setVelocityY += this.gameSpeed;
+            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 4;
+        }
+
+        if (this.spawnSpeed > 200) {
+            this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
         }
     }
 
@@ -280,7 +341,6 @@ class GameScene extends Phaser.Scene {
 
         cashPot.strength = cashPotValue; // Random value
         cashPot.value = cashPotValue;
-        cashPot.multiplier = Phaser.Math.FloatBetween(0.1, 0.25); // Random multiplier between 0.1x and 0.25x
 
         // Create a text object to display the strength
         // Store the text object inside the cashPot for easy updating
@@ -333,7 +393,6 @@ class GameScene extends Phaser.Scene {
         // Phaser.Math.Between(0.01, 0.99);
         barrel.strength = barrelStrength; // Random strength between 0.01 and 0.99
         barrel.value = barrelStrength;
-        barrel.multiplier = Phaser.Math.FloatBetween(0.1, 0.25); // Random multiplier between 0.1x and 0.25x
 
         // Create a text object to display the strength
         barrel.strengthText = this.add
@@ -349,24 +408,6 @@ class GameScene extends Phaser.Scene {
     }
 
     hitBarrel(bullet, barrel) {
-        // bullet.destroy(); // Destroy the bullet upon collision
-
-        // // Decrease barrel strength by 1
-        // barrel.strength -= 1;
-
-        // // Check if barrel's strength has reached 0
-        // if (barrel.strength <= 0) {
-        //     // Add the barrel's multiplier to the player's score
-        //     this.score += barrel.multiplier;
-
-        //     // Destroy the barrel
-        //     barrel.destroy();
-
-        //     // Optional: Add explosion animation or effect when barrel is destroyed
-        //     this.add.text(barrel.x, barrel.y, "Boom!", {fontSize: "32px", color: "#FF0000"}); // Example visual cue
-        // }
-        // Destroy the bullet upon collision
-
         bullet.destroy();
 
         // Decrease barrel strength by 1
@@ -377,21 +418,17 @@ class GameScene extends Phaser.Scene {
 
         // Check if the barrel should be destroyed
         if (barrel.strength <= 0) {
-            // Add barrel's multiplier to player's score
-            // this.score += +barrel.value;
-            // this.textS.setText(this.score);
-
             this.updateScore(barrel.value);
 
             // Destroy the barrel and the text
             barrel.destroy();
             barrel.strengthText.destroy();
 
-            // Optional: Display an explosion or multiplier added effect
+            // Optional: Display an explosion  added effect
             this.add.text(barrel.x, barrel.y, "Boom!", {fontSize: "32px", color: "#FF0000"});
 
             this.explosion = this.add.sprite(barrel.x, barrel.y, "explosion");
-
+            this.updateLavel();
             this.explosion.play("explode");
 
             // try {
@@ -429,6 +466,7 @@ class GameScene extends Phaser.Scene {
         cashPot.destroy();
         bullet.destroy();
         cashPot.strengthText.destroy();
+        this.updateLavel();
     }
 
     hitBomb(bullet, bomb) {
@@ -461,20 +499,25 @@ class GameScene extends Phaser.Scene {
 
     gameOver() {
         // Restart the game or show "Game Over" screen
-
         //  reset the game screen
+        this.scene.start("End", {totalScore: this.score});
 
-        // this.scene.restart();
-        // this.score = 0;
-        // // resetting magazine Size.
-        // this.magazineSize = 20;
-        // this.bulletsRemaining = this.magazineSize; // Current bullets available
-        // this.canShoot = true;
-        // this.lastShotTime = 0; // To track when the last shot was fired
-        // this.isReloading = false;
+        // reset
+        this.score = 0;
+        // resetting magazine Size.
+        this.magazineSize = 20;
+        this.bulletsRemaining = this.magazineSize; // Current bullets available
+        this.canShoot = true;
+        this.lastShotTime = 0; // To track when the last shot was fired
+        this.isReloading = false;
+        // resetting game Lavel
+        this.gameLevel = 1;
+        this.gameSpeed = 20;
+        this.spawnSpeed = 1000;
+        this.setVelocityY = 80;
 
         // move to game over screen
-        this.scene.start("End", {totalScore: this.score});
+        // this.scene.restart();
     }
 }
 
