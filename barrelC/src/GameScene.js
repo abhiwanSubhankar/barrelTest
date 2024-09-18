@@ -36,7 +36,13 @@ class GameScene extends Phaser.Scene {
         this.gameSpeed = 50;
         this.spawnSpeed = 1000;
     }
+    init(data) {
+        console.log("init data", data);
 
+        this.betAmount = data.betAmount;
+        this.currentCoins = data.currentCoins;
+        this.setGameCurrentCoins = data.setGameCurrentCoins;
+    }
     preload() {
         // Load game objects assets here
         this.load.image("bg", "/bg2.png");
@@ -162,8 +168,8 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
-        console.log(">>>>>>>>>>>>>>>>>>>>>",this.game.config);
-        
+        // console.log(">>>>>>>>>>>>>>>>>>>>>",this.game.config);
+
         // Player movement
         if (this.cursors.left.isDown || this.keyA.isDown) {
             this.player.setVelocityX(-this.playerVelocity);
@@ -253,7 +259,7 @@ class GameScene extends Phaser.Scene {
     spawnEntry() {
         // between 1 to 10 getting 1 is 10% chance
         //  if want to increase the chance modyfy the range accordingly
-        console.log("spawn speed", this, this.delay);
+        // console.log("spawn speed", this, this.delay);
         let spawnCashPot = Phaser.Math.Between(1, 10);
 
         let width = this.game.config.width - 100;
@@ -501,6 +507,13 @@ class GameScene extends Phaser.Scene {
         // Restart the game or show "Game Over" screen
         //  reset the game screen
         this.scene.start("End", {totalScore: this.score});
+        // this.setGameCurrentCoins(50)
+        sessionStorage.setItem(
+            "gameOver",
+            JSON.stringify({
+                score: this.score,
+            })
+        );
 
         // reset
         this.score = 0;

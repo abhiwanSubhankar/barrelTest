@@ -11,6 +11,8 @@ function App() {
   const [betAmount, setBetAmount] = useState(0);
   const [currentWinnings, setCurrentWinnings] = useState(0);
 
+  const [score, setScore] = useState(JSON.parse(sessionStorage.getItem("gameOver")) || null);
+
 
   // game window size
   const [sizes, setSizes] = useState({
@@ -35,15 +37,17 @@ function App() {
         }
       },
       scene: [GameScene, EndScene],
-      updfn: {
+      init: {
+        betAmount: betAmount,
+        currentCoins: currentCoins,
         setGameCurrentCoins: function (score) {
-          setCurrentCoins(score)
+          setCurrentCoins(pre => pre + score)
         }
       }
     };
 
     const game = new Phaser.Game(config);
-    // game.scene.add("End", EndScene);
+
 
     setGameState(game);
     console.log(game)
@@ -69,6 +73,27 @@ function App() {
     }
   }, [])
 
+  useEffect(() => {
+    let gameOverObj = JSON.parse(sessionStorage.getItem("gameOver"));
+
+    console.log("score", gameOverObj);
+    if (gameOverObj?.score) {
+      let updatedCoin = +gameOverObj.score * betAmount;
+      setCurrentCoins(pre => pre + updatedCoin);
+
+      sessionStorage.removeItem("gameOver");
+    }
+    
+  }, [JSON.parse(sessionStorage.getItem("gameOver"))])
+
+  const handlePlaceBet = () => {
+
+    sessionStorage.setItem("betAmount", JSON.stringify({
+      betAmount
+    }))
+
+  }
+
 
   console.log("game State>>>>", gameState);
 
@@ -90,10 +115,10 @@ function App() {
           <input type="number" placeholder='Enter Bet aMOUNT' onChange={(e) => {
             setBetAmount(e.target.value)
           }} />
-          <button >Bet</button>
+          <button onClick={handlePlaceBet}>Place Bet</button>
         </div>
       </div>
-      <canvas id='gameCanvas'></canvas>
+      <canvas id='gameCanvas' ></canvas>
     </div>
   );
   // return <>
