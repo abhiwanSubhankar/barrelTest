@@ -8,8 +8,8 @@ export default class EndScene extends Phaser.Scene {
     }
 
     init(data) {
-        console.log("init",data);
-        
+        console.log("init", data);
+
         this.score = data.totalScore;
     }
 
@@ -20,13 +20,21 @@ export default class EndScene extends Phaser.Scene {
     create() {
         // this.model = this.sys.game.globals.model;
         // submitScore(this.model.userName, this.score);
+
+        this.layout = {
+            x: 0,
+            y: 0,
+            width: 200,
+            height: 600,
+        };
+
         this.bgImage = this.add.image(0, -150, "game-over").setOrigin(0, 0);
 
         this.add.text(120, 50, `Your Score : ${this.score}`, {fontSize: 18});
 
         this.add.text(150, 200, `Game Over`, {fontSize: 38});
 
-        this.returnBtn = new Button(this, 400, 545, "blueButton1", "blueButton2", "Reload", "GameScene");
+        this.returnBtn = new Button(this, 400, 545, "blueButton1", "blueButton2", "Reload", "Start","restart");
 
         // this.TitleButton = new Button(this, 250, 510, 'blueButton1', 'blueButton2', 'Menu', 'Title');
         // this.LeaderBoardButton = new Button(this, 550, 510, 'blueButton1', 'blueButton2', 'High Score', 'Leaderboard');

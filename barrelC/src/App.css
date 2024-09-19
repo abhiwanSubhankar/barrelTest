@@ -6,6 +6,8 @@
 }
 .App>div{
     width: 16rem;
+    /* position: absolute; */
+    text-align: center;
     /* height: 100vh; */
 }
 canvas {

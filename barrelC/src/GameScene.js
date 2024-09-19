@@ -1,5 +1,7 @@
 import Phaser from "phaser";
 import axios from "axios";
+import { publish } from "./CustomEvents/events";
+import { updateScore } from "./CustomEvents/eventKeys";
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -67,6 +69,25 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+        // Creating Form    
+        // this.formUtil = new this.formUtil({
+        //     scene: this,
+        //     rows: 11,
+        //     cols: 11,
+        // });
+        // this.formUtil.showNumbers();
+        // this.formUtil.scaleToGameW("myText", 0.3);
+        // this.formUtil.placeElementAt(16, "myText", true);
+        // this.formUtil.scaleToGameW("area51", 0.8);
+        // this.formUtil.scaleToGameH("area51", 0.5);
+        // this.formUtil.placeElementAt(60, "area51", true, true);
+        // this.formUtil.addChangeCallback("area51", this.textAreaChanged, this);
+       
+        // Creating Form
+
+
+
+
         // add Background
         this.add.image(0, 0, "bg").setOrigin(0, 0).setScale(2);
 
@@ -216,6 +237,11 @@ class GameScene extends Phaser.Scene {
             // console.log(this.spawnSpeed);
             // this.spawnSpeed = this.spawnSpeed;
         }
+    }
+
+    textAreaChanged() {
+        var text = this.formUtil.getTextAreaValue("area51");
+        console.log(text);
     }
 
     shootBullet() {
@@ -505,6 +531,11 @@ class GameScene extends Phaser.Scene {
 
     gameOver() {
         // Restart the game or show "Game Over" screen
+
+        // dispatch game over event
+
+        publish(updateScore,{score:this.score});
+         
         //  reset the game screen
         this.scene.start("End", {totalScore: this.score});
         // this.setGameCurrentCoins(50)
