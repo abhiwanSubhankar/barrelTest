@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import axios from "axios";
-import { publish } from "./CustomEvents/events";
-import { updateScore } from "./CustomEvents/eventKeys";
+import {publish} from "./CustomEvents/events";
+import {updateScore} from "./CustomEvents/eventKeys";
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -35,8 +35,10 @@ class GameScene extends Phaser.Scene {
 
         //  game Lavel
         this.gameLevel = 1;
+        this.gamePreviousLevel = 1;
         this.gameSpeed = 50;
         this.spawnSpeed = 1000;
+        this.spawnObject; // storing the timer function for spawning barrel,bobmb,cashpod
     }
     init(data) {
         console.log("init data", data);
@@ -47,9 +49,10 @@ class GameScene extends Phaser.Scene {
     }
     preload() {
         // Load game objects assets here
-        this.load.image("bg", "/bg2.png");
+        this.load.image("bg", "/bg3.jpg");
         this.load.image("barrel", "barrel.svg");
-        this.load.image("player", "player.svg");
+        this.load.image("player", "shooter.png");
+        // this.load.image("player", "player.svg");
         this.load.image("bullet", "bullet.svg");
         this.load.image("cashpot", "cash.svg");
         this.load.image("bomb", "bomb.svg");
@@ -69,7 +72,7 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // Creating Form    
+        // Creating Form
         // this.formUtil = new this.formUtil({
         //     scene: this,
         //     rows: 11,
@@ -82,14 +85,11 @@ class GameScene extends Phaser.Scene {
         // this.formUtil.scaleToGameH("area51", 0.5);
         // this.formUtil.placeElementAt(60, "area51", true, true);
         // this.formUtil.addChangeCallback("area51", this.textAreaChanged, this);
-       
+
         // Creating Form
 
-
-
-
         // add Background
-        this.add.image(0, 0, "bg").setOrigin(0, 0).setScale(2);
+        this.add.image(0, 0, "bg").setOrigin(0, 0).setScale(0.35);
 
         this.userNameField = document.getElementById("txtName");
         // this.userNameField.style.display = "block";
@@ -135,10 +135,11 @@ class GameScene extends Phaser.Scene {
         // Add player sprite
         this.player = this.physics.add
         .image(this.game.config.width - this.game.config.width / 2, this.game.config.height - 80, "player")
+        .setScale(0.12)
         .setCollideWorldBounds(true);
 
-        this.player.setCircle(26);
-        this.player.setCircle(28, this.player.width / 2 - 26, this.player.height / 2 - 26);
+        this.player.setCircle(this.player.width / 2);
+        // this.player.setCircle(28, this.player.width / 2 - 26, this.player.height / 2 - 26);
 
         // Create barrel group
         this.barrels = this.physics.add.group();
@@ -165,7 +166,7 @@ class GameScene extends Phaser.Scene {
         this.bullets = this.physics.add.group().setOrigin(0, 0);
 
         // Barrels, cashpod and bombs falling logic
-        this.time.addEvent({
+        this.spawnObject = this.time.addEvent({
             delay: this.spawnSpeed, // Adjust the delay of appring barrel/cp/bomb as needed in ms
             callback: this.spawnEntry,
             callbackScope: this,
@@ -183,9 +184,13 @@ class GameScene extends Phaser.Scene {
 
         // Shooting and collision / overlap logic
         this.physics.add.overlap(this.bullets, this.barrels, this.hitBarrel, null, this);
-        this.physics.add.collider(this.player, this.barrels, this.gameOver, null, this);
+
         this.physics.add.overlap(this.bullets, this.cashPots, this.hitCashPot, null, this);
         this.physics.add.overlap(this.bullets, this.bombs, this.hitBomb, null, this);
+
+        this.physics.add.collider(this.player, this.barrels, this.gameOver, null, this);
+        this.physics.add.collider(this.player, this.cashPots, this.gameOver, null, this);
+        this.physics.add.collider(this.player, this.bombs, this.gameOver, null, this);
     }
 
     update() {
@@ -239,10 +244,11 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    textAreaChanged() {
-        var text = this.formUtil.getTextAreaValue("area51");
-        console.log(text);
-    }
+    // trying for in canvas form
+    // textAreaChanged() {
+    //     var text = this.formUtil.getTextAreaValue("area51");
+    //     console.log(text);
+    // }
 
     shootBullet() {
         if (this.bulletsRemaining > 0 && this.canShoot) {
@@ -285,7 +291,8 @@ class GameScene extends Phaser.Scene {
     spawnEntry() {
         // between 1 to 10 getting 1 is 10% chance
         //  if want to increase the chance modyfy the range accordingly
-        // console.log("spawn speed", this, this.delay);
+
+        console.log("spawn speed", this.spawnSpeed);
         let spawnCashPot = Phaser.Math.Between(1, 10);
 
         let width = this.game.config.width - 100;
@@ -303,51 +310,85 @@ class GameScene extends Phaser.Scene {
     }
 
     updateLavel() {
-        if (this.score >= 0 && this.score < 0.1) {
-            this.gameLevel = 1;
-            this.setVelocityY += this.gameSpeed;
-            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
-        } else if (this.score >= 0.1 && this.score < 0.2) {
-            this.gameLevel = 2;
-            this.setVelocityY += this.gameSpeed;
-            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
-        } else if (this.score >= 0.2 && this.score < 0.3) {
-            this.gameLevel = 3;
-            this.setVelocityY += this.gameSpeed;
-            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
-        } else if (this.score >= 0.3 && this.score < 0.4) {
-            this.gameLevel = 4;
-            this.setVelocityY += this.gameSpeed;
-            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
-        } else if (this.score >= 0.4 && this.score < 0.5) {
-            this.gameLevel = 5;
-            this.setVelocityY += this.gameSpeed;
-            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
-        } else if (this.score >= 0.5 && this.score < 0.6) {
-            this.gameLevel = 6;
-            this.setVelocityY += this.gameSpeed;
-            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
-        } else if (this.score >= 0.6 && this.score < 0.7) {
-            this.gameLevel = 7;
-            this.setVelocityY += this.gameSpeed;
-            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
-        } else if (this.score >= 0.7 && this.score < 0.8) {
-            this.gameLevel = 8;
-            this.setVelocityY += this.gameSpeed;
-            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 4;
-        } else if (this.score >= 0.8 && this.score < 0.9) {
-            this.gameLevel = 9;
-            this.setVelocityY += this.gameSpeed;
-            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 4;
-        } else if (this.score >= 0.9 && this.score <= 1) {
-            this.gameLevel = 10;
-            this.setVelocityY += this.gameSpeed;
-            // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 4;
+        // if (this.score >= 0 && this.score < 0.1) {
+        //     this.gameLevel = 1;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.1 && this.score < 0.2) {
+        //     this.gameLevel = 2;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.2 && this.score < 0.3) {
+        //     this.gameLevel = 3;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.3 && this.score < 0.4) {
+        //     this.gameLevel = 4;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.4 && this.score < 0.5) {
+        //     this.gameLevel = 5;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.5 && this.score < 0.6) {
+        //     this.gameLevel = 6;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.6 && this.score < 0.7) {
+        //     this.gameLevel = 7;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.7 && this.score < 0.8) {
+        //     this.gameLevel = 8;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 4;
+        // } else if (this.score >= 0.8 && this.score < 0.9) {
+        //     this.gameLevel = 9;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 4;
+        // } else if (this.score >= 0.9 && this.score <= 1) {
+        //     this.gameLevel = 10;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 4;
+        // }
+
+        // if (this.spawnSpeed > 200) {
+        //     this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        //     this.spawnObject.delay -= 100;
+        // }
+        const score = this.score;
+
+        // Dynamic game level calculation
+        this.gameLevel = Math.floor(score * 10) + 1;
+
+        if (this.gameLevel !== this.gamePreviousLevel) {
+            //  increasing game speed and spawning object by game lavel.
+            this.spawnSpeed -= this.gameSpeed * this.gameLevel;
+
+            // set fall velocity
+            // this.setVelocityY += this.gameSpeed * this.gameLevel;
+            this.setVelocityY += 5* this.gameLevel;
+
+            if (this.spawnSpeed > 200) {
+                this.spawnObject.delay = this.spawnSpeed;
+                //= Math.max(this.spawnObject.delay - 100, 50); // Ensures delay does not go negative
+            }
+            this.gamePreviousLevel = this.gameLevel;
+            console.log("lavels>>>>>", this.gameLevel, this.gamePreviousLevel, this.spawnObject.delay);
         }
 
-        if (this.spawnSpeed > 200) {
-            this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
-        }
+        // this.setVelocityY += this.gameSpeed;
+
+        // // Dynamic spawn speed adjustment
+
+        // Adjust velocity according to the game level
+        // this.setVelocityY = this.baseVelocityY + this.gameLevel * this.gameSpeed;
+
+        // Adjust spawn speed according to the game level
+        // if (this.spawnSpeed > 200) {
+        //     this.spawnSpeed = this.baseSpawnSpeed - this.gameSpeed * this.gameLevel * 5;
+        //     this.spawnObject.delay = Math.max(this.spawnObject.delay - this.gameLevel * 100, 50); // Limit delay reduction to avoid it becoming too fast
+        // }
     }
 
     spawnCashPot(width) {
@@ -534,8 +575,8 @@ class GameScene extends Phaser.Scene {
 
         // dispatch game over event
 
-        publish(updateScore,{score:this.score});
-         
+        publish(updateScore, {score: this.score});
+
         //  reset the game screen
         this.scene.start("End", {totalScore: this.score});
         // this.setGameCurrentCoins(50)

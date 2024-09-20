@@ -14,8 +14,9 @@ export default class PreStartScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("player", "player.svg");
-        this.load.image("bg", "/bg2.png");
+        // this.load.image("player", "player.svg");
+        this.load.image("player", "shooter.png");
+        this.load.image("bg", "/bg3.jpg");
 
         // buttons
         this.load.image("blueButton1", "/blue_button02.png");
@@ -25,15 +26,16 @@ export default class PreStartScene extends Phaser.Scene {
     create() {
         // this.model = this.sys.game.globals.model;
         // submitScore(this.model.userName, this.score);
-        this.bgImage = this.add.image(0, 0, "bg").setOrigin(0, 0).setScale(2);
+        this.bgImage = this.add.image(0, 0, "bg").setOrigin(0, 0).setScale(0.35);
 
         // Add player sprite
         this.player = this.physics.add
         .image(this.game.config.width - this.game.config.width / 2, this.game.config.height - 80, "player")
+        .setScale(0.12)
         .setCollideWorldBounds(true);
 
-        this.player.setCircle(26);
-        this.player.setCircle(28, this.player.width / 2 - 26, this.player.height / 2 - 26);
+        this.player.setCircle(this.player.width/2);
+        // this.player.setCircle(28, this.player.width / 2 - 26, this.player.height / 2 - 26);
 
         this.startButton = new Button(
             this,

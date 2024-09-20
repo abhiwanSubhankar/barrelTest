@@ -10,7 +10,7 @@
     text-align: center;
     /* height: 100vh; */
 }
-canvas {
+.App>canvas {
 width:calc(100% - 16rem);
 height: 100vh;
 }

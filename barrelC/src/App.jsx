@@ -10,11 +10,8 @@ import PreStartScene from './scenes/preStart';
 function App() {
   const [gameState, setGameState] = useState();
 
-  const [currentCoins, setCurrentCoins] = useState(524);
+  const [currentCoins, setCurrentCoins] = useState(500);
   const [betAmount, setBetAmount] = useState(JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0);
-  const [currentWinnings, setCurrentWinnings] = useState(0);
-
-  const [score, setScore] = useState(JSON.parse(sessionStorage.getItem("gameOver")) || null);
 
 
   // game window size
@@ -25,13 +22,13 @@ function App() {
 
   useEffect(() => {
 
-    let gameCanvas = document.getElementById("gameCanvas")
-
+    let gameCanvas = document.getElementById("gameCanvas");
+//  document.querySelector(".App>canvas")
     const config = {
       type: Phaser.WEBGL,
       width: sizes.width,
       height: sizes.height,
-      canvas: gameCanvas,
+      canvas:gameCanvas,
       physics: {
         default: 'arcade',
         arcade: {
@@ -77,18 +74,21 @@ function App() {
   }
 
   useEffect(() => {
+    // custom event listiner for update the score.
 
     subscribe(updateScore, (data) => {
       console.log("event data", data);
-      let finalScore = (+betAmount * data.detail.score)
-      setCurrentCoins(pre => pre + finalScore)
+      let finalScore = ((+betAmount) * data.detail.score)
+      setCurrentCoins(pre => pre + finalScore);
+      console.count("score",)
+      console.log(betAmount, finalScore);
     })
 
     return () => {
       unsubscribe(updateScore);
     }
 
-  }, [])
+  }, [betAmount])
 
   return (
     <div className="App">
@@ -105,8 +105,6 @@ function App() {
 
             {/* <input type="text" id="myText" />
             <textarea id="area51">SOME TEXT HERE</textarea> */}
-
-
           </div>
           <input type="number" placeholder='Enter Bet aMOUNT' value={betAmount} onChange={(e) => {
             setBetAmount(e.target.value)
@@ -114,7 +112,8 @@ function App() {
           <button onClick={handlePlaceBet}>Place Bet</button>
         </div>
       </div>
-      <canvas id='gameCanvas' ></canvas>
+
+      <canvas id='gameCanvas' width={sizes.width} height={sizes.height}></canvas>
 
     </div>
   );
