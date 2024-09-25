@@ -6,12 +6,15 @@ import "./App.css";
 import { subscribe, unsubscribe } from './CustomEvents/events';
 import { updateScore } from './CustomEvents/eventKeys';
 import PreStartScene from './scenes/preStart';
+import PracticeGameScene from './scenes/practiceGame';
 
 function App() {
   const [gameState, setGameState] = useState();
 
   const [currentCoins, setCurrentCoins] = useState(500);
   const [betAmount, setBetAmount] = useState(JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0);
+
+  const [gameMode, setGameMode] = useState("");
 
 
   // game window size
@@ -22,29 +25,53 @@ function App() {
 
   useEffect(() => {
 
-    let gameCanvas = document.getElementById("gameCanvas");
-//  document.querySelector(".App>canvas")
-    const config = {
-      type: Phaser.WEBGL,
-      width: sizes.width,
-      height: sizes.height,
-      canvas:gameCanvas,
-      physics: {
-        default: 'arcade',
-        arcade: {
-          gravity: { y: 0 },
-          debug: true
-        }
-      },
-      scene: [PreStartScene, GameScene, EndScene],
-    };
+    let game;
+
+    // if (gameMode === "practice") {
+    //   let gameCanvas = document.getElementById("gameCanvas");
+    //   //  document.querySelector(".App>canvas")
+    //   const config = {
+    //     type: Phaser.WEBGL,
+    //     width: sizes.width,
+    //     height: sizes.height,
+    //     canvas: gameCanvas,
+    //     physics: {
+    //       default: 'arcade',
+    //       arcade: {
+    //         gravity: { y: 0 },
+    //         debug: true
+    //       }
+    //     },
+    //     scene: [PreStartScene, PracticeGameScene, EndScene],
+    //   };
+    //    game = new Phaser.Game(config);
+    // } else {
+
+      let gameCanvas = document.getElementById("gameCanvas");
+      //  document.querySelector(".App>canvas")
+      const config = {
+        type: Phaser.WEBGL,
+        width: sizes.width,
+        height: sizes.height,
+        canvas: gameCanvas,
+        physics: {
+          default: 'arcade',
+          arcade: {
+            gravity: { y: 0 },
+            debug: true
+          }
+        },
+        scene: [PreStartScene, GameScene, EndScene],
+      };
+       game = new Phaser.Game(config);
+    // }
 
 
-    const game = new Phaser.Game(config);
-    game.scene.layout
 
-    setGameState(game);
-    console.log(game)
+    // game.scene.start(game.scene.getScenes());
+
+    // setGameState(game);
+    // console.log(game)
 
     return () => {
       game.destroy(true);
@@ -99,7 +126,7 @@ function App() {
           <div>
             <h3>Current coin</h3>
             <h4>{currentCoins}</h4>
-
+            <br />
             <h3>Current Bet</h3>
             <h4>{betAmount}</h4>
 
@@ -110,6 +137,19 @@ function App() {
             setBetAmount(e.target.value)
           }} />
           <button onClick={handlePlaceBet}>Place Bet</button>
+
+
+          <div>
+            <h2>selected game Mode :- {gameMode}</h2>
+            <select name="" id="" onChange={(e) => {
+              setGameMode(e.target.value)
+              sessionStorage.setItem("gameMode",e.target.value);
+            }}>
+              <option value="">Selet Game mode</option>
+              <option value="practice"> practice</option>
+              <option value="normal">Normal</option>
+            </select>
+          </div>
         </div>
       </div>
 

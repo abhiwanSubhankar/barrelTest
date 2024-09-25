@@ -1,11 +1,12 @@
+
 import Phaser from "phaser";
 import axios from "axios";
-import {publish} from "./CustomEvents/events";
-import {updateScore} from "./CustomEvents/eventKeys";
+// import {publish} from "./CustomEvents/events";
+// import {updateScore} from "./CustomEvents/eventKeys";
 
-class GameScene extends Phaser.Scene {
+class PracticeGameScene extends Phaser.Scene {
     constructor() {
-        super({key: "GameScene"});
+        super({key: "PracticeGameScene"});
         this.setVelocityY = 80;
         this.playerVelocity = 300;
         this.keyD;
@@ -40,13 +41,14 @@ class GameScene extends Phaser.Scene {
         this.spawnSpeed = 1000;
         this.spawnObject; // storing the timer function for spawning barrel,bobmb,cashpod
     }
+
     init(data) {
         console.log("init data", data);
-
         this.betAmount = data.betAmount;
         this.currentCoins = data.currentCoins;
         this.setGameCurrentCoins = data.setGameCurrentCoins;
     }
+
     preload() {
         // Load game objects assets here
         this.load.image("bg", "/bg3.jpg");
@@ -310,8 +312,52 @@ class GameScene extends Phaser.Scene {
     }
 
     updateLavel() {
-       console.log( "level updated");
-       
+        // if (this.score >= 0 && this.score < 0.1) {
+        //     this.gameLevel = 1;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.1 && this.score < 0.2) {
+        //     this.gameLevel = 2;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.2 && this.score < 0.3) {
+        //     this.gameLevel = 3;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.3 && this.score < 0.4) {
+        //     this.gameLevel = 4;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.4 && this.score < 0.5) {
+        //     this.gameLevel = 5;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.5 && this.score < 0.6) {
+        //     this.gameLevel = 6;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.6 && this.score < 0.7) {
+        //     this.gameLevel = 7;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        // } else if (this.score >= 0.7 && this.score < 0.8) {
+        //     this.gameLevel = 8;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 4;
+        // } else if (this.score >= 0.8 && this.score < 0.9) {
+        //     this.gameLevel = 9;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 4;
+        // } else if (this.score >= 0.9 && this.score <= 1) {
+        //     this.gameLevel = 10;
+        //     this.setVelocityY += this.gameSpeed;
+        //     // this.spawnSpeed -= this.gameSpeed * this.gameLevel * 4;
+        // }
+
+        // if (this.spawnSpeed > 200) {
+        //     this.spawnSpeed -= this.gameSpeed * this.gameLevel * 5;
+        //     this.spawnObject.delay -= 100;
+        // }
         const score = this.score;
 
         // Dynamic game level calculation
@@ -457,11 +503,8 @@ class GameScene extends Phaser.Scene {
             this.add.text(barrel.x, barrel.y, "Boom!", {fontSize: "32px", color: "#FF0000"});
 
             this.explosion = this.add.sprite(barrel.x, barrel.y, "explosion");
+            this.updateLavel();
             this.explosion.play("explode");
-
-            let gameMode = sessionStorage.getItem("gameMode");
-            gameMode !== "practice" && this.updateLavel();
-            // console.log("barre game mode",gameMode)
 
             // try {
             //     // {
@@ -498,11 +541,7 @@ class GameScene extends Phaser.Scene {
         cashPot.destroy();
         bullet.destroy();
         cashPot.strengthText.destroy();
-        let gameMode = sessionStorage.getItem("gameMode");
-        gameMode !== "practice" && this.updateLavel();
-
-        // console.log("cash Pod game mode",gameMode)
-
+        this.updateLavel();
     }
 
     hitBomb(bullet, bomb) {
@@ -570,30 +609,30 @@ class GameScene extends Phaser.Scene {
 
     saveGameState() {
         const gameState = {
-            playerPosition: {
-                x: this.player.x,
-                y: this.player.y,
-            },
-            score: this.score,
-            level: this.currentLevel,
-            health: this.playerHealth,
+          playerPosition: {
+            x: this.player.x,
+            y: this.player.y
+          },
+          score: this.score,
+          level: this.currentLevel,
+          health: this.playerHealth
         };
-
-        localStorage.setItem("phaserGameState", JSON.stringify(gameState));
-    }
-
-    loadGameState() {
-        const savedState = localStorage.getItem("phaserGameState");
+    
+        localStorage.setItem('phaserGameState', JSON.stringify(gameState));
+      }
+    
+      loadGameState() {
+        const savedState = localStorage.getItem('phaserGameState');
         if (savedState) {
-            const gameState = JSON.parse(savedState);
-            this.player.setPosition(gameState.playerPosition.x, gameState.playerPosition.y);
-            this.currentScore = gameState.score;
-            this.currentLevel = gameState.level;
-            this.playerHealth = gameState.health;
-
-            // Update any other elements based on saved data
+          const gameState = JSON.parse(savedState);
+          this.player.setPosition(gameState.playerPosition.x, gameState.playerPosition.y);
+          this.currentScore = gameState.score;
+          this.currentLevel = gameState.level;
+          this.playerHealth = gameState.health;
+    
+          // Update any other elements based on saved data
         }
-    }
+      }
 }
 
-export default GameScene;
+export default PracticeGameScene;
