@@ -49,9 +49,9 @@ class GameScene extends Phaser.Scene {
     }
     preload() {
         // Load game objects assets here
-        this.load.image("bg", "/bg3.jpg");
+        this.load.image("bg", "/bg.svg");
         this.load.image("barrel", "barrel.svg");
-        this.load.image("player", "shooter.png");
+        this.load.image("player", "player.svg");
         // this.load.image("player", "player.svg");
         this.load.image("bullet", "bullet.svg");
         this.load.image("cashpot", "cash.svg");
@@ -89,7 +89,9 @@ class GameScene extends Phaser.Scene {
         // Creating Form
 
         // add Background
-        this.add.image(0, 0, "bg").setOrigin(0, 0).setScale(0.35);
+        // this.loadGameState();
+
+        this.add.image(0, -80, "bg").setOrigin(0, 0).setScale(0.95);
 
         this.userNameField = document.getElementById("txtName");
         // this.userNameField.style.display = "block";
@@ -134,8 +136,8 @@ class GameScene extends Phaser.Scene {
 
         // Add player sprite
         this.player = this.physics.add
-        .image(this.game.config.width - this.game.config.width / 2, this.game.config.height - 80, "player")
-        .setScale(0.12)
+        .image(this.game.config.width - this.game.config.width / 2, this.game.config.height - 150, "player")
+        .setScale(0.7)
         .setCollideWorldBounds(true);
 
         this.player.setCircle(this.player.width / 2);
@@ -191,6 +193,8 @@ class GameScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.barrels, this.gameOver, null, this);
         this.physics.add.collider(this.player, this.cashPots, this.gameOver, null, this);
         this.physics.add.collider(this.player, this.bombs, this.gameOver, null, this);
+
+        this.loadGameState();
     }
 
     update() {
@@ -255,7 +259,7 @@ class GameScene extends Phaser.Scene {
             this.bulletsRemaining -= 1;
             this.updateMagazineBar();
 
-            let bullet = this.bullets.create(this.player.x, this.player.y - 20, "bullet");
+            let bullet = this.bullets.create(this.player.x, this.player.y - 70, "bullet");
             bullet.setVelocityY(-400); // Adjust speed
         }
 
@@ -266,6 +270,9 @@ class GameScene extends Phaser.Scene {
         // Update the last shot time
         this.lastShotTime = this.time.now;
         this.isReloading = false; // Stop reload if player shootss
+
+        // save game state to use after reload.
+        this.saveGameState();
     }
 
     // Check if we need to start reloading
@@ -310,8 +317,8 @@ class GameScene extends Phaser.Scene {
     }
 
     updateLavel() {
-       console.log( "level updated");
-       
+        console.log("level updated");
+
         const score = this.score;
 
         // Dynamic game level calculation
@@ -332,19 +339,6 @@ class GameScene extends Phaser.Scene {
             this.gamePreviousLevel = this.gameLevel;
             console.log("lavels>>>>>", this.gameLevel, this.gamePreviousLevel, this.spawnObject.delay);
         }
-
-        // this.setVelocityY += this.gameSpeed;
-
-        // // Dynamic spawn speed adjustment
-
-        // Adjust velocity according to the game level
-        // this.setVelocityY = this.baseVelocityY + this.gameLevel * this.gameSpeed;
-
-        // Adjust spawn speed according to the game level
-        // if (this.spawnSpeed > 200) {
-        //     this.spawnSpeed = this.baseSpawnSpeed - this.gameSpeed * this.gameLevel * 5;
-        //     this.spawnObject.delay = Math.max(this.spawnObject.delay - this.gameLevel * 100, 50); // Limit delay reduction to avoid it becoming too fast
-        // }
     }
 
     spawnCashPot(width) {
@@ -419,8 +413,8 @@ class GameScene extends Phaser.Scene {
 
         let barrelStrength = getRandomNumber().toFixed(2);
 
-        // Phaser.Math.Between(0.01, 0.99);
-        barrel.strength = barrelStrength; // Random strength between 0.01 and 0.99
+        // Phaser.Math.Between(0.01, 0.25);
+        barrel.strength = barrelStrength; // Random strength between 0.01 and 0.25
         barrel.value = barrelStrength;
 
         // Create a text object to display the strength
@@ -502,7 +496,6 @@ class GameScene extends Phaser.Scene {
         gameMode !== "practice" && this.updateLavel();
 
         // console.log("cash Pod game mode",gameMode)
-
     }
 
     hitBomb(bullet, bomb) {
@@ -569,29 +562,79 @@ class GameScene extends Phaser.Scene {
     }
 
     saveGameState() {
+        const bombsData = this.bombs.getChildren().map((bomb) => ({
+            x: bomb.x,
+            y: bomb.y,
+            velocityX: bomb.body.velocity.x,
+            velocityY: bomb.body.velocity.y,
+        }));
+        const cashpotData = this.cashPots.getChildren().map((cashPot) => ({
+            x: cashPot.x,
+            y: cashPot.y,
+            velocityX: cashPot.body.velocity.x,
+            velocityY: cashPot.body.velocity.y,
+            value: cashPot.value,
+        }));
+
+        const barrelsData = this.barrels.getChildren().map((barrel) => ({
+            x: barrel.x,
+            y: barrel.y,
+            velocityX: barrel.body.velocity.x,
+            velocityY: barrel.body.velocity.y,
+            value: barrel.value,
+            strength: barrel.strength,
+        }));
+
         const gameState = {
             playerPosition: {
                 x: this.player.x,
                 y: this.player.y,
             },
             score: this.score,
-            level: this.currentLevel,
-            health: this.playerHealth,
+            gameLevel: this.gameLevel,
+            bulletsRemaining: this.bulletsRemaining,
+            barrels: barrelsData,
+            bombs: bombsData,
+            cashPots: cashpotData,
         };
+
+        console.log("barrel bomb, cashpot", gameState,this.cashPots, this.barrels, this.bombs);
 
         localStorage.setItem("phaserGameState", JSON.stringify(gameState));
     }
 
     loadGameState() {
         const savedState = localStorage.getItem("phaserGameState");
+
         if (savedState) {
             const gameState = JSON.parse(savedState);
-            this.player.setPosition(gameState.playerPosition.x, gameState.playerPosition.y);
-            this.currentScore = gameState.score;
-            this.currentLevel = gameState.level;
-            this.playerHealth = gameState.health;
 
+            this.player.setPosition(gameState.playerPosition.x, gameState.playerPosition.y);
+
+            this.score = gameState.score;
+            this.gameLevel = gameState.gameLevel;
+            this.bulletsRemaining = gameState.bulletsRemaining;
+
+
+            //  create every barrel with the saved value.
+
+            gameState.bombs.forEach(bombData => {
+                const bomb = this.bombsGroup.create(bombData.x, bombData.y, 'bomb');
+                bomb.body.setVelocity(bombData.velocityX, bombData.velocityY);
+              });
+            gameState.barrels.forEach(bombData => {
+                const bomb = this.bombsGroup.create(bombData.x, bombData.y, 'bomb');
+                bomb.body.setVelocity(bombData.velocityX, bombData.velocityY);
+              });
+            gameState.cashPots.forEach(bombData => {
+                const bomb = this.bombsGroup.create(bombData.x, bombData.y, 'bomb');
+                bomb.body.setVelocity(bombData.velocityX, bombData.velocityY);
+              });
+            // this.barrels = gameState.barrels;
+            // this.bombs = gameState.bombs;
+            // this.cashPots = gameState.cashPots;
             // Update any other elements based on saved data
+            console.log("game bomb obj", gameState.bombs);
         }
     }
 }

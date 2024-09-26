@@ -17,6 +17,8 @@ function App() {
   const [gameMode, setGameMode] = useState("");
 
 
+
+
   // game window size
   const [sizes, setSizes] = useState({
     height: window.innerHeight,
@@ -47,28 +49,24 @@ function App() {
     //    game = new Phaser.Game(config);
     // } else {
 
-      let gameCanvas = document.getElementById("gameCanvas");
-      //  document.querySelector(".App>canvas")
-      const config = {
-        type: Phaser.WEBGL,
-        width: sizes.width,
-        height: sizes.height,
-        canvas: gameCanvas,
-        physics: {
-          default: 'arcade',
-          arcade: {
-            gravity: { y: 0 },
-            debug: true
-          }
-        },
-        scene: [PreStartScene, GameScene, EndScene],
-      };
-       game = new Phaser.Game(config);
+    let gameCanvas = document.getElementById("gameCanvas");
+    //  document.querySelector(".App>canvas")
+    const config = {
+      type: Phaser.WEBGL,
+      width: sizes.width,
+      height: sizes.height,
+      canvas: gameCanvas,
+      physics: {
+        default: 'arcade',
+        arcade: {
+          gravity: { y: 0 },
+          debug: true
+        }
+      },
+      scene: [PreStartScene, GameScene, EndScene],
+    };
+    game = new Phaser.Game(config);
     // }
-
-
-
-    // game.scene.start(game.scene.getScenes());
 
     // setGameState(game);
     // console.log(game)
@@ -120,30 +118,44 @@ function App() {
   return (
     <div className="App">
       <div>
-        <h1>Barrel Shooter Game</h1>
+        <div>
+          <img src="/lOGO.svg" alt="logo" width={"80%"} />
+        </div>
 
         <div>
           <div>
-            <h3>Current coin</h3>
-            <h4>{currentCoins}</h4>
+            <h3>Balance</h3>
+            <h4 className='balance'>{currentCoins}</h4>
             <br />
-            <h3>Current Bet</h3>
-            <h4>{betAmount}</h4>
+            <h3>Bet Size</h3>
 
-            {/* <input type="text" id="myText" />
-            <textarea id="area51">SOME TEXT HERE</textarea> */}
+            <div className='betAmountWrapper'>
+
+              <button className='incdecButton'>
+                <img src="/minus.svg" alt="plus" />
+              </button>
+
+              <input type="number" className='balance' placeholder='Enter Bet aMOUNT' value={betAmount} onChange={(e) => {
+                setBetAmount(e.target.value)
+              }} />
+
+              <button className='incdecButton'>
+                <img src="/plus.svg" alt="minus" />
+              </button>
+            </div>
+
           </div>
-          <input type="number" placeholder='Enter Bet aMOUNT' value={betAmount} onChange={(e) => {
-            setBetAmount(e.target.value)
-          }} />
-          <button onClick={handlePlaceBet}>Place Bet</button>
 
+          <br />
+          <button onClick={handlePlaceBet} className='button'>Place Bet</button>
+
+          <button onClick={handlePlaceBet} className='button'>connect wallet</button>
 
           <div>
             <h2>selected game Mode :- {gameMode}</h2>
-            <select name="" id="" onChange={(e) => {
+            <select name="" id="" className='balance' onChange={(e) => {
               setGameMode(e.target.value)
-              sessionStorage.setItem("gameMode",e.target.value);
+              sessionStorage.setItem("gameMode", e.target.value);
             }}>
               <option value="">Selet Game mode</option>
               <option value="practice"> practice</option>

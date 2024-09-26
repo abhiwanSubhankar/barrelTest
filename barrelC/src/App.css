@@ -1,17 +1,70 @@
-.cc{
-    color: #ff8c00 ;
-}
-.App{
-    display: flex;
-}
-.App>div{
-    width: 16rem;
-    /* position: absolute; */
-    text-align: center;
-    /* height: 100vh; */
-}
-.App>canvas {
-width:calc(100% - 16rem);
-height: 100vh;
+.cc {
+    color: #ff8c00;
 }
 
+.App {
+    display: flex;
+    background: #858585;
+}
+
+.App>div {
+    width: 16rem;
+    text-align: center;
+    border-radius: 15px 0 0 15px;
+    background: radial-gradient(50.01% 50.01% at 50.43% 24.99%, #712E81 0%, #2F1753 100%);
+    background-position: center;
+    /* position: absolute; */
+    /* height: 100vh; */
+}
+
+.App>canvas {
+    width: calc(100% - 16rem);
+    height: 100vh;
+}
+
+.balance {
+    border: 1.98px solid rgba(217, 143, 230, 1);
+    border-radius: 8px;
+    width: 60%;
+    margin: 10px auto;
+    padding: 5px 10px;
+    background: local;
+    text-align: center;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.button {
+    background: rgb(243, 224, 119);
+    background: linear-gradient(59deg, rgb(240, 215, 77) 22%, rgba(241, 164, 88, 1) 60%);
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 5px 20px;
+    color: rgb(231, 231, 231);
+    text-shadow: 1px 1px #262626;
+    border: none;
+    margin-bottom: 30px;
+}
+
+.incdecButton{
+    background: local;
+    border: none;
+    width: 30px;
+    cursor: pointer;
+}
+.incdecButton >img{
+    width: 100%;
+}
+.betAmountWrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
+}
+select > option{
+    background-color: #712E81;
+}
+select > option:active{
+    background-color: #542460;
+}
