@@ -31,11 +31,13 @@ export default class PreStartScene extends Phaser.Scene {
         // Add player sprite
         this.player = this.physics.add
         .image(this.game.config.width - this.game.config.width / 2, this.game.config.height - 150, "player")
-        .setScale(0.70)
+        .setScale(0.7)
         .setCollideWorldBounds(true);
 
-        this.player.setCircle(this.player.width/2);
+        this.player.setCircle(this.player.width / 2);
         // this.player.setCircle(28, this.player.width / 2 - 26, this.player.height / 2 - 26);
+
+        let unfinishedGame = JSON.parse(localStorage.getItem("phaserGameState"));
 
         this.startButton = new Button(
             this,
@@ -43,7 +45,7 @@ export default class PreStartScene extends Phaser.Scene {
             this.buttonY,
             "blueButton1",
             "blueButton2",
-            "Start Game",
+            unfinishedGame ? "Resume" : "Start Game",
             "GameScene",
             "startScene"
         );

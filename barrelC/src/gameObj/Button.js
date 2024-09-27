@@ -18,13 +18,17 @@ export default class Button extends Phaser.GameObjects.Container {
             if (cb === "startScene") {
                 // console.log("start scgffgff called.");
                 let betAmount = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount;
-                if (betAmount && +betAmount >= 1) {
+
+                let gameMode = sessionStorage.getItem("gameMode");
+                if (gameMode === "practice") {
+                    this.scene.scene.start(targetScene);
+                } else if (betAmount && +betAmount >= 1) {
                     this.scene.scene.start(targetScene);
                 } else {
                     this.errortext = this.scene.add.text(-200, -50, "Please enter a valid BetAmount", {
                         fontSize: "20px",
                         fill: "red",
-                        fontWidth:"800"
+                        fontWidth: 900,
                     });
 
                     this.add(this.errortext);

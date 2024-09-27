@@ -54,7 +54,7 @@ class GameScene extends Phaser.Scene {
         this.load.image("player", "player.svg");
         // this.load.image("player", "player.svg");
         this.load.image("bullet", "bullet.svg");
-        this.load.image("cashpot", "cash.svg");
+        this.load.image("cashpot", "cashPot.svg");
         this.load.image("bomb", "bomb.svg");
         this.load.spritesheet(
             "explosion", // spiteSheet name
@@ -65,10 +65,34 @@ class GameScene extends Phaser.Scene {
                 // endFrame: 23, // Total frames in the sprite sheet
             } // info for the spiteSheet.
         );
+        this.load.spritesheet(
+            "wheelFront", // spiteSheet name
+            "/front.png", // spite sheet asset path
+            {
+                frameWidth: 56, // Width of each frame
+                frameHeight: 76, // Height of each frame
+                // endFrame: 23, // Total frames in the sprite sheet
+            } // info for the spiteSheet.
+        );
+        // this.load.spritesheet(
+        //     "wheelBack", // spiteSheet name
+        //     "/back.png", // spite sheet asset path
+        //     {
+        //         frameWidth: 16, // Width of each frame
+        //         frameHeight: 16, // Height of each frame
+        //         // endFrame: 23, // Total frames in the sprite sheet
+        //     } // info for the spiteSheet.
+        // );
 
         // buttons
         this.load.image("blueButton1", "/blue_button02.png");
         this.load.image("blueButton2", "/blue_button03.png");
+
+        // game sounds
+        this.load.audio("explosion", "/sounds/BarrelBlasting.wav");
+        this.load.audio("shoot", "/sounds/cannonFire.mp3");
+        this.load.audio("wheel", "/sounds/CannonWheel.mp3");
+        this.load.audio("cashPot", "/sounds/cashpot.mp3");
     }
 
     create() {
@@ -90,6 +114,20 @@ class GameScene extends Phaser.Scene {
 
         // add Background
         // this.loadGameState();
+
+        //add sound to the game
+
+        // Create sound objects
+        this.explosionSound = this.sound.add("explosion");
+        this.shootSound = this.sound.add("shoot");
+        this.cashPotSound = this.sound.add("cashPot", {
+            loop: false, // Set to true if you want the background music to loop
+            // volume: 0.5, // Adjust the volume
+        });
+        this.wheelSound = this.sound.add("wheel", {
+            loop: true,
+            // volume: 0.5, // Adjust the volume
+        });
 
         this.add.image(0, -80, "bg").setOrigin(0, 0).setScale(0.95);
 
@@ -126,6 +164,17 @@ class GameScene extends Phaser.Scene {
                 // {start: 0, end: 23}
             ),
             frameRate: 20,
+            hideOnComplete: true,
+            // repeat: 0,
+            // duration: 2000,
+        });
+        this.anims.create({
+            key: "rotateWheel", // this create animation key not the pre load invock key.
+            frames: this.anims.generateFrameNumbers(
+                "wheelFront"
+                // {start: 0, end: 23}
+            ),
+            frameRate: 15,
             hideOnComplete: true,
             // repeat: 0,
             // duration: 2000,
@@ -203,10 +252,20 @@ class GameScene extends Phaser.Scene {
         // Player movement
         if (this.cursors.left.isDown || this.keyA.isDown) {
             this.player.setVelocityX(-this.playerVelocity);
+
+            if (!this.wheelSound.isPlaying) {
+                this.wheelSound.play();
+            }
         } else if (this.cursors.right.isDown || this.keyD.isDown) {
             this.player.setVelocityX(this.playerVelocity);
+            if (!this.wheelSound.isPlaying) {
+                this.wheelSound.play();
+            }
         } else {
             this.player.setVelocityX(0);
+            if (this.wheelSound.isPlaying) {
+                this.wheelSound.stop();
+            }
         }
 
         // Shooting logic with cooldown
@@ -241,11 +300,6 @@ class GameScene extends Phaser.Scene {
 
         this.textS.setText(`Score :- ${this.score}`);
         this.levelText.setText(`Lavel :- ${this.gameLevel}`);
-
-        if (this.spawnSpeed > 200) {
-            // console.log(this.spawnSpeed);
-            // this.spawnSpeed = this.spawnSpeed;
-        }
     }
 
     // trying for in canvas form
@@ -256,6 +310,7 @@ class GameScene extends Phaser.Scene {
 
     shootBullet() {
         if (this.bulletsRemaining > 0 && this.canShoot) {
+            this.shootSound.play();
             this.bulletsRemaining -= 1;
             this.updateMagazineBar();
 
@@ -270,9 +325,6 @@ class GameScene extends Phaser.Scene {
         // Update the last shot time
         this.lastShotTime = this.time.now;
         this.isReloading = false; // Stop reload if player shootss
-
-        // save game state to use after reload.
-        this.saveGameState();
     }
 
     // Check if we need to start reloading
@@ -314,6 +366,9 @@ class GameScene extends Phaser.Scene {
         } else {
             this.spawnBarrel(width);
         }
+
+        // save game state to use after reload.
+        this.saveGameState();
     }
 
     updateLavel() {
@@ -348,8 +403,10 @@ class GameScene extends Phaser.Scene {
         let cashPot = this.cashPots.create(x, 0, "cashpot");
         cashPot.setVelocityY(this.setVelocityY); // Adjust falling speed
 
+        this.cashPotSound.play();
+
         cashPot.setCircle(27);
-        cashPot.setCircle(27, cashPot.width / 2 - 27, cashPot.height / 2 - 27);
+        cashPot.setCircle(30, cashPot.width / 2 - 27, cashPot.height / 2 - 27);
 
         function getRandomNumber() {
             // Generate a random number between 0 and 1
@@ -385,10 +442,10 @@ class GameScene extends Phaser.Scene {
         // Create the bomb
         let bomb = this.bombs.create(x, 0, "bomb");
         bomb.setVelocityY(this.setVelocityY); // Adjust falling speed
-
+        // bomb.setScale(0.7)
         bomb.setCircle(26);
-        bomb.setCircle(26, bomb.width / 2 - 26, bomb.height / 2 - 26);
-        bomb.setOffset(10, 3);
+        bomb.setCircle(36, bomb.width / 2 - 26, bomb.height / 2 - 26);
+        bomb.setOffset(1, 3);
     }
 
     spawnBarrel(width) {
@@ -400,13 +457,12 @@ class GameScene extends Phaser.Scene {
         // barrel.setScale(0.9,0.8);
         // barrel.setOffset(-5,-10)
         // this.player.setSize(this.player.width / 4, this.player.height / 4).setOffset(this.player.width / 10, this.player.height / 10)
-        barrel.setCircle(25);
-        barrel.setCircle(25, barrel.width / 2 - 25, barrel.height / 2 - 25);
+        barrel.setCircle(25, 75);
+        barrel.setCircle(25, barrel.width / 2 - 25, barrel.height / 2 - 15);
 
         function getRandomNumber() {
             // Generate a random number between 0 and 1
             let randomNum = Math.random();
-
             // Scale it to the range [0.01, 0.25]
             return 0.01 + randomNum * (0.25 - 0.01);
         }
@@ -445,10 +501,14 @@ class GameScene extends Phaser.Scene {
 
             // Destroy the barrel and the text
             barrel.destroy();
+            this.explosionSound.play();
             barrel.strengthText.destroy();
 
             // Optional: Display an explosion  added effect
-            this.add.text(barrel.x, barrel.y, "Boom!", {fontSize: "32px", color: "#FF0000"});
+            // this.add.text(barrel.x, barrel.y, "Boom!", {fontSize: "32px", color: "#FF0000"});
+
+            // this.wheelFront = this.add.sprite(barrel.x, barrel.y, "wheelFront");
+            // this.wheelFront.play("rotateWheel");
 
             this.explosion = this.add.sprite(barrel.x, barrel.y, "explosion");
             this.explosion.play("explode");
@@ -593,12 +653,13 @@ class GameScene extends Phaser.Scene {
             score: this.score,
             gameLevel: this.gameLevel,
             bulletsRemaining: this.bulletsRemaining,
+            gameVelocity: this.setVelocityY,
             barrels: barrelsData,
             bombs: bombsData,
             cashPots: cashpotData,
         };
 
-        console.log("barrel bomb, cashpot", gameState,this.cashPots, this.barrels, this.bombs);
+        console.log("barrel bomb, cashpot", gameState, this.cashPots, this.barrels, this.bombs);
 
         localStorage.setItem("phaserGameState", JSON.stringify(gameState));
     }
@@ -615,25 +676,62 @@ class GameScene extends Phaser.Scene {
             this.gameLevel = gameState.gameLevel;
             this.bulletsRemaining = gameState.bulletsRemaining;
 
+            this.setVelocityY = gameState.gameVelocity;
 
             //  create every barrel with the saved value.
 
-            gameState.bombs.forEach(bombData => {
-                const bomb = this.bombsGroup.create(bombData.x, bombData.y, 'bomb');
-                bomb.body.setVelocity(bombData.velocityX, bombData.velocityY);
-              });
-            gameState.barrels.forEach(bombData => {
-                const bomb = this.bombsGroup.create(bombData.x, bombData.y, 'bomb');
-                bomb.body.setVelocity(bombData.velocityX, bombData.velocityY);
-              });
-            gameState.cashPots.forEach(bombData => {
-                const bomb = this.bombsGroup.create(bombData.x, bombData.y, 'bomb');
-                bomb.body.setVelocity(bombData.velocityX, bombData.velocityY);
-              });
-            // this.barrels = gameState.barrels;
-            // this.bombs = gameState.bombs;
-            // this.cashPots = gameState.cashPots;
-            // Update any other elements based on saved data
+            gameState.bombs.forEach((bombData) => {
+                const bomb = this.bombs.create(bombData.x, bombData.y, "bomb");
+                // bomb.body.setVelocity(bombData.velocityX, bombData.velocityY);
+
+                bomb.setVelocityY(bombData.velocityY); // Adjust falling speed
+
+                bomb.setCircle(26);
+                bomb.setCircle(26, bomb.width / 2 - 26, bomb.height / 2 - 26);
+                bomb.setOffset(10, 3);
+            });
+
+            gameState.barrels.forEach((barrelData) => {
+                let barrel = this.barrels.create(barrelData.x, barrelData.y, "barrel");
+                barrel.setVelocityY(barrelData.velocityY);
+                barrel.setCircle(25);
+                barrel.setCircle(25, barrel.width / 2 - 25, barrel.height / 2 - 25);
+
+                barrel.strength = barrelData.strength;
+                barrel.value = barrelData.value;
+                barrel.strengthText = this.add
+                .text(barrel.x, barrel.y, barrel.strength, {
+                    fontSize: "20px",
+                    fill: "#ffffff",
+                    fontStyle: "bold",
+                })
+                .setOrigin(0.5);
+
+                // Store the text object inside the barrel for easy updating
+                barrel.strengthText.setDepth(1);
+            });
+
+            gameState.cashPots.forEach((cashPotData) => {
+                let cashPot = this.cashPots.create(cashPotData.x, cashPotData.y, "cashpot");
+                cashPot.setVelocityY(cashPotData.velocityY);
+
+                cashPot.setCircle(27);
+                cashPot.setCircle(27, cashPot.width / 2 - 27, cashPot.height / 2 - 27);
+
+                cashPot.strength = cashPotData.value; // Random value
+                cashPot.value = cashPotData.value;
+                cashPot.strengthText = this.add
+                .text(cashPot.x, cashPot.y, cashPot.strength, {
+                    fontSize: "16px",
+                    fill: "#ffffff",
+                    fontStyle: "bold",
+                })
+                .setOrigin(0.5);
+
+                // Ensures the text appears on top of the barrel
+                cashPot.strengthText.setDepth(1);
+            });
+
             console.log("game bomb obj", gameState.bombs);
         }
     }

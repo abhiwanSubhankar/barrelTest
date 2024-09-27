@@ -9,8 +9,10 @@ export default class EndScene extends Phaser.Scene {
 
     init(data) {
         console.log("init", data);
-
         this.score = data.totalScore;
+
+        // clearing the localstorage for removing the reload data
+        localStorage.clear();
     }
 
     preload() {

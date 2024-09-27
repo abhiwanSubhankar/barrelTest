@@ -45,26 +45,43 @@
     text-shadow: 1px 1px #262626;
     border: none;
     margin-bottom: 30px;
+    cursor: pointer;
+    transition: all 0.5s;
 }
 
-.incdecButton{
+.button:active {
+    background: linear-gradient(59deg, rgba(241, 164, 88, 1) 22%, rgb(240, 215, 77) 60%);
+}
+.button:disabled {
+    background: linear-gradient(59deg, rgba(119, 82, 45, 0.776) 22%, rgba(116, 104, 37, 0.674) 60%);
+    color: rgb(157, 157, 157);
+    cursor:not-allowed;
+}
+
+.incdecButton {
     background: local;
     border: none;
     width: 30px;
     cursor: pointer;
 }
-.incdecButton >img{
+.incdecButton:disabled{
+    cursor:not-allowed;
+}
+.incdecButton>img {
     width: 100%;
 }
-.betAmountWrapper{
+
+.betAmountWrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 0 10px;
 }
-select > option{
+
+select>option {
     background-color: #712E81;
 }
-select > option:active{
+
+select>option:active {
     background-color: #542460;
 }

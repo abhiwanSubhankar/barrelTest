@@ -6,7 +6,7 @@ import "./App.css";
 import { subscribe, unsubscribe } from './CustomEvents/events';
 import { updateScore } from './CustomEvents/eventKeys';
 import PreStartScene from './scenes/preStart';
-import PracticeGameScene from './scenes/practiceGame';
+
 
 function App() {
   const [gameState, setGameState] = useState();
@@ -14,7 +14,9 @@ function App() {
   const [currentCoins, setCurrentCoins] = useState(500);
   const [betAmount, setBetAmount] = useState(JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0);
 
-  const [gameMode, setGameMode] = useState("");
+  const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "practice");
+  const [started, setStarted] = useState(false);
+
 
 
 
@@ -115,6 +117,14 @@ function App() {
 
   }, [betAmount])
 
+  useEffect(() => {
+    if (!gameMode) {
+      setGameMode("practice");
+      sessionStorage.setItem("gameMode", "practice")
+      sessionStorage.setItem("gameMode", "practice")
+    }
+  }, [gameMode])
+
   return (
     <div className="App">
       <div>
@@ -127,36 +137,43 @@ function App() {
             <h3>Balance</h3>
             <h4 className='balance'>{currentCoins}</h4>
             <br />
-            <h3>Bet Size</h3>
+            {gameMode !== "practice" && <h3>Bet Size</h3>}
 
-            <div className='betAmountWrapper'>
+            {gameMode !== "practice" && <div className='betAmountWrapper'>
 
-              <button className='incdecButton'>
+              <button className='incdecButton' disabled={started} onClick={() => {
+                betAmount > 0 && setBetAmount((pre) => pre - 1)
+              }}>
                 <img src="/minus.svg" alt="plus" />
               </button>
 
-              <input type="number" className='balance' placeholder='Enter Bet aMOUNT' value={betAmount} onChange={(e) => {
+              <input type="number" className='balance' placeholder='Enter Bet aMOUNT' disabled={started} value={betAmount} onChange={(e) => {
                 setBetAmount(e.target.value)
               }} />
 
-              <button className='incdecButton'>
-                <img src="/plus.svg" alt="minus" />
+              <button className='incdecButton' disabled={started} onClick={() => {
+                setBetAmount((pre) => +pre + 1)
+              }}>
+                <img src="/plus.svg" alt="plus" />
               </button>
-            </div>
+            </div>}
 
           </div>
 
           <br />
-          <button onClick={handlePlaceBet} className='button'>Place Bet</button>
+          {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started}>Place Bet</button>}
 
           <button onClick={handlePlaceBet} className='button'>connect wallet</button>
 
           <div>
-            <h2>selected game Mode :- {gameMode}</h2>
-            <select name="" id="" className='balance' onChange={(e) => {
-              setGameMode(e.target.value)
-              sessionStorage.setItem("gameMode", e.target.value);
-            }}>
+            <h4>Selected Game Mode :- {gameMode}</h4>
+            <select name="" id="" className='balance'
+              disabled={started}
+              value={gameMode}
+              onChange={(e) => {
+                setGameMode(e.target.value)
+                sessionStorage.setItem("gameMode", e.target.value);
+              }}>
               <option value="">Selet Game mode</option>
               <option value="practice"> practice</option>
               <option value="normal">Normal</option>
