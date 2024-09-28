@@ -158,9 +158,31 @@ function App() {
                 <img src="/minus.svg" alt="plus" />
               </button>
 
-              <input type="number" className='balance' placeholder='Enter Bet aMOUNT' disabled={started} value={betAmount} onChange={(e) => {
-                setBetAmount(e.target.value)
-              }} />
+              <input
+                type="number"
+                className='balance'
+                placeholder='Enter Bet Amount'
+                min={0}
+                max={10000000}
+                disabled={started}
+                value={betAmount}
+                onKeyDown={(e) => {
+                  // Prevent the 'e' key from being typed
+                  if (e.key === 'e' || e.key === 'E' || e.key === "-") {
+                    e.preventDefault();
+                  }
+                  // console.log(e.key);
+
+                }}
+                onChange={(e) => {
+
+                  let val = +e.target.value;
+
+                  if (val > 0 && val < 1000000) {
+                    setBetAmount(val)
+                  }
+
+                }} />
 
               <button className='incdecButton' disabled={started} onClick={() => {
                 setBetAmount((pre) => +pre + 1)
