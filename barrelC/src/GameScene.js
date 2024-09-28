@@ -140,7 +140,7 @@ class GameScene extends Phaser.Scene {
 
         this.background = this.add.image(0, -80, "bg").setOrigin(0, 0).setScale(0.95);
         this.bgImageGround = this.add.image(0, this.game.config.height - 140, "bgGround").setOrigin(0, 0);
-        
+
         // this.scale.on("resize", this.scaleBackground, this);
         // this.userNameField = document.getElementById("txtName");
         // this.userNameField.style.display = "block";
@@ -718,7 +718,7 @@ class GameScene extends Phaser.Scene {
         if (savedState) {
             const gameState = JSON.parse(savedState);
 
-            this.player.setPosition(gameState.playerPosition.x, gameState.playerPosition.y);
+            this.player.setPosition(gameState.playerPosition.x, this.game.config.height - 150);
 
             this.score = gameState.score;
             this.gameLevel = gameState.gameLevel;
