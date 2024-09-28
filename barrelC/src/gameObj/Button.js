@@ -1,4 +1,6 @@
 import Phaser from "phaser";
+import {publish} from "../CustomEvents/events";
+import {endGame, startGame} from "../CustomEvents/eventKeys";
 
 export default class Button extends Phaser.GameObjects.Container {
     constructor(scene, x, y, key1, key2, text, targetScene, cb) {
@@ -24,6 +26,9 @@ export default class Button extends Phaser.GameObjects.Container {
                     this.scene.scene.start(targetScene);
                 } else if (betAmount && +betAmount >= 1) {
                     this.scene.scene.start(targetScene);
+                    publish(startGame, {
+                        started: true,
+                    });
                 } else {
                     this.errortext = this.scene.add.text(-200, -50, "Please enter a valid BetAmount", {
                         fontSize: "20px",
@@ -33,9 +38,13 @@ export default class Button extends Phaser.GameObjects.Container {
 
                     this.add(this.errortext);
                 }
+             
             } else if (cb === "restart") {
                 // sessionStorage.clear();
                 this.scene.scene.start(targetScene);
+                publish(endGame, {
+                    started: false,
+                });
             } else {
                 this.scene.scene.start(targetScene);
             }

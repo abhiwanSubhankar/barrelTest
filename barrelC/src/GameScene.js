@@ -39,6 +39,9 @@ class GameScene extends Phaser.Scene {
         this.gameSpeed = 50;
         this.spawnSpeed = 1000;
         this.spawnObject; // storing the timer function for spawning barrel,bobmb,cashpod
+
+        // others
+        this.gameMode = sessionStorage.getItem("gameMode") || "practice";
     }
     init(data) {
         console.log("init data", data);
@@ -56,6 +59,10 @@ class GameScene extends Phaser.Scene {
         this.load.image("bullet", "bullet.svg");
         this.load.image("cashpot", "cashPot.svg");
         this.load.image("bomb", "bomb.svg");
+        this.load.image("multiPlayerValue", "/multiplayer.svg");
+        this.load.image("showScore", "/score.svg");
+
+        //  adding spiteSheets
         this.load.spritesheet(
             "explosion", // spiteSheet name
             "/explosion.png", // spite sheet asset path
@@ -134,9 +141,16 @@ class GameScene extends Phaser.Scene {
         this.userNameField = document.getElementById("txtName");
         // this.userNameField.style.display = "block";
 
-        // add score text
+        // add score text and img
+        // img
+        this.add
+        .image(this.game.config.width - 160, 25, "showScore")
+        .setOrigin(0, 0)
+        .setScale(0.75);
+
         this.textS = this.add
-        .text(0, 25, `Score :- ${this.score}`, {
+        .text(this.game.config.width - 100, 35, `${this.score} X`, {
+            font: "bold 25px Arial",
             fontSize: "16px",
             fill: "red",
             fontStyle: "bold",
@@ -144,15 +158,33 @@ class GameScene extends Phaser.Scene {
         .setOrigin(0, 0)
         .setDepth(1);
 
-        // // add score text
-        this.levelText = this.add
-        .text(this.game.config.width - 150, 25, `Lavel :- ${this.gameLevel}`, {
-            fontSize: "20px",
-            fill: "red",
-            fontStyle: "bold",
-        })
-        .setOrigin(0, 0)
-        .setDepth(1);
+        // multiplayer text and image
+        if (this.gameMode !== "practice") {
+            this.add
+            .image(this.game.config.width - 140, 75, "multiPlayerValue")
+            .setOrigin(0, 0)
+            .setScale(0.75);
+
+            this.textM = this.add
+            .text(this.game.config.width - 90, 75, `${this.score} X`, {
+                font: "bold 25px Arial",
+                fontSize: "16px",
+                fill: "red",
+                fontStyle: "bold",
+            })
+            .setOrigin(0, 0)
+            .setDepth(1);
+
+            // // add score text
+            this.levelText = this.add
+            .text(this.game.config.width - 120, 120, `Lavel :- ${this.gameLevel}`, {
+                font: "bold 25px Arial",
+                fill: "red",
+                fontStyle: "bold",
+            })
+            .setOrigin(0, 0)
+            .setDepth(1);
+        }
 
         //  Creating explosion animation
         // this.add.sprite(400, 300, "explosion").setScale(2).displayHeight = 80;
@@ -298,8 +330,15 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        this.textS.setText(`Score :- ${this.score}`);
-        this.levelText.setText(`Lavel :- ${this.gameLevel}`);
+        this.textS.setText(`${this.score.toFixed(2)}x`);
+        let betAmount = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount;
+
+        if (this.gameMode !== "practice") {
+            let multiplayerTextValue = this.score * betAmount;
+
+            this.textM.setText(`${multiplayerTextValue.toFixed(2)}x`);
+            this.levelText.setText(`Lavel :- ${this.gameLevel}`);
+        }
     }
 
     // trying for in canvas form

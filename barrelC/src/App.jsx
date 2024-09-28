@@ -4,7 +4,7 @@ import GameScene from './GameScene';
 import EndScene from './scenes/gameOver';
 import "./App.css";
 import { subscribe, unsubscribe } from './CustomEvents/events';
-import { updateScore } from './CustomEvents/eventKeys';
+import { endGame, startGame, updateScore } from './CustomEvents/eventKeys';
 import PreStartScene from './scenes/preStart';
 
 
@@ -105,14 +105,25 @@ function App() {
 
     subscribe(updateScore, (data) => {
       console.log("event data", data);
-      let finalScore = ((+betAmount) * data.detail.score)
-      setCurrentCoins(pre => pre + finalScore);
-      console.count("score",)
-      console.log(betAmount, finalScore);
+
+      if (gameMode !== "practice") {
+        let finalScore = ((+betAmount) * data.detail.score)
+        setCurrentCoins(pre => pre + finalScore);
+        console.count("score",)
+        console.log(betAmount, finalScore);
+      }
+    })
+    subscribe(startGame, (data) => {
+      setStarted(true);
+    })
+    subscribe(endGame, (data) => {
+      setStarted(false);
     })
 
     return () => {
       unsubscribe(updateScore);
+      unsubscribe(startGame);
+      unsubscribe(endGame);
     }
 
   }, [betAmount])
@@ -121,7 +132,7 @@ function App() {
     if (!gameMode) {
       setGameMode("practice");
       sessionStorage.setItem("gameMode", "practice")
-      sessionStorage.setItem("gameMode", "practice")
+
     }
   }, [gameMode])
 
