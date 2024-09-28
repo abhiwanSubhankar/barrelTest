@@ -22,6 +22,7 @@ export default class Button extends Phaser.GameObjects.Container {
                 let betAmount = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount;
 
                 let gameMode = sessionStorage.getItem("gameMode");
+
                 if (gameMode === "practice") {
                     this.scene.scene.start(targetScene);
                 } else if (betAmount && +betAmount >= 1) {
@@ -38,7 +39,6 @@ export default class Button extends Phaser.GameObjects.Container {
 
                     this.add(this.errortext);
                 }
-             
             } else if (cb === "restart") {
                 // sessionStorage.clear();
                 this.scene.scene.start(targetScene);

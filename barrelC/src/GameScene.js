@@ -62,6 +62,8 @@ class GameScene extends Phaser.Scene {
         this.load.image("multiPlayerValue", "/multiplayer.svg");
         this.load.image("showScore", "/score.svg");
 
+        this.load.image("bgGround", "/ground.svg");
+
         //  adding spiteSheets
         this.load.spritesheet(
             "explosion", // spiteSheet name
@@ -136,9 +138,11 @@ class GameScene extends Phaser.Scene {
             // volume: 0.5, // Adjust the volume
         });
 
-        this.add.image(0, -80, "bg").setOrigin(0, 0).setScale(0.95);
-
-        this.userNameField = document.getElementById("txtName");
+        this.background = this.add.image(0, -80, "bg").setOrigin(0, 0).setScale(0.95);
+        this.bgImageGround = this.add.image(0, this.game.config.height - 140, "bgGround").setOrigin(0, 0);
+        
+        // this.scale.on("resize", this.scaleBackground, this);
+        // this.userNameField = document.getElementById("txtName");
         // this.userNameField.style.display = "block";
 
         // add score text and img
@@ -341,6 +345,11 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    scaleBackground() {
+        const {width, height} = this.scale.gameSize;
+        console.log("gameWindowSize",this.scale.gameSize)
+        this.background.setDisplaySize(width, height);
+    }
     // trying for in canvas form
     // textAreaChanged() {
     //     var text = this.formUtil.getTextAreaValue("area51");

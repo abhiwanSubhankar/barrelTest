@@ -17,6 +17,7 @@ export default class PreStartScene extends Phaser.Scene {
         // this.load.image("player", "player.svg");
         this.load.image("player", "player.svg");
         this.load.image("bg", "/bg.svg");
+        this.load.image("bgGround", "/ground.svg");
 
         // buttons
         this.load.image("blueButton1", "/blue_button02.png");
@@ -27,6 +28,8 @@ export default class PreStartScene extends Phaser.Scene {
         // this.model = this.sys.game.globals.model;
         // submitScore(this.model.userName, this.score);
         this.bgImage = this.add.image(0, -80, "bg").setOrigin(0, 0).setScale(0.95);
+        this.bgImageGround = this.add.image(0, this.game.config.height - 140, "bgGround").setOrigin(0, 0);
+        // .setScale(0.95);
 
         // Add player sprite
         this.player = this.physics.add

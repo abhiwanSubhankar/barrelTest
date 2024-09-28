@@ -14,7 +14,7 @@ function App() {
   const [currentCoins, setCurrentCoins] = useState(500);
   const [betAmount, setBetAmount] = useState(JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0);
 
-  const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "practice");
+  const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "");
   const [started, setStarted] = useState(false);
 
 
@@ -107,7 +107,7 @@ function App() {
       console.log("event data", data);
 
       if (gameMode !== "practice") {
-        let finalScore = ((+betAmount) * data.detail.score)
+        let finalScore = ((+betAmount) * data.detail.score).toFixed(2);
         setCurrentCoins(pre => pre + finalScore);
         console.count("score",)
         console.log(betAmount, finalScore);
