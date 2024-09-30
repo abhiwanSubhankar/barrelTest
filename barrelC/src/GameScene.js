@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import axios from "axios";
 import {publish} from "./CustomEvents/events";
 import {updateScore} from "./CustomEvents/eventKeys";
+import CtrlButton from "./gameObj/ControllButton";
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -42,6 +43,10 @@ class GameScene extends Phaser.Scene {
 
         // others
         this.gameMode = sessionStorage.getItem("gameMode") || "practice";
+
+        // Flags to track whether CtrlButtons are being held down
+        this.isMovingLeft = false;
+        this.isMovingRight = false;
     }
     init(data) {
         console.log("init data", data);
@@ -102,6 +107,12 @@ class GameScene extends Phaser.Scene {
         this.load.audio("shoot", "/sounds/cannonFire.mp3");
         this.load.audio("wheel", "/sounds/CannonWheel.mp3");
         this.load.audio("cashPot", "/sounds/cashpot.mp3");
+
+        // controll Buttons
+
+        this.load.image("shootBtn", "/shootBtn.svg");
+        this.load.image("leftAro", "/leftAro.svg");
+        this.load.image("rightAro", "/rightAro.svg");
     }
 
     create() {
@@ -226,6 +237,7 @@ class GameScene extends Phaser.Scene {
         .setCollideWorldBounds(true);
 
         this.player.setCircle(this.player.width / 2 - 7);
+
         // this.player.body.setCircle(this.player.width / 2 - 7, 40, 30);
         // this.player.setCircle(48, this.player.width / 2 - 26, this.player.height / 2 - 26);
 
@@ -270,50 +282,131 @@ class GameScene extends Phaser.Scene {
             callbackScope: this,
         });
 
-        //adding mobile gusture event
+        // controll buttons
+        // shootbutton
+        this.shootBtn = new CtrlButton(
+            this,
+            // this.buttonX,
+            this.game.config.width - 200,
+            // this.buttonY,
+            this.game.config.height - 50,
+            "shootBtn",
+            "SHOOT"
+        );
+        this.shootBtn.setDepth(5);
+
+        this.shootBtn.button.on("pointerdown", () => {
+            console.log("shoot Btn clicked");
+            this.shootBullet();
+            this.cooldown -= 10; // Adjust cooldown
+            this.shooting = true;
+        });
+
+        this.shootBtn.button.on("pointerup", () => {
+            console.log("shoot Btn pointer up");
+            this.shooting = false;
+        });
+
+        // leftAro
+        this.moveLeft = new CtrlButton(
+            this,
+            // this.buttonX,
+            50,
+            // this.buttonY,
+            this.game.config.height - 50,
+            "leftAro"
+        );
+        this.moveLeft.setDepth(5);
+
+        this.moveLeft.button.on("pointerdown", () => {
+            // this.player.setVelocityX(-this.playerVelocity);
+
+            // if (!this.wheelSound.isPlaying) {
+            //     this.wheelSound.play();
+            // }
+            this.isMovingLeft = true;
+        });
+
+        this.moveLeft.button.on("pointerup", () => {
+            // this.player.setVelocityX(0);
+            // if (this.wheelSound.isPlaying) {
+            //     this.wheelSound.stop();
+            // }
+            
+            this.isMovingLeft = false;
+        });
+
+        // rightAro
+        this.moveRight = new CtrlButton(
+            this,
+            // this.buttonX,
+            150,
+            // this.buttonY,
+            this.game.config.height - 50,
+            "rightAro"
+        );
+        this.moveRight.setDepth(5);
+
+        this.moveRight.button.on("pointerdown", () => {
+            // this.player.setVelocityX(this.playerVelocity);
+            // if (!this.wheelSound.isPlaying) {
+            //     this.wheelSound.play();
+            // }
+            this.isMovingRight = true;
+        });
         
-        let swipeStartX = 0;
-
-        this.input.on("pointerdown", (pointer) => {
-            swipeStartX = pointer.x; // Record the starting x position of the touch
+        this.moveRight.button.on("pointerup", () => {
+            this.isMovingRight = false;
+            // this.player.setVelocityX(0);
+            // if (this.wheelSound.isPlaying) {
+            //     this.wheelSound.stop();
+            // }
         });
 
-        this.input.on("pointerup", (pointer) => {
-            const deltaX = pointer.x - swipeStartX;
+        //adding mobile gusture event
 
-            // Check the horizontal swipe distance
-            if (deltaX > 50) {
-                // Swiped right
-                moveRight(); // Replace with your move right function
-            } else if (deltaX < -50) {
-                // Swiped left
-                moveLeft(); // Replace with your move left function
-            } else {
-                this.player.setVelocityX(0);
-                if (this.wheelSound.isPlaying) {
-                    this.wheelSound.stop();
-                }
-            }
-        });
+        // let swipeStartX = 0;
 
-        function moveLeft() {
-            console.log("Player moves left");
-            // Add your logic for moving left
-            this.player.setVelocityX(-this.playerVelocity);
+        // this.input.on("pointerdown", (pointer) => {
+        //     swipeStartX = pointer.x; // Record the starting x position of the touch
+        // });
 
-            if (!this.wheelSound.isPlaying) {
-                this.wheelSound.play();
-            }
-        }
+        // this.input.on("pointerup", (pointer) => {
+        //     const deltaX = pointer.x - swipeStartX;
 
-        function moveRight() {
-            console.log("Player moves right");
-            // Add your logic for moving right
-            this.player.setVelocityX(this.playerVelocity);
-            if (!this.wheelSound.isPlaying) {
-                this.wheelSound.play();
-            }
-        }
+        //     // Check the horizontal swipe distance
+        //     if (deltaX > 50) {
+        //         // Swiped right
+        //         moveRight(); // Replace with your move right function
+        //     } else if (deltaX < -50) {
+        //         // Swiped left
+        //         moveLeft(); // Replace with your move left function
+        //     } else {
+        //         this.player.setVelocityX(0);
+        //         if (this.wheelSound.isPlaying) {
+        //             this.wheelSound.stop();
+        //         }
+        //     }
+        // });
+
+        // function moveLeft() {
+        //     console.log("Player moves left");
+        //     // Add your logic for moving left
+        //     this.player.setVelocityX(-this.playerVelocity);
+
+        //     if (!this.wheelSound.isPlaying) {
+        //         this.wheelSound.play();
+        //     }
+        // }
+
+        // function moveRight() {
+        //     console.log("Player moves right");
+        //     // Add your logic for moving right
+        //     this.player.setVelocityX(this.playerVelocity);
+        //     if (!this.wheelSound.isPlaying) {
+        //         this.wheelSound.play();
+        //     }
+        // }
 
         // gusture event end
 
@@ -333,14 +426,22 @@ class GameScene extends Phaser.Scene {
     update() {
         // console.log(">>>>>>>>>>>>>>>>>>>>>",this.game.config);
 
+        // this.moveLeft.button.on("pointerdown", () => {
+        //     this.player.setVelocityX(-this.playerVelocity);
+
+        //     if (!this.wheelSound.isPlaying) {
+        //         this.wheelSound.play();
+        //     }
+        // });
+
         // Player movement
-        if (this.cursors.left.isDown || this.keyA.isDown) {
+        if (this.cursors.left.isDown || this.keyA.isDown || this.isMovingLeft) {
             this.player.setVelocityX(-this.playerVelocity);
 
             if (!this.wheelSound.isPlaying) {
                 this.wheelSound.play();
             }
-        } else if (this.cursors.right.isDown || this.keyD.isDown) {
+        } else if (this.cursors.right.isDown || this.keyD.isDown || this.isMovingRight) {
             this.player.setVelocityX(this.playerVelocity);
             if (!this.wheelSound.isPlaying) {
                 this.wheelSound.play();
@@ -755,7 +856,7 @@ class GameScene extends Phaser.Scene {
             cashPots: cashpotData,
         };
 
-        console.log("barrel bomb, cashpot", gameState, this.cashPots, this.barrels, this.bombs);
+        // console.log("barrel bomb, cashpot", gameState, this.cashPots, this.barrels, this.bombs);
 
         localStorage.setItem("phaserGameState", JSON.stringify(gameState));
     }

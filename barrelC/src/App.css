@@ -15,6 +15,7 @@
     background-position: center;
     /* position: absolute; */
     /* height: 100vh; */
+    color: #000;
 }
 
 .App>canvas {
