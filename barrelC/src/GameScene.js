@@ -56,7 +56,7 @@ class GameScene extends Phaser.Scene {
         this.load.image("barrel", "barrel.svg");
         this.load.image("player", "player.svg");
         // this.load.image("player", "player.svg");
-        this.load.image("bullet", "bullet.svg");
+        this.load.image("bullet", "bullet1.svg");
         this.load.image("cashpot", "cashPot.svg");
         this.load.image("bomb", "bomb.svg");
         this.load.image("multiPlayerValue", "/multiplayer.svg");
@@ -225,8 +225,9 @@ class GameScene extends Phaser.Scene {
         .setScale(0.7)
         .setCollideWorldBounds(true);
 
-        this.player.setCircle(this.player.width / 2);
-        // this.player.setCircle(28, this.player.width / 2 - 26, this.player.height / 2 - 26);
+        this.player.setCircle(this.player.width / 2 - 7);
+        // this.player.body.setCircle(this.player.width / 2 - 7, 40, 30);
+        // this.player.setCircle(48, this.player.width / 2 - 26, this.player.height / 2 - 26);
 
         // Create barrel group
         this.barrels = this.physics.add.group();
@@ -268,6 +269,53 @@ class GameScene extends Phaser.Scene {
             callback: this.checkReload,
             callbackScope: this,
         });
+
+        //adding mobile gusture event
+        
+        let swipeStartX = 0;
+
+        this.input.on("pointerdown", (pointer) => {
+            swipeStartX = pointer.x; // Record the starting x position of the touch
+        });
+
+        this.input.on("pointerup", (pointer) => {
+            const deltaX = pointer.x - swipeStartX;
+
+            // Check the horizontal swipe distance
+            if (deltaX > 50) {
+                // Swiped right
+                moveRight(); // Replace with your move right function
+            } else if (deltaX < -50) {
+                // Swiped left
+                moveLeft(); // Replace with your move left function
+            } else {
+                this.player.setVelocityX(0);
+                if (this.wheelSound.isPlaying) {
+                    this.wheelSound.stop();
+                }
+            }
+        });
+
+        function moveLeft() {
+            console.log("Player moves left");
+            // Add your logic for moving left
+            this.player.setVelocityX(-this.playerVelocity);
+
+            if (!this.wheelSound.isPlaying) {
+                this.wheelSound.play();
+            }
+        }
+
+        function moveRight() {
+            console.log("Player moves right");
+            // Add your logic for moving right
+            this.player.setVelocityX(this.playerVelocity);
+            if (!this.wheelSound.isPlaying) {
+                this.wheelSound.play();
+            }
+        }
+
+        // gusture event end
 
         // Shooting and collision / overlap logic
         this.physics.add.overlap(this.bullets, this.barrels, this.hitBarrel, null, this);
@@ -347,7 +395,7 @@ class GameScene extends Phaser.Scene {
 
     scaleBackground() {
         const {width, height} = this.scale.gameSize;
-        console.log("gameWindowSize",this.scale.gameSize)
+        console.log("gameWindowSize", this.scale.gameSize);
         this.background.setDisplaySize(width, height);
     }
     // trying for in canvas form
@@ -362,7 +410,7 @@ class GameScene extends Phaser.Scene {
             this.bulletsRemaining -= 1;
             this.updateMagazineBar();
 
-            let bullet = this.bullets.create(this.player.x, this.player.y - 70, "bullet");
+            let bullet = this.bullets.create(this.player.x - 8, this.player.y - 70, "bullet");
             bullet.setVelocityY(-400); // Adjust speed
         }
 
@@ -491,9 +539,9 @@ class GameScene extends Phaser.Scene {
         let bomb = this.bombs.create(x, 0, "bomb");
         bomb.setVelocityY(this.setVelocityY); // Adjust falling speed
         // bomb.setScale(0.7)
-        bomb.setCircle(26);
-        bomb.setCircle(36, bomb.width / 2 - 26, bomb.height / 2 - 26);
-        bomb.setOffset(1, 3);
+        // bomb.setCircle(bomb.width / 2);
+        bomb.setCircle(30, bomb.width / 2 - 38, bomb.height / 2 - 25);
+        // bomb.setOffset(1, 3);
     }
 
     spawnBarrel(width) {
@@ -505,8 +553,8 @@ class GameScene extends Phaser.Scene {
         // barrel.setScale(0.9,0.8);
         // barrel.setOffset(-5,-10)
         // this.player.setSize(this.player.width / 4, this.player.height / 4).setOffset(this.player.width / 10, this.player.height / 10)
-        barrel.setCircle(25, 75);
-        barrel.setCircle(25, barrel.width / 2 - 25, barrel.height / 2 - 15);
+        // barrel.setCircle(25, 75);
+        barrel.setCircle(30, barrel.width / 2 - 30, barrel.height / 2 - 25);
 
         function getRandomNumber() {
             // Generate a random number between 0 and 1
@@ -734,16 +782,19 @@ class GameScene extends Phaser.Scene {
 
                 bomb.setVelocityY(bombData.velocityY); // Adjust falling speed
 
-                bomb.setCircle(26);
-                bomb.setCircle(26, bomb.width / 2 - 26, bomb.height / 2 - 26);
-                bomb.setOffset(10, 3);
+                // bomb.setCircle(26);
+                // bomb.setCircle(26, bomb.width / 2 - 26, bomb.height / 2 - 26);
+                // bomb.setOffset(10, 3);
+
+                bomb.setCircle(30, bomb.width / 2 - 38, bomb.height / 2 - 25);
             });
 
             gameState.barrels.forEach((barrelData) => {
                 let barrel = this.barrels.create(barrelData.x, barrelData.y, "barrel");
                 barrel.setVelocityY(barrelData.velocityY);
-                barrel.setCircle(25);
-                barrel.setCircle(25, barrel.width / 2 - 25, barrel.height / 2 - 25);
+                // barrel.setCircle(25);
+                // barrel.setCircle(25, barrel.width / 2 - 25, barrel.height / 2 - 25);
+                barrel.setCircle(30, barrel.width / 2 - 30, barrel.height / 2 - 25);
 
                 barrel.strength = barrelData.strength;
                 barrel.value = barrelData.value;
@@ -764,7 +815,7 @@ class GameScene extends Phaser.Scene {
                 cashPot.setVelocityY(cashPotData.velocityY);
 
                 cashPot.setCircle(27);
-                cashPot.setCircle(27, cashPot.width / 2 - 27, cashPot.height / 2 - 27);
+                cashPot.setCircle(30, cashPot.width / 2 - 27, cashPot.height / 2 - 27);
 
                 cashPot.strength = cashPotData.value; // Random value
                 cashPot.value = cashPotData.value;

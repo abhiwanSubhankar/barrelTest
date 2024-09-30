@@ -8,7 +8,7 @@
 }
 
 .App>div {
-    width: 16rem;
+    width: 30%;
     text-align: center;
     border-radius: 15px 0 0 15px;
     background: radial-gradient(50.01% 50.01% at 50.43% 24.99%, #712E81 0%, #2F1753 100%);
@@ -18,20 +18,25 @@
 }
 
 .App>canvas {
-    width: calc(100% - 16rem);
+    width: calc(100% - 30%);
     height: 100vh;
 }
 
 .balance {
     border: 1.98px solid rgba(217, 143, 230, 1);
     border-radius: 8px;
-    width: 60%;
-    margin: 10px auto;
+    max-width: 60%;
+    align-self: center;
+    /* width: 60%; */
+    /* margin: 10px auto; */
     padding: 5px 10px;
     background: local;
     text-align: center;
     font-size: 17px;
     font-weight: 800;
+}
+h4{
+    margin: auto;
 }
 
 .button {
@@ -47,15 +52,18 @@
     margin-bottom: 30px;
     cursor: pointer;
     transition: all 0.5s;
+    display: block;
+    margin: 30px auto;
 }
 
 .button:active {
     background: linear-gradient(59deg, rgba(241, 164, 88, 1) 22%, rgb(240, 215, 77) 60%);
 }
+
 .button:disabled {
     background: linear-gradient(59deg, rgba(119, 82, 45, 0.776) 22%, rgba(116, 104, 37, 0.674) 60%);
     color: rgb(157, 157, 157);
-    cursor:not-allowed;
+    cursor: not-allowed;
 }
 
 .incdecButton {
@@ -63,10 +71,13 @@
     border: none;
     width: 30px;
     cursor: pointer;
+
 }
-.incdecButton:disabled{
-    cursor:not-allowed;
+
+.incdecButton:disabled {
+    cursor: not-allowed;
 }
+
 .incdecButton>img {
     width: 100%;
 }
@@ -76,6 +87,7 @@
     justify-content: center;
     align-items: center;
     padding: 0 10px;
+    gap: 10px;
 }
 
 select>option {
@@ -84,4 +96,18 @@ select>option {
 
 select>option:active {
     background-color: #542460;
+}
+
+
+/* input field pre defined inc dec button hide */
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* For Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
 }

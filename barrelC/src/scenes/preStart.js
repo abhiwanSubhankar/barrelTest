@@ -5,8 +5,8 @@ import Button from "../gameObj/Button";
 export default class PreStartScene extends Phaser.Scene {
     constructor() {
         super("Start");
-        this.buttonX = 400;
-        this.buttonY = 545;
+        // this.buttonX = this.game.config.width / 2;
+        // this.buttonY = this.game.config.height / 2;
     }
 
     init(data) {
@@ -27,9 +27,12 @@ export default class PreStartScene extends Phaser.Scene {
     create() {
         // this.model = this.sys.game.globals.model;
         // submitScore(this.model.userName, this.score);
-        this.bgImage = this.add.image(0, -80, "bg").setOrigin(0, 0).setScale(0.95);
-        this.bgImageGround = this.add.image(0, this.game.config.height - 140, "bgGround").setOrigin(0, 0);
+        this.bgImage = this.add.image(0, -80, "bg").setOrigin(0, 0)
         // .setScale(0.95);
+        // this.bgImageGround = this.add.image(0, this.game.config.height - 140, "bgGround").setOrigin(0, 0);
+        // .setScale(0.95);
+
+        this.bgImage.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height+100);
 
         // Add player sprite
         this.player = this.physics.add
@@ -44,8 +47,10 @@ export default class PreStartScene extends Phaser.Scene {
 
         this.startButton = new Button(
             this,
-            this.buttonX,
-            this.buttonY,
+            // this.buttonX,
+            this.game.config.width / 2,
+            // this.buttonY,
+            this.game.config.height / 2,
             "blueButton1",
             "blueButton2",
             unfinishedGame ? "Resume" : "Start Game",

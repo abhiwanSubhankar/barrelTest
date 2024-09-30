@@ -62,7 +62,7 @@ function App() {
         default: 'arcade',
         arcade: {
           gravity: { y: 0 },
-          debug: true
+          debug: false
         }
       },
       scene: [PreStartScene, GameScene, EndScene],
@@ -108,7 +108,7 @@ function App() {
 
       if (gameMode !== "practice") {
         let finalScore = ((+betAmount) * data.detail.score).toFixed(2);
-        setCurrentCoins(pre => pre + finalScore);
+        setCurrentCoins(pre => pre + +finalScore);
         console.count("score",)
         console.log(betAmount, finalScore);
       }
