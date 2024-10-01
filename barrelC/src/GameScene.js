@@ -605,7 +605,7 @@ class GameScene extends Phaser.Scene {
         let cashPot = this.cashPots.create(x, 0, "cashpot");
         cashPot.setVelocityY(this.setVelocityY); // Adjust falling speed
 
-        this.cashPotSound.play();
+        // this.cashPotSound.play();
 
         cashPot.setCircle(27);
         cashPot.setCircle(30, cashPot.width / 2 - 27, cashPot.height / 2 - 27);
@@ -749,6 +749,8 @@ class GameScene extends Phaser.Scene {
         // this.score += +cashPot.value;
         // this.textS.setText(this.score);
         this.updateScore(cashPot.value);
+
+        this.cashPotSound.play();
 
         // removing all the element from canvas
         cashPot.destroy();
