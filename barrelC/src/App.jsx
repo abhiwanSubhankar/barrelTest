@@ -6,16 +6,45 @@ import "./App.css";
 import { subscribe, unsubscribe } from './CustomEvents/events';
 import { endGame, startGame, updateScore } from './CustomEvents/eventKeys';
 import PreStartScene from './scenes/preStart';
+import BetMenuM from './components/BetMenuM';
+import SplashScreen from './components/SplashScreen';
+
+
+import { Routes, Route } from "react-router-dom";
+import GameSceneM from './Mobile/GameSceneM.jsx';
 
 
 function App() {
   const [gameState, setGameState] = useState();
+
+  const [deviceType, setDevicType] = useState("");
 
   const [currentCoins, setCurrentCoins] = useState(500);
   const [betAmount, setBetAmount] = useState(JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0);
 
   const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "");
   const [started, setStarted] = useState(false);
+
+
+  useEffect(() => {
+
+    function isDesktop() {
+      return window.matchMedia("(min-width: 1025px)").matches;
+    }
+
+    function isMobileOrTablet() {
+      return window.matchMedia("(max-width: 1024px)").matches;
+    }
+
+    // Usage example
+    if (isDesktop()) {
+      console.log("Device is a desktop/laptop");
+      setDevicType("desktop");
+    } else if (isMobileOrTablet()) {
+      console.log("Device is a mobile/tablet");
+      setDevicType("mobile");
+    }
+  }, [])
 
 
 
@@ -51,32 +80,35 @@ function App() {
     //    game = new Phaser.Game(config);
     // } else {
 
-    let gameCanvas = document.getElementById("gameCanvas");
-    //  document.querySelector(".App>canvas")
-    const config = {
-      type: Phaser.WEBGL,
-      width: sizes.width,
-      height: sizes.height,
-      canvas: gameCanvas,
-      physics: {
-        default: 'arcade',
-        arcade: {
-          gravity: { y: 0 },
-          debug: false
-        }
-      },
-      scene: [PreStartScene, GameScene, EndScene],
-    };
-    game = new Phaser.Game(config);
-    // }
+    if (deviceType === "desktop") {
 
-    // setGameState(game);
-    // console.log(game)
+      let gameCanvas = document.getElementById("gameCanvas");
+      //  document.querySelector(".App>canvas")
+      const config = {
+        type: Phaser.WEBGL,
+        width: sizes.width,
+        height: sizes.height,
+        canvas: gameCanvas,
+        physics: {
+          default: 'arcade',
+          arcade: {
+            gravity: { y: 0 },
+            debug: false
+          }
+        },
+        scene: [PreStartScene, GameScene, EndScene],
+      };
+      game = new Phaser.Game(config);
+      // }
 
-    return () => {
-      game.destroy(true);
-    };
-  }, [sizes]);
+      // setGameState(game);
+      // console.log(game)
+
+      return () => {
+        game.destroy(true);
+      };
+    }
+  }, [sizes, deviceType]);
 
 
   useEffect(() => {
@@ -136,92 +168,122 @@ function App() {
     }
   }, [gameMode])
 
-  return (
-    <div className="App">
-      <div>
-        <div>
-          <img src="/lOGO.svg" alt="logo" width={"80%"} />
-        </div>
 
+  if (deviceType === "desktop") {
+    return (
+      <div className="App">
         <div>
           <div>
-            <h3>Balance</h3>
-            <h4 className='balance'>{currentCoins}</h4>
+            <img src="/lOGO.svg" alt="logo" width={"80%"} />
+          </div>
+
+          <div>
+            <div>
+              <h3>Balance</h3>
+              <h4 className='balance'>{currentCoins}</h4>
+              <br />
+              {gameMode !== "practice" && <h3>Bet Size</h3>}
+
+              {gameMode !== "practice" && <div className='betAmountWrapper'>
+
+                <button className='incdecButton' disabled={started} onClick={() => {
+                  betAmount > 0 && setBetAmount((pre) => pre - 1)
+                }}>
+                  <img src="/minus.svg" alt="plus" />
+                </button>
+
+                <input
+                  type="number"
+                  className='balance'
+                  placeholder='Enter Bet Amount'
+                  min={0}
+                  max={10000000}
+                  disabled={started}
+                  value={betAmount}
+                  onKeyDown={(e) => {
+                    // Prevent the 'e' key from being typed
+                    if (e.key === 'e' || e.key === 'E' || e.key === "-") {
+                      e.preventDefault();
+                    }
+                    // console.log(e.key);
+
+                  }}
+                  onChange={(e) => {
+
+                    let val = +e.target.value;
+
+                    if (val > 0 && val < 1000000) {
+                      setBetAmount(val)
+                    }
+
+                  }} />
+
+                <button className='incdecButton' disabled={started} onClick={() => {
+                  setBetAmount((pre) => +pre + 1)
+                }}>
+                  <img src="/plus.svg" alt="plus" />
+                </button>
+              </div>}
+
+            </div>
+
             <br />
-            {gameMode !== "practice" && <h3>Bet Size</h3>}
+            {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started}>Place Bet</button>}
 
-            {gameMode !== "practice" && <div className='betAmountWrapper'>
+            <button onClick={handlePlaceBet} className='button'>connect wallet</button>
 
-              <button className='incdecButton' disabled={started} onClick={() => {
-                betAmount > 0 && setBetAmount((pre) => pre - 1)
-              }}>
-                <img src="/minus.svg" alt="plus" />
-              </button>
-
-              <input
-                type="number"
-                className='balance'
-                placeholder='Enter Bet Amount'
-                min={0}
-                max={10000000}
+            <div>
+              <h4>Selected Game Mode :- {gameMode}</h4>
+              <select name="" id="" className='balance'
                 disabled={started}
-                value={betAmount}
-                onKeyDown={(e) => {
-                  // Prevent the 'e' key from being typed
-                  if (e.key === 'e' || e.key === 'E' || e.key === "-") {
-                    e.preventDefault();
-                  }
-                  // console.log(e.key);
-
-                }}
+                value={gameMode}
                 onChange={(e) => {
-
-                  let val = +e.target.value;
-
-                  if (val > 0 && val < 1000000) {
-                    setBetAmount(val)
-                  }
-
-                }} />
-
-              <button className='incdecButton' disabled={started} onClick={() => {
-                setBetAmount((pre) => +pre + 1)
-              }}>
-                <img src="/plus.svg" alt="plus" />
-              </button>
-            </div>}
-
-          </div>
-
-          <br />
-          {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started}>Place Bet</button>}
-
-          <button onClick={handlePlaceBet} className='button'>connect wallet</button>
-
-          <div>
-            <h4>Selected Game Mode :- {gameMode}</h4>
-            <select name="" id="" className='balance'
-              disabled={started}
-              value={gameMode}
-              onChange={(e) => {
-                setGameMode(e.target.value)
-                sessionStorage.setItem("gameMode", e.target.value);
-              }}>
-              <option value="">Selet Game mode</option>
-              <option value="practice"> practice</option>
-              <option value="normal">Normal</option>
-            </select>
+                  setGameMode(e.target.value)
+                  sessionStorage.setItem("gameMode", e.target.value);
+                }}>
+                <option value="">Selet Game mode</option>
+                <option value="practice"> practice</option>
+                <option value="normal">Normal</option>
+              </select>
+            </div>
           </div>
         </div>
+
+        <canvas id='gameCanvas' width={sizes.width} height={sizes.height}></canvas>
+
       </div>
+    );
+  }
 
-      <canvas id='gameCanvas' width={sizes.width} height={sizes.height}></canvas>
 
-    </div>
-  );
-  // return <>
-  //   <canvas id='gameCanvas'></canvas>
-  // </>
+  // if in mobile show the routes
+  return <div className="App">
+
+    <Routes>
+      <Route path='/' element={
+        <BetMenuM
+          currentCoins={currentCoins}
+          gameMode={gameMode}
+          started={started}
+          betAmount={betAmount}
+          setBetAmount={setBetAmount}
+          handlePlaceBet={handlePlaceBet}
+          setGameMode={setGameMode}
+        ></BetMenuM>
+      }></Route>
+
+      <Route path='/loading' element={
+        <SplashScreen />
+      }></Route>
+
+      <Route path='/game' element={
+        <GameSceneM />
+      }></Route>
+
+
+    </Routes>
+
+  </div>
 }
 
 export default App;

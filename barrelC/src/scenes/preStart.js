@@ -43,7 +43,7 @@ export default class PreStartScene extends Phaser.Scene {
         this.player.setCircle(this.player.width / 2);
         // this.player.setCircle(28, this.player.width / 2 - 26, this.player.height / 2 - 26);
 
-        let unfinishedGame = JSON.parse(localStorage.getItem("phaserGameState"));
+        let unfinishedGame = JSON.parse(sessionStorage.getItem("phaserGameState"));
 
         this.startButton = new Button(
             this,

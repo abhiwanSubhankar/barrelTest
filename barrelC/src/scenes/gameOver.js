@@ -12,7 +12,8 @@ export default class EndScene extends Phaser.Scene {
         this.score = data.totalScore;
 
         // clearing the localstorage for removing the reload data
-        localStorage.clear();
+        // localStorage.clear();
+        sessionStorage.removeItem("phaserGameState");
     }
 
     preload() {

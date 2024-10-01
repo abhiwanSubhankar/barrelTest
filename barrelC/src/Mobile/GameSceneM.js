@@ -1,8 +1,8 @@
 import Phaser from "phaser";
 import axios from "axios";
-import {publish} from "./CustomEvents/events";
-import {updateScore} from "./CustomEvents/eventKeys";
-import CtrlButton from "./gameObj/ControllButton";
+import {publish} from "../CustomEvents/events";
+import {updateScore} from "../CustomEvents/eventKeys";
+import CtrlButton from "../gameObj/ControllButton";
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -943,3 +943,4 @@ class GameScene extends Phaser.Scene {
 }
 
 export default GameScene;
+
