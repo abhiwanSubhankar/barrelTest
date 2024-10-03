@@ -10,7 +10,7 @@ import BetMenuM from './components/BetMenuM';
 import SplashScreen from './components/SplashScreen';
 
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import GameSceneM from './Mobile/GameSceneM.jsx';
 
 
@@ -24,6 +24,8 @@ function App() {
 
   const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "");
   const [started, setStarted] = useState(false);
+
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -110,7 +112,7 @@ function App() {
     }
   }, [sizes, deviceType]);
 
-
+  // set window size by device window
   useEffect(() => {
     // console.log(gameState)
     window.addEventListener("resize", () => {
@@ -130,6 +132,10 @@ function App() {
     sessionStorage.setItem("betAmount", JSON.stringify({
       betAmount
     }));
+
+    if (deviceType === "mobile") {
+      navigate("/loading")
+    }
   }
 
   useEffect(() => {
@@ -144,9 +150,15 @@ function App() {
         console.count("score",)
         console.log(betAmount, finalScore);
       }
+
+      if (deviceType === "mobile") {
+        navigate("/");
+        sessionStorage.removeItem("phaserGameState");
+      }
     })
     subscribe(startGame, (data) => {
       setStarted(true);
+      setCurrentCoins((pre) => pre - betAmount)
     })
     subscribe(endGame, (data) => {
       setStarted(false);
@@ -158,7 +170,7 @@ function App() {
       unsubscribe(endGame);
     }
 
-  }, [betAmount])
+  }, [betAmount, deviceType, gameMode, navigate])
 
   useEffect(() => {
     if (!gameMode) {
@@ -269,6 +281,7 @@ function App() {
           setBetAmount={setBetAmount}
           handlePlaceBet={handlePlaceBet}
           setGameMode={setGameMode}
+          deviceType={deviceType}
         ></BetMenuM>
       }></Route>
 

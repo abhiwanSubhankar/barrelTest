@@ -6,7 +6,8 @@ const BetMenuM = ({
     betAmount,
     setBetAmount,
     handlePlaceBet,
-    setGameMode
+    setGameMode,
+    deviceType
 }) => {
 
 
@@ -70,6 +71,8 @@ const BetMenuM = ({
 
             <br />
             {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started}>Place Bet</button>}
+
+            {gameMode === "practice" && deviceType === "mobile" && <button onClick={handlePlaceBet} className='button' disabled={started}>Start Play</button>}
 
             <button
                 //    onClick={handlePlaceBet} 

@@ -4,7 +4,7 @@ import {publish} from "../CustomEvents/events";
 import {updateScore} from "../CustomEvents/eventKeys";
 import CtrlButton from "../gameObj/ControllButton";
 
-class GameScene extends Phaser.Scene {
+class GameSceneMobile extends Phaser.Scene {
     constructor() {
         super({key: "GameScene"});
         this.setVelocityY = 80;
@@ -605,7 +605,7 @@ class GameScene extends Phaser.Scene {
         let cashPot = this.cashPots.create(x, 0, "cashpot");
         cashPot.setVelocityY(this.setVelocityY); // Adjust falling speed
 
-        this.cashPotSound.play();
+        // this.cashPotSound.play();
 
         cashPot.setCircle(27);
         cashPot.setCircle(30, cashPot.width / 2 - 27, cashPot.height / 2 - 27);
@@ -749,7 +749,7 @@ class GameScene extends Phaser.Scene {
         // this.score += +cashPot.value;
         // this.textS.setText(this.score);
         this.updateScore(cashPot.value);
-
+        this.cashPotSound.play();
         // removing all the element from canvas
         cashPot.destroy();
         bullet.destroy();
@@ -796,7 +796,7 @@ class GameScene extends Phaser.Scene {
         publish(updateScore, {score: this.score});
 
         //  reset the game screen
-        this.scene.start("End", {totalScore: this.score});
+        // this.scene.start("End", {totalScore: this.score});
         // this.setGameCurrentCoins(50)
         sessionStorage.setItem(
             "gameOver",
@@ -942,5 +942,4 @@ class GameScene extends Phaser.Scene {
     }
 }
 
-export default GameScene;
-
+export default GameSceneMobile;

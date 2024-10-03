@@ -8,7 +8,7 @@
 }
 
 .App>div {
-    width: 30%;
+    width: 25%;
     text-align: center;
     border-radius: 15px 0 0 15px;
     background: radial-gradient(50.01% 50.01% at 50.43% 24.99%, #712E81 0%, #2F1753 100%);
@@ -19,9 +19,17 @@
 }
 
 .App>canvas {
-    width: calc(100% - 30%);
+    width: calc(100% - 25%);
     height: 100vh;
 }
+
+#gameCanvasMobile {
+    width: 100vw;
+    height: 100vh;
+}
+
+
+
 
 .balance {
     border: 1.98px solid rgba(217, 143, 230, 1);
@@ -36,7 +44,9 @@
     font-size: 17px;
     font-weight: 800;
 }
-h4,h3{
+
+h4,
+h3 {
     margin: auto;
     color: #fff;
 }
