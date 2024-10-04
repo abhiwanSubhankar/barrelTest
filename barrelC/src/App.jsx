@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Phaser from 'phaser';
 import GameScene from './GameScene';
 import EndScene from './scenes/gameOver';
@@ -15,7 +15,7 @@ import GameSceneM from './Mobile/GameSceneM.jsx';
 
 
 function App() {
-  const [gameState, setGameState] = useState();
+  // const [gameState, setGameState] = useState();
 
   const [deviceType, setDevicType] = useState("");
 
@@ -95,7 +95,7 @@ function App() {
           default: 'arcade',
           arcade: {
             gravity: { y: 0 },
-            debug: false
+            debug: true
           }
         },
         scene: [PreStartScene, GameScene, EndScene],
@@ -138,45 +138,53 @@ function App() {
     }
   }
 
+  const updateScoreCB = useCallback((data) => {
+    console.log(data);
+    if (gameMode !== "practice") {
+      let finalScore = ((+betAmount) * data.detail.score).toFixed(2);
+      setCurrentCoins(pre => pre + +finalScore);
+      console.count("score",)
+      console.log(betAmount, finalScore);
+    }
+
+    if (deviceType === "mobile") {
+      navigate("/");
+      sessionStorage.removeItem("phaserGameState");
+    };
+
+
+  }, [gameMode, betAmount, navigate, deviceType, setCurrentCoins])
+
+  const startGameCB = useCallback((data) => {
+    console.log("start event data", data);
+    setStarted(true);
+    setCurrentCoins((pre) => pre - betAmount)
+  }, [betAmount])
+
+  const endGameCB = useCallback((data) => {
+    console.log("end event data", data);
+    setStarted(false);
+  }, [])
+
   useEffect(() => {
     // custom event listiner for update the score.
 
-    subscribe(updateScore, (data) => {
-      console.log("event data", data);
-
-      if (gameMode !== "practice") {
-        let finalScore = ((+betAmount) * data.detail.score).toFixed(2);
-        setCurrentCoins(pre => pre + +finalScore);
-        console.count("score",)
-        console.log(betAmount, finalScore);
-      }
-
-      if (deviceType === "mobile") {
-        navigate("/");
-        sessionStorage.removeItem("phaserGameState");
-      }
-    })
-    subscribe(startGame, (data) => {
-      setStarted(true);
-      setCurrentCoins((pre) => pre - betAmount)
-    })
-    subscribe(endGame, (data) => {
-      setStarted(false);
-    })
+    subscribe(updateScore, updateScoreCB);
+    subscribe(startGame, startGameCB);
+    subscribe(endGame, endGameCB)
 
     return () => {
-      unsubscribe(updateScore);
-      unsubscribe(startGame);
-      unsubscribe(endGame);
+      unsubscribe(updateScore, updateScoreCB);
+      unsubscribe(startGame, startGameCB);
+      unsubscribe(endGame, endGameCB);
     }
 
-  }, [betAmount, deviceType, gameMode, navigate])
+  }, [updateScoreCB, startGameCB, endGameCB])
 
   useEffect(() => {
     if (!gameMode) {
       setGameMode("practice");
       sessionStorage.setItem("gameMode", "practice")
-
     }
   }, [gameMode])
 
