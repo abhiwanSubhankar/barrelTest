@@ -10,6 +10,7 @@ export default class Button extends Phaser.GameObjects.Container {
         this.y = y;
 
         this.button = this.scene.add.sprite(0, 0, key1).setInteractive({useHandCursor: true});
+        if (key1 === "yellowButton1") this.button.setScale(0.5);
         this.text = this.scene.add.text(0, 0, text, {fontSize: "30px", fill: "#fff"});
         Phaser.Display.Align.In.Center(this.text, this.button);
 
@@ -41,6 +42,7 @@ export default class Button extends Phaser.GameObjects.Container {
                 }
             } else if (cb === "restart") {
                 // sessionStorage.clear();
+
                 this.scene.scene.start(targetScene);
                 publish(endGame, {
                     started: false,

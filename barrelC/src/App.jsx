@@ -3,7 +3,7 @@ import Phaser from 'phaser';
 import GameScene from './GameScene';
 import EndScene from './scenes/gameOver';
 import "./App.css";
-import { subscribe, unsubscribe } from './CustomEvents/events';
+import { publish, subscribe, unsubscribe } from './CustomEvents/events';
 import { endGame, startGame, updateScore } from './CustomEvents/eventKeys';
 import PreStartScene from './scenes/preStart';
 import BetMenuM from './components/BetMenuM';
@@ -12,6 +12,7 @@ import SplashScreen from './components/SplashScreen';
 
 import { Routes, Route, useNavigate } from "react-router-dom";
 import GameSceneM from './Mobile/GameSceneM.jsx';
+import EndScenePopup from './scenes/gameOverPopup.js';
 
 
 function App() {
@@ -95,9 +96,10 @@ function App() {
           default: 'arcade',
           arcade: {
             gravity: { y: 0 },
-            debug: true
+            debug: false
           }
         },
+        // scene: [PreStartScene, GameScene, EndScenePopup],
         scene: [PreStartScene, GameScene, EndScene],
       };
       game = new Phaser.Game(config);
@@ -135,6 +137,10 @@ function App() {
 
     if (deviceType === "mobile") {
       navigate("/loading")
+
+      publish(startGame, {
+        started: true,
+      });
     }
   }
 
@@ -147,13 +153,13 @@ function App() {
       console.log(betAmount, finalScore);
     }
 
-    if (deviceType === "mobile") {
-      navigate("/");
-      sessionStorage.removeItem("phaserGameState");
-    };
+    // if (deviceType === "mobile") {
+    //   navigate("/");
+    //   sessionStorage.removeItem("phaserGameState");
+    // };
 
 
-  }, [gameMode, betAmount, navigate, deviceType, setCurrentCoins])
+  }, [gameMode, betAmount, setCurrentCoins])
 
   const startGameCB = useCallback((data) => {
     console.log("start event data", data);
@@ -164,7 +170,13 @@ function App() {
   const endGameCB = useCallback((data) => {
     console.log("end event data", data);
     setStarted(false);
-  }, [])
+
+    if (deviceType === "mobile") {
+      navigate("/");
+      sessionStorage.removeItem("phaserGameState");
+    };
+
+  }, [deviceType, navigate])
 
   useEffect(() => {
     // custom event listiner for update the score.

@@ -17,7 +17,11 @@ export default class EndScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("game-over", "/game-end.jpeg");
+        this.load.image("game-over", "/game-end.png");
+
+        // yellow buttons
+        this.load.image("yellowButton1", "/yellowButton1.png");
+        this.load.image("yellowButton2", "/yellowButton2.png");
     }
 
     create() {
@@ -38,14 +42,17 @@ export default class EndScene extends Phaser.Scene {
 
         this.add.text(120, 50, `Your Score : ${this.score}`, {fontSize: 18});
 
-        this.add.text(150, 200, `Game Over`, {fontSize: 38});
-
+        this.add.text(this.game.config.width / 2 - 100, this.game.config.height / 2 - 100, `Game Over`, {
+            fontSize: "38px",
+            fill: "#FFE358",
+            fontStyle: "bold",
+        });
         this.returnBtn = new Button(
             this,
             this.game.config.width / 2,
             this.game.config.height / 2,
-            "blueButton1",
-            "blueButton2",
+            "yellowButton1",
+            "yellowButton2",
             "Reload",
             "Start",
             "restart"

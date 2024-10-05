@@ -22,6 +22,10 @@ export default class PreStartScene extends Phaser.Scene {
         // buttons
         this.load.image("blueButton1", "/blue_button02.png");
         this.load.image("blueButton2", "/blue_button03.png");
+
+        // yellow buttons
+        this.load.image("yellowButton1", "/yellowButton1.png");
+        this.load.image("yellowButton2", "/yellowButton2.png");
     }
 
     create() {
