@@ -93,13 +93,22 @@ class GameScene extends Phaser.Scene {
         //  adding spiteSheets
         this.load.spritesheet(
             "explosion", // spiteSheet name
-            "/bigboom.png", // spite sheet asset path
+            "/bigboom1.png", // spite sheet asset path
             {
-                frameWidth: 800, // Width of each frame
-                frameHeight: 800, // Height of each frame
+                frameWidth: 200, // Width of each frame
+                frameHeight: 200, // Height of each frame
                 // endFrame: 23, // Total frames in the sprite sheet
             } // info for the spiteSheet.
         );
+        // this.load.spritesheet(
+        //     "explosion", // spiteSheet name
+        //     "/bigboom.png", // spite sheet asset path
+        //     {
+        //         frameWidth: 800, // Width of each frame
+        //         frameHeight: 800, // Height of each frame
+        //         // endFrame: 23, // Total frames in the sprite sheet
+        //     } // info for the spiteSheet.
+        // );
         this.load.spritesheet(
             "wheelFront", // spiteSheet name
             "/front.png", // spite sheet asset path
@@ -618,7 +627,7 @@ class GameScene extends Phaser.Scene {
         this.explosion = this.add.sprite(obj.x, obj.y, "explosion");
         this.explosionSound.play();
         this.explosion.play("explode");
-        this.explosion.setScale(0.3);
+        this.explosion.setScale(0.8);
         if (obj.strengthText) obj.strengthText.destroy();
         obj.destroy();
     }
@@ -790,7 +799,7 @@ class GameScene extends Phaser.Scene {
         // cashPot.setScale(this.deviceType === "mobile" ? 0.7 : 1);
         cashPot.setScale(this.deviceType === "mobile" ? 0.7 : 1);
 
-        let values = [2, 3, 5, 8, 10, 15, 25, 40, 75, 100];
+        // let values = [2, 3, 5, 8, 10, 15, 25, 40, 75, 100];
 
         function getRandomNumber() {
             // Generate a random number between 0 and 1
@@ -915,7 +924,7 @@ class GameScene extends Phaser.Scene {
 
             this.explosion = this.add.sprite(barrel.x, barrel.y, "explosion");
             this.explosion.play("explode");
-            this.explosion.setScale(0.3);
+            this.explosion.setScale(0.8);
 
             let gameMode = sessionStorage.getItem("gameMode");
             gameMode !== "practice" && this.updateLavel();
@@ -951,7 +960,7 @@ class GameScene extends Phaser.Scene {
         // play blust animation
         this.explosion = this.add.sprite(cashPot.x, cashPot.y, "explosion");
         this.explosion.play("explode");
-        this.explosion.setScale(0.3);
+        this.explosion.setScale(0.8);
 
         // removing all the element from canvas
         cashPot.destroy();
@@ -969,7 +978,7 @@ class GameScene extends Phaser.Scene {
         this.explosionSound.play();
         this.explosion = this.add.sprite(bomb.x, bomb.y, "explosion");
         this.explosion.play("explode");
-        this.explosion.setScale(0.3);
+        this.explosion.setScale(0.8);
 
         this.gameOver();
     }

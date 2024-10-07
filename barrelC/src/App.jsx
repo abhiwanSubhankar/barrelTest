@@ -12,7 +12,7 @@ import SplashScreen from './components/SplashScreen';
 
 import { Routes, Route, useNavigate } from "react-router-dom";
 import GameSceneM from './Mobile/GameSceneM.jsx';
-import EndScenePopup from './scenes/gameOverPopup.js';
+// import EndScenePopup from './scenes/gameOverPopup.js';
 
 
 function App() {
@@ -22,9 +22,13 @@ function App() {
 
   const [currentCoins, setCurrentCoins] = useState(500);
   const [betAmount, setBetAmount] = useState(JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0);
-
   const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "");
   const [started, setStarted] = useState(false);
+  // game window size
+  const [sizes, setSizes] = useState({
+    height: window.innerHeight,
+    width: window.innerWidth,
+  });
 
   const navigate = useNavigate();
 
@@ -47,17 +51,7 @@ function App() {
       console.log("Device is a mobile/tablet");
       setDevicType("mobile");
     }
-  }, [])
-
-
-
-
-
-  // game window size
-  const [sizes, setSizes] = useState({
-    height: window.innerHeight,
-    width: window.innerWidth,
-  });
+  }, []);
 
   useEffect(() => {
 
@@ -180,7 +174,6 @@ function App() {
 
   useEffect(() => {
     // custom event listiner for update the score.
-
     subscribe(updateScore, updateScoreCB);
     subscribe(startGame, startGameCB);
     subscribe(endGame, endGameCB)
