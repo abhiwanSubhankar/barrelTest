@@ -8,7 +8,7 @@ class GameScene extends Phaser.Scene {
     constructor() {
         super({key: "GameScene"});
         this.setVelocityY = 80;
-        this.playerVelocity = 300;
+        this.playerVelocity = 375;
         this.keyD;
         this.keyA;
         this.textS; // store score text
@@ -89,6 +89,7 @@ class GameScene extends Phaser.Scene {
 
         this.load.image("bgGround", "/ground.svg");
         this.load.image("betAmount", "/betAmount.svg");
+        this.load.image("wheel", "/wheel.png");
 
         //  adding spiteSheets
         this.load.spritesheet(
@@ -193,13 +194,14 @@ class GameScene extends Phaser.Scene {
         this.add
         .image(this.game.config.width - 160, 25, "showScore")
         .setOrigin(0, 0)
-        .setScale(0.75);
+        .setScale(0.75)
+        .setDepth(1);
 
         this.textS = this.add
         .text(this.game.config.width - 100, 35, `${this.score} X`, {
             font: "bold 25px Arial",
             fontSize: "16px",
-            fill: "red",
+            fill: "white",
             fontStyle: "bold",
         })
         .setOrigin(0, 0)
@@ -210,13 +212,14 @@ class GameScene extends Phaser.Scene {
             this.add
             .image(this.game.config.width - 140, 65, "multiPlayerValue")
             .setOrigin(0, 0)
-            .setScale(0.75);
+            .setScale(0.75)
+            .setDepth(1);
 
             this.textM = this.add
-            .text(this.game.config.width - 90, 65, `${this.score} X`, {
+            .text(this.game.config.width - 90, 65, `$${this.score}`, {
                 font: "bold 25px Arial",
                 fontSize: "16px",
-                fill: "red",
+                fill: "green",
                 fontStyle: "bold",
             })
             .setOrigin(0, 0)
@@ -226,7 +229,8 @@ class GameScene extends Phaser.Scene {
             this.add
             .image(this.game.config.width - 130, 95, "betAmount")
             .setOrigin(0, 0)
-            .setScale(this.deviceType === "mobile" ? 0.6 : 0.75);
+            .setScale(this.deviceType === "mobile" ? 0.6 : 0.75)
+            .setDepth(1);
 
             let bet = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount;
 
@@ -234,21 +238,21 @@ class GameScene extends Phaser.Scene {
             .text(this.game.config.width - 80, 100, `$${bet}`, {
                 font: `bold ${this.deviceType === "mobile" ? 20 : 25}px Arial`,
                 // fontSize: "16px",
-                fill: "red",
+                fill: "gray",
                 fontStyle: "bold",
             })
             .setOrigin(0, 0)
             .setDepth(1);
 
             // add level text
-            this.levelText = this.add
-            .text(this.game.config.width - 120, 140, `Lavel :- ${this.gameLevel}`, {
-                font: `bold ${this.deviceType === "mobile" ? 20 : 25}px Arial`,
-                fill: "red",
-                fontStyle: "bold",
-            })
-            .setOrigin(0, 0)
-            .setDepth(1);
+            // this.levelText = this.add
+            // .text(this.game.config.width - 120, 140, `Lavel :- ${this.gameLevel}`, {
+            //     font: `bold ${this.deviceType === "mobile" ? 20 : 25}px Arial`,
+            //     fill: "red",
+            //     fontStyle: "bold",
+            // })
+            // .setOrigin(0, 0)
+            // .setDepth(1);
         }
 
         //  Creating explosion animation
@@ -470,6 +474,16 @@ class GameScene extends Phaser.Scene {
 
         // gusture event end
 
+        // exp wheel animation
+
+        this.car = this.add.sprite(400, 300, "player");
+
+        // Assuming the wheels are separate images, position them under the car
+        this.wheel1 = this.add.sprite(this.car.x - 40, this.car.y + 40, "wheel");
+        this.wheel2 = this.add.sprite(this.car.x + 40, this.car.y + 40, "wheel");
+
+        // exp wheel
+
         // Shooting and collision / overlap logic
         this.physics.add.overlap(this.bullets, this.barrels, this.hitBarrel, null, this);
 
@@ -612,9 +626,34 @@ class GameScene extends Phaser.Scene {
         if (this.gameMode !== "practice") {
             let multiplayerTextValue = this.score * betAmount;
 
-            this.textM.setText(`${multiplayerTextValue.toFixed(2)}x`);
-            this.levelText.setText(`Lavel :- ${this.gameLevel}`);
+            this.textM.setText(`$${multiplayerTextValue.toFixed(2)}`);
+            // this.levelText.setText(`Lavel :- ${this.gameLevel}`);
         }
+
+        // update car wheels
+
+        // this.car.setVelocityX(0);
+
+        // Check for left or right input
+        if (this.cursors.left.isDown) {
+            // this.car.setVelocityX(-200); // Move car to the left
+            this.rotateWheels(1); // Rotate wheels clockwise
+        } else if (this.cursors.right.isDown) {
+            // this.car.setVelocityX(200); // Move car to the right
+            this.rotateWheels(-1); // Rotate wheels counterclockwise
+        }
+
+        // Update the position of the wheels to stay aligned with the car
+        this.wheel1.x = this.car.x - 40;
+        this.wheel2.x = this.car.x + 40;
+    }
+
+    rotateWheels(direction) {
+        // Rotate both wheels based on the car's movement
+        // The direction argument will be 1 or -1, affecting the rotation direction
+        var rotationSpeed = 0.1 * direction;
+        this.wheel1.rotation += rotationSpeed;
+        this.wheel2.rotation += rotationSpeed;
     }
 
     scaleBackground() {

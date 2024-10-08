@@ -13,24 +13,31 @@ const getAllUserDetails = async (req, res, next) => {
 };
 
 const getUserDetails = async (req, res, next) => {
-    let userId = req?.params.id;
+    try {
+        let userId = req?.params.id;
 
-    if (!userId) {
-        return res.status(401).send({
-            message: "Invalid userID",
-        });
-    } else {
-        let userDetails = await User.findById(userId);
-
-        if (!userDetails) {
+        if (!userId) {
             return res.status(401).send({
                 message: "Invalid userID",
             });
-        }
+        } else {
+            let userDetails = await User.findById(userId);
 
-        return res.status(200).send({
-            message: "successful.",
-            data: userDetails,
+            if (!userDetails) {
+                return res.status(401).send({
+                    message: "Invalid userID",
+                });
+            }
+
+            return res.status(200).send({
+                message: "successful.",
+                data: userDetails,
+            });
+        }
+    } catch (error) {
+        return res.status(401).send({
+            message: "Invalid userID",
+            error
         });
     }
 };
