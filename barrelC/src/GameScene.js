@@ -409,7 +409,7 @@ class GameScene extends Phaser.Scene {
                 // this.buttonX,
                 this.game.config.width - 50,
                 // this.buttonY,
-                this.game.config.height - 50,
+                this.game.config.height - 90,
                 "shootBtn",
                 "SHOOT"
             );
@@ -437,7 +437,7 @@ class GameScene extends Phaser.Scene {
                 // this.buttonX,
                 30,
                 // this.buttonY,
-                this.game.config.height - 50,
+                this.game.config.height - 90,
                 "leftAro"
             );
             this.moveLeft.setDepth(5);
@@ -456,7 +456,7 @@ class GameScene extends Phaser.Scene {
                 // this.buttonX,
                 100,
                 // this.buttonY,
-                this.game.config.height - 50,
+                this.game.config.height - 90,
                 "rightAro"
             );
             this.moveRight.setDepth(5);
