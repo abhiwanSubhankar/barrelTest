@@ -42,8 +42,8 @@ export default class EndScene extends Phaser.Scene {
 
         this.add.text(120, 50, `Your Score : ${this.score}`, {fontSize: 18});
 
-        this.add.text(this.game.config.width / 2 - 100, this.game.config.height / 2 - 100, `Game Over`, {
-            fontSize: "38px",
+        this.add.text(this.game.config.width / 2 -180, this.game.config.height / 2 - 100, `Game Over`, {
+            fontSize: "58px",
             fill: "#FFE358",
             fontStyle: "bold",
         });
