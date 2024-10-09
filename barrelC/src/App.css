@@ -16,6 +16,8 @@
     /* position: absolute; */
     /* height: 100vh; */
     color: #000;
+    border-right: 3px solid black;
+    box-sizing: border-box;
 }
 
 .App>canvas {

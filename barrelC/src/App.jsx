@@ -56,31 +56,11 @@ function App() {
   useEffect(() => {
 
     let game;
-
-    // if (gameMode === "practice") {
-    //   let gameCanvas = document.getElementById("gameCanvas");
-    //   //  document.querySelector(".App>canvas")
-    //   const config = {
-    //     type: Phaser.WEBGL,
-    //     width: sizes.width,
-    //     height: sizes.height,
-    //     canvas: gameCanvas,
-    //     physics: {
-    //       default: 'arcade',
-    //       arcade: {
-    //         gravity: { y: 0 },
-    //         debug: true
-    //       }
-    //     },
-    //     scene: [PreStartScene, PracticeGameScene, EndScene],
-    //   };
-    //    game = new Phaser.Game(config);
-    // } else {
-
+    
     if (deviceType === "desktop") {
 
       let gameCanvas = document.getElementById("gameCanvas");
-      //  document.querySelector(".App>canvas")
+  
       const config = {
         type: Phaser.WEBGL,
         width: sizes.width,
@@ -96,11 +76,7 @@ function App() {
         // scene: [PreStartScene, GameScene, EndScenePopup],
         scene: [PreStartScene, GameScene, EndScene],
       };
-      game = new Phaser.Game(config);
-      // }
-
-      // setGameState(game);
-      // console.log(game)
+      game = new Phaser.Game(config);    
 
       return () => {
         game.destroy(true);

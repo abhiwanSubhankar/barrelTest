@@ -13,6 +13,7 @@ class GameScene extends Phaser.Scene {
         this.keyA;
         this.textS; // store score text
         this.levelText;
+        this.gameEnd = false;
 
         // Cooldown bar setup
         this.cooldown = 100;
@@ -80,6 +81,8 @@ class GameScene extends Phaser.Scene {
         this.load.image("bg", "/bg.svg");
         this.load.image("barrel", "barrel.svg");
         this.load.image("player", "player.svg");
+        this.load.image("cannonImg", "player2.svg");
+        this.load.image("cannonShadow", "cannonShadow.png");
         // this.load.image("player", "player.svg");
         this.load.image("bullet", "bullet1.svg");
         this.load.image("cashpot", "cashPot.svg");
@@ -138,6 +141,7 @@ class GameScene extends Phaser.Scene {
         this.load.audio("shoot", "/sounds/cannonFire.mp3");
         this.load.audio("wheel", "/sounds/CannonWheel.mp3");
         this.load.audio("cashPot", "/sounds/cashpot.mp3");
+        this.load.audio("woodenBarrelHitGround", "/sounds/wooden-barrel-hit-ground.mp3");
 
         // controll Buttons
 
@@ -166,6 +170,7 @@ class GameScene extends Phaser.Scene {
 
         // Create sound objects
         this.explosionSound = this.sound.add("explosion");
+        this.woodenBarrelHitGroundSound = this.sound.add("woodenBarrelHitGround");
         this.shootSound = this.sound.add("shoot");
         this.cashPotSound = this.sound.add("cashPot", {
             loop: false, // Set to true if you want the background music to loop
@@ -293,18 +298,56 @@ class GameScene extends Phaser.Scene {
         .setOrigin(0, 0)
         .setDepth(1);
 
-        // Add player sprite
-        this.player = this.physics.add
-        .image(this.game.config.width - this.game.config.width / 2, this.game.config.height - 150, "player")
-        .setScale(this.deviceType === "mobile" ? 0.6 : 0.8)
-        .setCollideWorldBounds(true);
-        // .setOrigin(0, 0);
-        // setCircle(width, offsetX, offsetY)
-        this.player.setCircle(this.player.width / 2 - 17, 10, 8);
+        // Add player sprite with wheel animation
+        // this.player = this.physics.add
+        // .image(this.game.config.width - this.game.config.width / 2, this.game.config.height - 150, "player")
+        // .setScale(this.deviceType === "mobile" ? 0.6 : 0.8)
+        // .setCollideWorldBounds(true);
+        // // .setOrigin(0, 0);
+        // // setCircle(width, offsetX, offsetY)
+        // this.player.setCircle(this.player.width / 2 - 17, 10, 8);
 
         // this.player.body.setCircle(this.player.width / 2 - 7, 40, 30);
         // this.player.setCircle(48, this.player.width / 2 - 26, this.player.height / 2 - 26);
 
+        this.cannonImg = this.add.image(0, 0, "cannonImg").setDepth(2);
+
+        this.cannonShadow = this.add.image(this.cannonImg.x, this.cannonImg.y + 90, "cannonShadow").setDepth(2);
+
+        // Assuming the wheels are separate images, position them under the cannonImg
+        this.wheel1 = this.add
+        .image(this.cannonImg.x - 20, this.cannonImg.y + 60, "wheel")
+        // .setScale(0.9)
+        .setDepth(3);
+
+        this.wheel2 = this.add
+        .image(this.cannonImg.x + 20, this.cannonImg.y + 60, "wheel")
+        // .setScale(0.9)
+        .setDepth(1);
+
+        // Create a container to hold the car and its wheels
+        // this.player = this.physics.add
+        // .image(this.game.config.width - this.game.config.width / 2, this.game.config.height - 150, "player")
+        // .setScale(this.deviceType === "mobile" ? 0.6 : 0.8)
+        // .setCollideWorldBounds(true);
+        // // .setOrigin(0, 0);
+        // // setCircle(width, offsetX, offsetY)
+        // this.player.setCircle(this.player.width / 2 - 17, 10, 8);
+
+        this.player = this.add.container(
+            this.game.config.width - this.game.config.width / 2,
+            this.game.config.height - 150,
+            [this.cannonShadow, this.wheel2, this.cannonImg, this.wheel1]
+        );
+        // Enable physics for the container (not individual objects)
+        this.physics.world.enable(this.player);
+        this.player.body.setCollideWorldBounds(true);
+        this.player.body.setAllowGravity(false);
+        this.player.setScale(this.deviceType === "mobile" ? 0.6 : 0.8);
+        // this.player.setCircle(this.player.width / 2 - 17, 10, 58);
+        this.player.body.setOffset(-35, -60);
+
+        // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         // Create barrel group
         this.barrels = this.physics.add.group();
 
@@ -427,60 +470,29 @@ class GameScene extends Phaser.Scene {
             });
         }
 
-        //adding mobile gusture event
-
-        // let swipeStartX = 0;
-
-        // this.input.on("pointerdown", (pointer) => {
-        //     swipeStartX = pointer.x; // Record the starting x position of the touch
-        // });
-
-        // this.input.on("pointerup", (pointer) => {
-        //     const deltaX = pointer.x - swipeStartX;
-
-        //     // Check the horizontal swipe distance
-        //     if (deltaX > 50) {
-        //         // Swiped right
-        //         moveRight(); // Replace with your move right function
-        //     } else if (deltaX < -50) {
-        //         // Swiped left
-        //         moveLeft(); // Replace with your move left function
-        //     } else {
-        //         this.player.setVelocityX(0);
-        //         if (this.wheelSound.isPlaying) {
-        //             this.wheelSound.stop();
-        //         }
-        //     }
-        // });
-
-        // function moveLeft() {
-        //     console.log("Player moves left");
-        //     // Add your logic for moving left
-        //     this.player.setVelocityX(-this.playerVelocity);
-
-        //     if (!this.wheelSound.isPlaying) {
-        //         this.wheelSound.play();
-        //     }
-        // }
-
-        // function moveRight() {
-        //     console.log("Player moves right");
-        //     // Add your logic for moving right
-        //     this.player.setVelocityX(this.playerVelocity);
-        //     if (!this.wheelSound.isPlaying) {
-        //         this.wheelSound.play();
-        //     }
-        // }
-
-        // gusture event end
-
         // exp wheel animation
 
-        this.car = this.add.sprite(400, 300, "player");
+        // this.car = this.add.image(400, 300, "car").setDepth(2);
 
-        // Assuming the wheels are separate images, position them under the car
-        this.wheel1 = this.add.sprite(this.car.x - 40, this.car.y + 40, "wheel");
-        this.wheel2 = this.add.sprite(this.car.x + 40, this.car.y + 40, "wheel");
+        // this.cannonShadow = this.add.image(this.car.x , this.car.y + 90, "cannonShadow").setDepth(2);
+
+        // // Assuming the wheels are separate images, position them under the car
+        // this.wheel1 = this.add
+        // .image(this.car.x - 20, this.car.y + 60, "wheel")
+        // // .setScale(0.9)
+        // .setDepth(3);
+
+        // this.wheel2 = this.add
+        // .image(this.car.x + 20, this.car.y + 60, "wheel")
+        // // .setScale(0.9)
+        // .setDepth(1);
+
+        // // Create a container to hold the car and its wheels
+        // this.carContainer = this.add.container(400, 300, [this.cannonShadow, this.wheel2, this.car, this.wheel1]);
+        // // Enable physics for the container (not individual objects)
+        // this.physics.world.enable(this.carContainer);
+        // this.carContainer.body.setCollideWorldBounds(true);
+        // this.carContainer.body.setAllowGravity(false);
 
         // exp wheel
 
@@ -514,18 +526,21 @@ class GameScene extends Phaser.Scene {
 
         // Player movement
         if (this.cursors.left.isDown || this.keyA.isDown || this.isMovingLeft) {
-            this.player.setVelocityX(-this.playerVelocity);
+            this.player.body.setVelocityX(-this.playerVelocity);
+            !this.gameEnd && this.rotateWheels(-1);
 
-            if (!this.wheelSound.isPlaying) {
+            if (!this.wheelSound.isPlaying && !this.gameEnd) {
                 this.wheelSound.play();
             }
         } else if (this.cursors.right.isDown || this.keyD.isDown || this.isMovingRight) {
-            this.player.setVelocityX(this.playerVelocity);
-            if (!this.wheelSound.isPlaying) {
+            this.player.body.setVelocityX(this.playerVelocity);
+            !this.gameEnd && this.rotateWheels(1);
+
+            if (!this.wheelSound.isPlaying && !this.gameEnd) {
                 this.wheelSound.play();
             }
         } else {
-            this.player.setVelocityX(0);
+            this.player.body.setVelocityX(0);
             if (this.wheelSound.isPlaying) {
                 this.wheelSound.stop();
             }
@@ -613,8 +628,8 @@ class GameScene extends Phaser.Scene {
         // updating the text position for the every cash pod
         this.cashPots.children.iterate((cashpod) => {
             if (cashpod && cashpod.strengthText) {
-                cashpod.strengthText.x = cashpod.x;
-                cashpod.strengthText.y = cashpod.y;
+                cashpod.strengthText.x = cashpod.x - 13;
+                cashpod.strengthText.y = cashpod.y + 5;
             }
         });
 
@@ -632,28 +647,37 @@ class GameScene extends Phaser.Scene {
 
         // update car wheels
 
-        // this.car.setVelocityX(0);
-
-        // Check for left or right input
-        if (this.cursors.left.isDown) {
-            // this.car.setVelocityX(-200); // Move car to the left
-            this.rotateWheels(1); // Rotate wheels clockwise
-        } else if (this.cursors.right.isDown) {
-            // this.car.setVelocityX(200); // Move car to the right
-            this.rotateWheels(-1); // Rotate wheels counterclockwise
-        }
-
         // Update the position of the wheels to stay aligned with the car
-        this.wheel1.x = this.car.x - 40;
-        this.wheel2.x = this.car.x + 40;
+        // this.wheel1.x = this.car.x - 20;
+        // this.wheel2.x = this.car.x + 20;
+
+        // this.car.setVelocityX(0);
+        // Reset the car's velocity
+        // this.carContainer.body.setVelocityX(0);
+
+        // // Check for left or right input
+        // if (this.cursors.left.isDown) {
+        //     this.carContainer.body.setVelocityX(-200); // Move car to the left
+        //     this.rotateWheels(-1); // Rotate wheels clockwise
+        // } else if (this.cursors.right.isDown) {
+        //     this.carContainer.body.setVelocityX(200); // Move car to the right
+        //     this.rotateWheels(1); // Rotate wheels counterclockwise
+        // }
     }
 
     rotateWheels(direction) {
         // Rotate both wheels based on the car's movement
         // The direction argument will be 1 or -1, affecting the rotation direction
-        var rotationSpeed = 0.1 * direction;
-        this.wheel1.rotation += rotationSpeed;
-        this.wheel2.rotation += rotationSpeed;
+        var rotationSpeed = 0.25 * direction;
+
+        // for normal object
+        // this.wheel1.rotation += rotationSpeed;
+        // this.wheel2.rotation += rotationSpeed;
+
+        //  for the container object
+        // wheels are the second and fourth children in the container
+        this.player.list[1].rotation += rotationSpeed;
+        this.player.list[3].rotation += rotationSpeed;
     }
 
     scaleBackground() {
@@ -664,7 +688,7 @@ class GameScene extends Phaser.Scene {
 
     destroyObj(floor, obj) {
         this.explosion = this.add.sprite(obj.x, obj.y, "explosion");
-        this.explosionSound.play();
+        this.woodenBarrelHitGroundSound.play();
         this.explosion.play("explode");
         this.explosion.setScale(0.8);
         if (obj.strengthText) obj.strengthText.destroy();
@@ -838,26 +862,26 @@ class GameScene extends Phaser.Scene {
         // cashPot.setScale(this.deviceType === "mobile" ? 0.7 : 1);
         cashPot.setScale(this.deviceType === "mobile" ? 0.7 : 1);
 
-        // let values = [2, 3, 5, 8, 10, 15, 25, 40, 75, 100];
+        let values = [2, 3, 5, 8, 10, 15, 25, 40, 75, 100];
 
-        function getRandomNumber() {
-            // Generate a random number between 0 and 1
-            let randomNum = Math.random();
-
-            // Scale it to the range [0.01, 0.25]
-            return 0.01 + randomNum * (0.25 - 0.01);
-        }
         // function getRandomNumber() {
         //     // Generate a random number between 0 and 1
         //     let randomNum = Math.random();
 
         //     // Scale it to the range [0.01, 0.25]
-        //     return Math.floor(0 + randomNum * 9);
+        //     return 0.01 + randomNum * (0.25 - 0.01);
         // }
+        function getRandomNumber() {
+            // Generate a random number between 0 and 1
+            let randomNum = Math.random();
+
+            // Scale it to the range [0, 9]
+            return Math.floor(0 + randomNum * 9);
+        }
 
         // Phaser.Math.Between(0.01, 0.25);
-        let cashPotValue = getRandomNumber().toFixed(2);
-        // let cashPotValue = values[getRandomNumber()];
+        // let cashPotValue = getRandomNumber().toFixed(2);
+        let cashPotValue = values[getRandomNumber()];
         // let cashPotValue = multiplier;
 
         cashPot.strength = cashPotValue; // Random value
@@ -865,13 +889,12 @@ class GameScene extends Phaser.Scene {
 
         // Create a text object to display the strength
         // Store the text object inside the cashPot for easy updating
-        cashPot.strengthText = this.add
-        .text(cashPot.x, cashPot.y, `${cashPot.strength}x`, {
-            fontSize: "16px",
-            fill: "#ffffff",
+        cashPot.strengthText = this.add.text(cashPot.x, cashPot.y, `${cashPot.strength}x`, {
+            fontSize: "26px",
+            fill: "black",
             fontStyle: "bold",
-        })
-        .setOrigin(0.5);
+        });
+        // .setOrigin(0.5);
 
         // Ensures the text appears on top of the barrel
         cashPot.strengthText.setDepth(1);
@@ -1054,6 +1077,7 @@ class GameScene extends Phaser.Scene {
         //     fill: "#ff0000",
         // });
         // reasonText.setOrigin(0.5, 0.5);
+        this.gameEnd = true;
 
         this.physics.pause(); // Disable game controls (optional)
 
@@ -1105,6 +1129,7 @@ class GameScene extends Phaser.Scene {
         this.gameSpeed = 20;
         this.spawnSpeed = 1000;
         this.setVelocityY = 80;
+        this.gameEnd = false;
     }
 
     saveGameState() {

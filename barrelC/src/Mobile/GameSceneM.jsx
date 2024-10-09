@@ -29,7 +29,7 @@ const GameSceneM = () => {
                     debug: false
                 }
             },
-            scene: [GameScene,EndScene],
+            scene: [GameScene, EndScene],
         };
         game = new Phaser.Game(config);
 
