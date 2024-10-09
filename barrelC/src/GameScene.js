@@ -151,21 +151,6 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // Creating Form
-        // this.formUtil = new this.formUtil({
-        //     scene: this,
-        //     rows: 11,
-        //     cols: 11,
-        // });
-        // this.formUtil.showNumbers();
-        // this.formUtil.scaleToGameW("myText", 0.3);
-        // this.formUtil.placeElementAt(16, "myText", true);
-        // this.formUtil.scaleToGameW("area51", 0.8);
-        // this.formUtil.scaleToGameH("area51", 0.5);
-        // this.formUtil.placeElementAt(60, "area51", true, true);
-        // this.formUtil.addChangeCallback("area51", this.textAreaChanged, this);
-        // Creating Form
-
         //add sound to the game
 
         // Create sound objects
@@ -177,8 +162,8 @@ class GameScene extends Phaser.Scene {
             // volume: 0.5, // Adjust the volume
         });
         this.wheelSound = this.sound.add("wheel", {
-            loop: true,
-            // volume: 0.5, // Adjust the volume
+            loop: false,
+            // volume: 0.5,
         });
         // ^ game sounds
 
@@ -194,18 +179,18 @@ class GameScene extends Phaser.Scene {
         .setDepth(-1)
         .setImmovable(true);
 
-        // add score text and img
+        // add score text and img > game info
         // img
         this.add
-        .image(this.game.config.width - 160, 25, "showScore")
+        .image(this.game.config.width - 130, 25, "showScore")
         .setOrigin(0, 0)
         .setScale(0.75)
         .setDepth(1);
 
         this.textS = this.add
-        .text(this.game.config.width - 100, 35, `${this.score} X`, {
-            font: "bold 25px Arial",
-            fontSize: "16px",
+        .text(this.game.config.width - 70, 35, `${this.score} X`, {
+            font: `bold ${this.deviceType === "mobile" ? 20 : 25}px Arial`,
+            // fontSize: "16px",
             fill: "white",
             fontStyle: "bold",
         })
@@ -215,15 +200,15 @@ class GameScene extends Phaser.Scene {
         // multiplayer text and image
         if (this.gameMode !== "practice") {
             this.add
-            .image(this.game.config.width - 140, 65, "multiPlayerValue")
+            .image(this.game.config.width - 130, 65, "multiPlayerValue")
             .setOrigin(0, 0)
             .setScale(0.75)
             .setDepth(1);
 
             this.textM = this.add
-            .text(this.game.config.width - 90, 65, `$${this.score}`, {
-                font: "bold 25px Arial",
-                fontSize: "16px",
+            .text(this.game.config.width - 70, 65, `$${this.score}`, {
+                font: `bold ${this.deviceType === "mobile" ? 20 : 25}px Arial`,
+                // fontSize: "16px",
                 fill: "green",
                 fontStyle: "bold",
             })
@@ -240,7 +225,7 @@ class GameScene extends Phaser.Scene {
             let bet = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount;
 
             this.textBetAmount = this.add
-            .text(this.game.config.width - 80, 100, `$${bet}`, {
+            .text(this.game.config.width - 70, 100, `$${bet}`, {
                 font: `bold ${this.deviceType === "mobile" ? 20 : 25}px Arial`,
                 // fontSize: "16px",
                 fill: "gray",
@@ -325,20 +310,11 @@ class GameScene extends Phaser.Scene {
         // .setScale(0.9)
         .setDepth(1);
 
-        // Create a container to hold the car and its wheels
-        // this.player = this.physics.add
-        // .image(this.game.config.width - this.game.config.width / 2, this.game.config.height - 150, "player")
-        // .setScale(this.deviceType === "mobile" ? 0.6 : 0.8)
-        // .setCollideWorldBounds(true);
-        // // .setOrigin(0, 0);
-        // // setCircle(width, offsetX, offsetY)
-        // this.player.setCircle(this.player.width / 2 - 17, 10, 8);
-
         this.player = this.add.container(
             this.game.config.width - this.game.config.width / 2,
             this.game.config.height - 150,
             [this.cannonShadow, this.wheel2, this.cannonImg, this.wheel1]
-        );
+        ).setDepth(2);
         // Enable physics for the container (not individual objects)
         this.physics.world.enable(this.player);
         this.player.body.setCollideWorldBounds(true);
@@ -347,7 +323,6 @@ class GameScene extends Phaser.Scene {
         // this.player.setCircle(this.player.width / 2 - 17, 10, 58);
         this.player.body.setOffset(-35, -60);
 
-        // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         // Create barrel group
         this.barrels = this.physics.add.group();
 
@@ -435,7 +410,7 @@ class GameScene extends Phaser.Scene {
             this.moveLeft = new CtrlButton(
                 this,
                 // this.buttonX,
-                30,
+                60,
                 // this.buttonY,
                 this.game.config.height - 90,
                 "leftAro"
@@ -454,7 +429,7 @@ class GameScene extends Phaser.Scene {
             this.moveRight = new CtrlButton(
                 this,
                 // this.buttonX,
-                100,
+                130,
                 // this.buttonY,
                 this.game.config.height - 90,
                 "rightAro"
@@ -707,7 +682,7 @@ class GameScene extends Phaser.Scene {
             this.bulletsRemaining -= 1;
             this.updateMagazineBar();
 
-            let bullet = this.bullets.create(this.player.x - 8, this.player.y - 70, "bullet");
+            let bullet = this.bullets.create(this.player.x - 8, this.player.y - 30, "bullet").setDepth(1);
             bullet.setVelocityY(-400); // Adjust speed
             if (this.deviceType === "mobile") {
                 bullet.setScale(0.8, 0.8);

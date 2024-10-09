@@ -5,6 +5,9 @@ import Button from "../gameObj/Button";
 export default class EndScene extends Phaser.Scene {
     constructor() {
         super("End");
+
+        //  devise type
+        this.deviceType = window.matchMedia("(min-width: 1025px)").matches ? "desktop" : "mobile";
     }
 
     init(data) {
@@ -12,7 +15,6 @@ export default class EndScene extends Phaser.Scene {
         this.score = data.totalScore;
 
         // clearing the localstorage for removing the reload data
-        // localStorage.clear();
         sessionStorage.removeItem("phaserGameState");
     }
 
@@ -42,11 +44,16 @@ export default class EndScene extends Phaser.Scene {
 
         this.add.text(120, 50, `Your Score : ${this.score}`, {fontSize: 18});
 
-        this.add.text(this.game.config.width / 2 -180, this.game.config.height / 2 - 100, `Game Over`, {
-            fontSize: "58px",
-            fill: "#FFE358",
-            fontStyle: "bold",
-        });
+        this.add.text(
+            this.game.config.width / 2 - (this.deviceType === "mobile" ? 130 : 180),
+            this.game.config.height / 2 - 100,
+            `Game Over`,
+            {
+                fontSize: `${this.deviceType === "mobile" ? 48 : 65}px`,
+                fill: "#FFE358",
+                fontStyle: "bold",
+            }
+        );
         this.returnBtn = new Button(
             this,
             this.game.config.width / 2,

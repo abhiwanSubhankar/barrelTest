@@ -44,9 +44,8 @@ const SplashScreen = () => {
         <div id='splashScreen' >
 
             <img src={logo}
-                alt="Teen patti"
+                alt="logo"
                 id='logoIcon'
-                className='absolute right-5 top-5 max-w-36'
             />
 
             <div className='loaderWrapper'>
