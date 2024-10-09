@@ -46,7 +46,7 @@ export default class EndScene extends Phaser.Scene {
 
         this.add.text(
             this.game.config.width / 2 - (this.deviceType === "mobile" ? 130 : 180),
-            this.game.config.height / 2 - 100,
+            this.game.config.height / 2 - 120,
             `Game Over`,
             {
                 fontSize: `${this.deviceType === "mobile" ? 48 : 65}px`,

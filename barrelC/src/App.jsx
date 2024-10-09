@@ -180,10 +180,10 @@ function App() {
 
           <div>
             <div>
-              <h3>Balance</h3>
+              <h3>BALANCE</h3>
               <h4 className='balance'>{currentCoins}</h4>
               <br />
-              {gameMode !== "practice" && <h3>Bet Size</h3>}
+              {gameMode !== "practice" && <h3>BET SIZE</h3>}
 
               {gameMode !== "practice" && <div className='betAmountWrapper'>
 
@@ -229,12 +229,12 @@ function App() {
             </div>
 
             <br />
-            {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started}>Place Bet</button>}
+            {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started}>PLACE BET</button>}
 
-            <button onClick={handlePlaceBet} className='button'>connect wallet</button>
+            <button onClick={handlePlaceBet} className='button'>CONNECT WALLET</button>
 
             <div>
-              <h4>Selected Game Mode :- {gameMode}</h4>
+              <h4>SELECTED GAME MODE :- {gameMode === "normal" ? "NORMAL" : "PRACTICE"}</h4>
               <select name="" id="" className='balance'
                 disabled={started}
                 value={gameMode}
@@ -242,9 +242,9 @@ function App() {
                   setGameMode(e.target.value)
                   sessionStorage.setItem("gameMode", e.target.value);
                 }}>
-                <option value="">Selet Game mode</option>
-                <option value="practice"> practice</option>
-                <option value="normal">Normal</option>
+                <option value="">SELECT GAME MODE</option>
+                <option value="practice"> PRACTICE </option>
+                <option value="normal">NORMAL</option>
               </select>
             </div>
           </div>
