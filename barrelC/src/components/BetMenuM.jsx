@@ -16,7 +16,7 @@ const BetMenuM = ({
         height: "100vh"
     }}>
         <div>
-            <img src="/lOGO.svg" alt="logo" width={"60%"} />
+            <img src="/lOGO.svg" alt="logo" width={"60%"} draggable={false} />
         </div>
 
         <div>

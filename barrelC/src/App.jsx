@@ -175,7 +175,7 @@ function App() {
       <div className="App">
         <div>
           <div>
-            <img src="/lOGO.svg" alt="logo" width={"80%"} />
+            <img src="/lOGO.svg" alt="logo" width={"80%"} draggable={false} />
           </div>
 
           <div>

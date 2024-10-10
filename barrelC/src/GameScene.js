@@ -104,6 +104,15 @@ class GameScene extends Phaser.Scene {
                 // endFrame: 23, // Total frames in the sprite sheet
             } // info for the spiteSheet.
         );
+        this.load.spritesheet(
+            "groundExplosion", // spiteSheet name
+            "/groundBoom.png", // spite sheet asset path
+            {
+                frameWidth: 200, // Width of each frame
+                frameHeight: 200, // Height of each frame
+                // endFrame: 23, // Total frames in the sprite sheet
+            } // info for the spiteSheet.
+        );
         // this.load.spritesheet(
         //     "explosion", // spiteSheet name
         //     "/bigboom.png", // spite sheet asset path
@@ -260,6 +269,18 @@ class GameScene extends Phaser.Scene {
             // repeat: -1,
             // duration: 2000,
         });
+        this.anims.create({
+            key: "groundExplode", // this create animation key not the pre load invock key.
+            frames: this.anims.generateFrameNumbers(
+                "groundExplosion"
+                // {start: 0, end: 7}
+            ),
+            frameRate: 20,
+            hideOnComplete: true,
+            // repeat: -1,
+            // duration: 2000,
+        });
+
         this.anims.create({
             key: "rotateWheel", // this create animation key not the pre load invock key.
             frames: this.anims.generateFrameNumbers(
@@ -535,7 +556,7 @@ class GameScene extends Phaser.Scene {
         this.barrels.children.iterate((barrel) => {
             if (barrel && barrel.strengthText) {
                 barrel.strengthText.x = barrel.x;
-                barrel.strengthText.y = barrel.y + 5;
+                barrel.strengthText.y = barrel.y;
             }
         });
 
@@ -601,10 +622,10 @@ class GameScene extends Phaser.Scene {
     }
 
     destroyObj(floor, obj) {
-        this.explosion = this.add.sprite(obj.x, obj.y, "explosion");
+        this.explosion = this.add.sprite(obj.x, obj.y, "groundExplosion");
         this.woodenBarrelHitGroundSound.play();
-        this.explosion.play("explode");
-        this.explosion.setScale(0.8);
+        this.explosion.play("groundExplode");
+        this.explosion.setScale(this.deviceType === "mobile" ? 0.4 : 0.7);
         if (obj.strengthText) obj.strengthText.destroy();
         obj.destroy();
     }
@@ -624,7 +645,7 @@ class GameScene extends Phaser.Scene {
             let bullet = this.bullets.create(this.player.x - 4, this.player.y - 30, "bullet").setDepth(1);
             bullet.setVelocityY(-400); // Adjust speed
             if (this.deviceType === "mobile") {
-                bullet.setScale(0.8, 0.8);
+                bullet.setScale(0.5, 0.5);
             }
         }
 
@@ -834,7 +855,7 @@ class GameScene extends Phaser.Scene {
         );
         // bomb.setOffset(1, 3);
         if (this.deviceType === "mobile") {
-            bomb.setScale(0.6, 0.6);
+            bomb.setScale(0.7, 0.7);
         } else {
             bomb.setScale(1.3, 1);
         }
@@ -852,7 +873,7 @@ class GameScene extends Phaser.Scene {
         // barrel.setScale(this.deviceType === "mobile" ? 0.8 : 1.2);
 
         if (this.deviceType === "mobile") {
-            barrel.setScale(0.6, 0.6);
+            barrel.setScale(0.7, 0.7);
         } else {
             barrel.setScale(1.3, 1);
         }
@@ -872,9 +893,9 @@ class GameScene extends Phaser.Scene {
         // Create a text object to display the strength
         barrel.strengthText = this.add
         .text(barrel.x, barrel.y, `${barrel.strength}x`, {
-            fontSize: this.deviceType === "mobile" ? "9px" : "15px",
+            fontSize: this.deviceType === "mobile" ? "8px" : "15px",
             fill: "#ffffff",
-            fontStyle: "bold",
+            // fontStyle: "bold",
         })
         .setOrigin(0.5, this.deviceType === "mobile" ? 2.6 : 2.4);
         // .setOrigin(0.5);
@@ -909,7 +930,7 @@ class GameScene extends Phaser.Scene {
 
             this.explosion = this.add.sprite(barrel.x, barrel.y, "explosion");
             this.explosion.play("explode");
-            this.explosion.setScale(0.8);
+            this.explosion.setScale(this.deviceType === "mobile" ? 0.4 : 0.8);
 
             let gameMode = sessionStorage.getItem("gameMode");
             gameMode !== "practice" && this.updateLavel();
@@ -945,7 +966,7 @@ class GameScene extends Phaser.Scene {
         // play blust animation
         this.explosion = this.add.sprite(cashPot.x, cashPot.y, "explosion");
         this.explosion.play("explode");
-        this.explosion.setScale(0.8);
+        this.explosion.setScale(this.deviceType === "mobile" ? 0.4 : 0.8);
 
         // removing all the element from canvas
         cashPot.destroy();
@@ -963,7 +984,7 @@ class GameScene extends Phaser.Scene {
         this.explosionSound.play();
         this.explosion = this.add.sprite(bomb.x, bomb.y, "explosion");
         this.explosion.play("explode");
-        this.explosion.setScale(0.8);
+        this.explosion.setScale(this.deviceType === "mobile" ? 0.4 : 0.8);
 
         this.gameOver();
     }
@@ -1131,7 +1152,7 @@ class GameScene extends Phaser.Scene {
                 );
 
                 if (this.deviceType === "mobile") {
-                    bomb.setScale(0.6, 0.6);
+                    bomb.setScale(0.7, 0.7);
                 } else {
                     bomb.setScale(1.3, 1);
                 }
@@ -1152,7 +1173,7 @@ class GameScene extends Phaser.Scene {
                 barrel.value = barrelData.value;
                 barrel.strengthText = this.add
                 .text(barrel.x, barrel.y, `${barrel.strength}x`, {
-                    fontSize: this.deviceType === "mobile" ? "9px" : "15px",
+                    fontSize: this.deviceType === "mobile" ? "8px" : "15px",
                     fill: "#ffffff",
                     fontStyle: "bold",
                 })
@@ -1163,7 +1184,7 @@ class GameScene extends Phaser.Scene {
                 barrel.strengthText.setDepth(1);
 
                 if (this.deviceType === "mobile") {
-                    barrel.setScale(0.6, 0.6);
+                    barrel.setScale(0.7, 0.7);
                 } else {
                     barrel.setScale(1.3, 1);
                 }
