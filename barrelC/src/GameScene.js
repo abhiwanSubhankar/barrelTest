@@ -174,10 +174,11 @@ class GameScene extends Phaser.Scene {
         // this.background = this.add.image(0, -80, "bg").setOrigin(0, 0).setScale(0.95);
 
         this.bgImageGround = this.physics.add
-        .image(0, this.game.config.height - 140, "bgGround")
+        .image(0, this.game.config.height - (this.deviceType === "mobile" ? 130 : 140), "bgGround")
         .setOrigin(0, 0)
         .setDepth(-1)
         .setImmovable(true);
+        // .setScale(this.deviceType === "mobile" ? 0.8 : 1);
 
         // add score text and img > game info
         // img
@@ -310,16 +311,19 @@ class GameScene extends Phaser.Scene {
         // .setScale(0.9)
         .setDepth(1);
 
-        this.player = this.add.container(
-            this.game.config.width - this.game.config.width / 2,
-            this.game.config.height - 150,
-            [this.cannonShadow, this.wheel2, this.cannonImg, this.wheel1]
-        ).setDepth(2);
+        this.player = this.add
+        .container(this.game.config.width - this.game.config.width / 2, this.game.config.height - 150, [
+            this.cannonShadow,
+            this.wheel2,
+            this.cannonImg,
+            this.wheel1,
+        ])
+        .setDepth(2);
         // Enable physics for the container (not individual objects)
         this.physics.world.enable(this.player);
         this.player.body.setCollideWorldBounds(true);
         this.player.body.setAllowGravity(false);
-        this.player.setScale(this.deviceType === "mobile" ? 0.6 : 0.8);
+        this.player.setScale(this.deviceType === "mobile" ? 0.4 : 0.8);
         // this.player.setCircle(this.player.width / 2 - 17, 10, 58);
         this.player.body.setOffset(-35, -60);
 
@@ -445,32 +449,6 @@ class GameScene extends Phaser.Scene {
             });
         }
 
-        // exp wheel animation
-
-        // this.car = this.add.image(400, 300, "car").setDepth(2);
-
-        // this.cannonShadow = this.add.image(this.car.x , this.car.y + 90, "cannonShadow").setDepth(2);
-
-        // // Assuming the wheels are separate images, position them under the car
-        // this.wheel1 = this.add
-        // .image(this.car.x - 20, this.car.y + 60, "wheel")
-        // // .setScale(0.9)
-        // .setDepth(3);
-
-        // this.wheel2 = this.add
-        // .image(this.car.x + 20, this.car.y + 60, "wheel")
-        // // .setScale(0.9)
-        // .setDepth(1);
-
-        // // Create a container to hold the car and its wheels
-        // this.carContainer = this.add.container(400, 300, [this.cannonShadow, this.wheel2, this.car, this.wheel1]);
-        // // Enable physics for the container (not individual objects)
-        // this.physics.world.enable(this.carContainer);
-        // this.carContainer.body.setCollideWorldBounds(true);
-        // this.carContainer.body.setAllowGravity(false);
-
-        // exp wheel
-
         // Shooting and collision / overlap logic
         this.physics.add.overlap(this.bullets, this.barrels, this.hitBarrel, null, this);
 
@@ -553,58 +531,19 @@ class GameScene extends Phaser.Scene {
             this.shootTimer.paused = true; // Pause auto shooting
         }
 
-        // >>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-        // Shooting logic with cooldown
-        // Shooting logic with spacebar press
-        // if (this.spaceBar.isDown && !this.shooting) {
-        //     this.shootBullet();
-        //     this.shooting = true; // Start shooting
-        //     this.shootTimer.paused = false; // Unpause the shooting timer
-        // } else if (this.spaceBar.isUp && this.shooting) {
-        //     this.shooting = false; // Stop shooting
-        //     this.shootTimer.paused = true; // Pause the shooting timer
-        // }
-
-        // update delay
-        // if (someConditionToIncreaseSpeed) {
-        //     this.shootingInterval = 200; // Faster shooting (200 ms)
-        //     this.shootTimer.delay = this.shootingInterval; // Adjust timer delay
-        // }
-
-        // // Example: Decrease shooting speed (e.g., if player loses power-up)
-        // if (someConditionToDecreaseSpeed) {
-        //     this.shootingInterval = 400; // Slower shooting (400 ms)
-        //     this.shootTimer.delay = this.shootingInterval; // Adjust timer delay
-        // }
-        // ...............................................
-
-        // if (this.spaceBar.isDown && this.cooldown > 0 && !this.shooting) {
-        //     this.shootBullet();
-        //     this.cooldown -= 10; // Adjust cooldown
-        //     this.shooting = true;
-        // } else if (this.spaceBar.isUp) {
-        //     this.shooting = false;
-        // }
-
-        // // Refill cooldown over time
-        // if (this.cooldown < 100 && this.spaceBar.isUp) {
-        //     this.cooldown += 1;
-        // }
-
         // Update the position of the strength text to follow each barrel
         this.barrels.children.iterate((barrel) => {
             if (barrel && barrel.strengthText) {
                 barrel.strengthText.x = barrel.x;
-                barrel.strengthText.y = barrel.y;
+                barrel.strengthText.y = barrel.y + 5;
             }
         });
 
         // updating the text position for the every cash pod
         this.cashPots.children.iterate((cashpod) => {
             if (cashpod && cashpod.strengthText) {
-                cashpod.strengthText.x = cashpod.x - 13;
-                cashpod.strengthText.y = cashpod.y + 5;
+                cashpod.strengthText.x = cashpod.x - (cashpod.value > 10 ? 17 : 15);
+                cashpod.strengthText.y = cashpod.y + 4;
             }
         });
 
@@ -682,7 +621,7 @@ class GameScene extends Phaser.Scene {
             this.bulletsRemaining -= 1;
             this.updateMagazineBar();
 
-            let bullet = this.bullets.create(this.player.x - 8, this.player.y - 30, "bullet").setDepth(1);
+            let bullet = this.bullets.create(this.player.x - 4, this.player.y - 30, "bullet").setDepth(1);
             bullet.setVelocityY(-400); // Adjust speed
             if (this.deviceType === "mobile") {
                 bullet.setScale(0.8, 0.8);
@@ -832,10 +771,10 @@ class GameScene extends Phaser.Scene {
 
         // this.cashPotSound.play();
 
-        cashPot.setCircle(27);
-        cashPot.setCircle(30, cashPot.width / 2 - 27, cashPot.height / 2 - 27);
+        // cashPot.setCircle(27);
+        cashPot.setCircle(30, cashPot.width / 2 - 30, cashPot.height / 2 - 15);
         // cashPot.setScale(this.deviceType === "mobile" ? 0.7 : 1);
-        cashPot.setScale(this.deviceType === "mobile" ? 0.7 : 1);
+        cashPot.setScale(this.deviceType === "mobile" ? 0.5 : 1);
 
         let values = [2, 3, 5, 8, 10, 15, 25, 40, 75, 100];
 
@@ -864,11 +803,16 @@ class GameScene extends Phaser.Scene {
 
         // Create a text object to display the strength
         // Store the text object inside the cashPot for easy updating
-        cashPot.strengthText = this.add.text(cashPot.x, cashPot.y, `${cashPot.strength}x`, {
-            fontSize: "26px",
-            fill: "black",
-            fontStyle: "bold",
-        });
+        cashPot.strengthText = this.add.text(
+            cashPot.x - (cashPot.value > 10 ? 17 : 15),
+            cashPot.y + 4,
+            `${cashPot.strength}x`,
+            {
+                fontSize: `${this.deviceType === "mobile" ? 20 : 24}px`,
+                fill: "black",
+                fontStyle: "bold",
+            }
+        );
         // .setOrigin(0.5);
 
         // Ensures the text appears on top of the barrel
@@ -883,10 +827,14 @@ class GameScene extends Phaser.Scene {
         bomb.setVelocityY(this.setVelocityY); // Adjust falling speed
         // bomb.setScale(this.deviceType === "mobile" ? 0.7 : 1);
         // bomb.setCircle(bomb.width / 2);
-        bomb.setCircle(26, bomb.width / 2 - 32, bomb.height / 2 - 25);
+        bomb.setCircle(
+            26, //width
+            bomb.width / 2 - 32, // offSetX
+            bomb.height / 2 - (this.deviceType === "mobile" ? 15 : 20) // offSetY
+        );
         // bomb.setOffset(1, 3);
         if (this.deviceType === "mobile") {
-            bomb.setScale(0.8, 0.8);
+            bomb.setScale(0.6, 0.6);
         } else {
             bomb.setScale(1.3, 1);
         }
@@ -900,11 +848,11 @@ class GameScene extends Phaser.Scene {
         barrel.setVelocityY(this.setVelocityY); // Adjust falling speed
         // barrel.setOffset(-5,-10)
         // this.player.setSize(this.player.width / 4, this.player.height / 4).setOffset(this.player.width / 10, this.player.height / 10)
-        barrel.setCircle(26, barrel.width / 2 - 25, barrel.height / 2 - 25);
+        barrel.setCircle(26, barrel.width / 2 - 25, barrel.height / 2 - (this.deviceType === "mobile" ? 15 : 20));
         // barrel.setScale(this.deviceType === "mobile" ? 0.8 : 1.2);
 
         if (this.deviceType === "mobile") {
-            barrel.setScale(0.8, 0.8);
+            barrel.setScale(0.6, 0.6);
         } else {
             barrel.setScale(1.3, 1);
         }
@@ -1176,10 +1124,14 @@ class GameScene extends Phaser.Scene {
                 // bomb.setCircle(26, bomb.width / 2 - 26, bomb.height / 2 - 26);
                 // bomb.setOffset(10, 3);
 
-                bomb.setCircle(26, bomb.width / 2 - 32, bomb.height / 2 - 25);
+                bomb.setCircle(
+                    26, //width
+                    bomb.width / 2 - 32, // offSetX
+                    bomb.height / 2 - (this.deviceType === "mobile" ? 15 : 20) // offSetY
+                );
 
                 if (this.deviceType === "mobile") {
-                    bomb.setScale(0.8, 0.8);
+                    bomb.setScale(0.6, 0.6);
                 } else {
                     bomb.setScale(1.3, 1);
                 }
@@ -1190,7 +1142,11 @@ class GameScene extends Phaser.Scene {
                 barrel.setVelocityY(barrelData.velocityY);
                 // barrel.setCircle(25);
                 // barrel.setCircle(25, barrel.width / 2 - 25, barrel.height / 2 - 25);
-                barrel.setCircle(26, barrel.width / 2 - 25, barrel.height / 2 - 25);
+                barrel.setCircle(
+                    26,
+                    barrel.width / 2 - 25,
+                    barrel.height / 2 - (this.deviceType === "mobile" ? 15 : 20)
+                );
 
                 barrel.strength = barrelData.strength;
                 barrel.value = barrelData.value;
@@ -1207,7 +1163,7 @@ class GameScene extends Phaser.Scene {
                 barrel.strengthText.setDepth(1);
 
                 if (this.deviceType === "mobile") {
-                    barrel.setScale(0.8, 0.8);
+                    barrel.setScale(0.6, 0.6);
                 } else {
                     barrel.setScale(1.3, 1);
                 }
@@ -1217,22 +1173,26 @@ class GameScene extends Phaser.Scene {
                 let cashPot = this.cashPots.create(cashPotData.x, cashPotData.y, "cashpot");
                 cashPot.setVelocityY(cashPotData.velocityY);
 
-                cashPot.setCircle(27);
-                cashPot.setCircle(30, cashPot.width / 2 - 27, cashPot.height / 2 - 27);
+                // cashPot.setCircle(27);
+                cashPot.setCircle(30, cashPot.width / 2 - 30, cashPot.height / 2 - 15);
 
                 cashPot.strength = cashPotData.value; // Random value
                 cashPot.value = cashPotData.value;
-                cashPot.strengthText = this.add
-                .text(cashPot.x, cashPot.y, `${cashPot.strength}x`, {
-                    fontSize: "16px",
-                    fill: "#ffffff",
-                    fontStyle: "bold",
-                })
-                .setOrigin(0.5);
+                cashPot.strengthText = this.add.text(
+                    cashPot.x - (cashPot.value > 10 ? 17 : 15),
+                    cashPot.y + 4,
+                    `${cashPot.strength}x`,
+                    {
+                        fontSize: `${this.deviceType === "mobile" ? 20 : 24}px`,
+                        fill: "black",
+                        fontStyle: "bold",
+                    }
+                );
+                // .setOrigin(0.5);
 
                 // Ensures the text appears on top of the barrel
                 cashPot.strengthText.setDepth(1);
-                cashPot.setScale(this.deviceType === "mobile" ? 0.7 : 1);
+                cashPot.setScale(this.deviceType === "mobile" ? 0.5 : 1);
             });
 
             console.log("game bomb obj", gameState.bombs);

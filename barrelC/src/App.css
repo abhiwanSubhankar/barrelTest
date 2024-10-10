@@ -10,7 +10,7 @@
 .App>div {
     width: 25%;
     text-align: center;
-    border-radius: 15px 0 0 15px;
+    /* border-radius: 15px 0 0 15px; */
     background: radial-gradient(50.01% 50.01% at 50.43% 24.99%, #712E81 0%, #2F1753 100%);
     background-position: center;
     /* position: absolute; */
