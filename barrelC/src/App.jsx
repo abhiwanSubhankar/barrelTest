@@ -56,11 +56,11 @@ function App() {
   useEffect(() => {
 
     let game;
-    
+
     if (deviceType === "desktop") {
 
       let gameCanvas = document.getElementById("gameCanvas");
-  
+
       const config = {
         type: Phaser.WEBGL,
         width: sizes.width,
@@ -70,13 +70,13 @@ function App() {
           default: 'arcade',
           arcade: {
             gravity: { y: 0 },
-            debug: true
+            debug: false
           }
         },
         // scene: [PreStartScene, GameScene, EndScenePopup],
         scene: [PreStartScene, GameScene, EndScene],
       };
-      game = new Phaser.Game(config);    
+      game = new Phaser.Game(config);
 
       return () => {
         game.destroy(true);
