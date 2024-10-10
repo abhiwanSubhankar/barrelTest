@@ -13,6 +13,8 @@ export default class EndScene extends Phaser.Scene {
     init(data) {
         console.log("init", data);
         this.score = data.totalScore;
+        this.betAmount = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0;
+        this.gameMode = sessionStorage.getItem("gameMode") || "practice";
 
         // clearing the localstorage for removing the reload data
         sessionStorage.removeItem("phaserGameState");
@@ -42,25 +44,38 @@ export default class EndScene extends Phaser.Scene {
         // this.bgImage.setScale(1.4);
         this.bgImage.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
-        this.add.text(120, 50, `Your Score : ${this.score}`, {fontSize: 18});
+        // this.add.text(120, 50, `Your Score : ${this.score}`, {fontSize: 18});
 
         this.add.text(
-            this.game.config.width / 2 - (this.deviceType === "mobile" ? 130 : 180),
+            this.game.config.width / 2 - (this.deviceType === "mobile" ? 130 : 350),
             this.game.config.height / 2 - 120,
-            `Game Over`,
+            `You have own ${this.deviceType === "mobile" ? "\n" : ""} $${(this.betAmount * this.score).toFixed(2)}.`,
             {
-                fontSize: `${this.deviceType === "mobile" ? 48 : 65}px`,
+                fontSize: `${this.deviceType === "mobile" ? 35 : 65}px`,
                 fill: "#FFE358",
                 fontStyle: "bold",
+                  align: 'center'
             }
         );
+        // if()
+
+        // this.add.text(
+        //     this.game.config.width / 2 - (this.deviceType === "mobile" ? 130 : 180),
+        //     this.game.config.height / 2 - 120,
+        //     `Game Over`,
+        //     {
+        //         fontSize: `${this.deviceType === "mobile" ? 48 : 65}px`,
+        //         fill: "#FFE358",
+        //         fontStyle: "bold",
+        //     }
+        // );
         this.returnBtn = new Button(
             this,
             this.game.config.width / 2,
             this.game.config.height / 2,
             "yellowButton1",
             "yellowButton2",
-            "Reload",
+            "Play Again",
             "Start",
             "restart"
         );

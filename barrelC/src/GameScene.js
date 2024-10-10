@@ -207,8 +207,10 @@ class GameScene extends Phaser.Scene {
         .setOrigin(0, 0)
         .setDepth(1);
 
+        let localGameMode = sessionStorage.getItem("gameMode") || "practice";
+
         // multiplayer text and image
-        if (this.gameMode !== "practice") {
+        if (localGameMode !== "practice") {
             this.add
             .image(this.game.config.width - 130, 65, "multiPlayerValue")
             .setOrigin(0, 0)
@@ -603,7 +605,7 @@ class GameScene extends Phaser.Scene {
     rotateWheels(direction) {
         // Rotate both wheels based on the car's movement
         // The direction argument will be 1 or -1, affecting the rotation direction
-        var rotationSpeed = 0.25 * direction;
+        var rotationSpeed = 0.3 * direction;
 
         // for normal object
         // this.wheel1.rotation += rotationSpeed;
@@ -756,6 +758,11 @@ class GameScene extends Phaser.Scene {
             this.updateExistingBarrelCashpotBombsVelocityY();
 
             this.shootingInterval -= this.gameLevel * 5;
+
+            if (this.playerVelocity < 500) {
+                let incVel = this.gameLevel * 3;
+                this.playerVelocity += incVel;
+            }
 
             if (this.spawnSpeed > 200) {
                 this.spawnObject.delay = this.spawnSpeed;

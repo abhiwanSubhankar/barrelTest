@@ -23,7 +23,7 @@ function App() {
   const [currentCoins, setCurrentCoins] = useState(500);
   const [betAmount, setBetAmount] = useState(JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0);
   const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "");
-  const [started, setStarted] = useState(false);
+  const [started, setStarted] = useState(JSON.parse(sessionStorage.getItem("phaserGameState")) ? true : false);
   // game window size
   const [sizes, setSizes] = useState({
     height: window.innerHeight,
@@ -84,6 +84,7 @@ function App() {
     }
   }, [sizes, deviceType]);
 
+
   // set window size by device window
   useEffect(() => {
     // console.log(gameState)
@@ -101,16 +102,19 @@ function App() {
   }, [])
 
   const handlePlaceBet = () => {
+
     sessionStorage.setItem("betAmount", JSON.stringify({
       betAmount
     }));
 
+    publish(startGame, {
+      started: true,
+    });
+
     if (deviceType === "mobile") {
       navigate("/loading")
 
-      publish(startGame, {
-        started: true,
-      });
+
     }
   }
 
@@ -139,7 +143,10 @@ function App() {
 
   const endGameCB = useCallback((data) => {
     console.log("end event data", data);
+
     setStarted(false);
+    sessionStorage.removeItem("betAmount");
+    setBetAmount(0);
 
     if (deviceType === "mobile") {
       navigate("/");
@@ -231,7 +238,9 @@ function App() {
             <br />
             {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started}>PLACE BET</button>}
 
-            <button onClick={handlePlaceBet} className='button'>CONNECT WALLET</button>
+            <button
+              // onClick={handlePlaceBet}
+              className='button'>CONNECT WALLET</button>
 
             <div>
               <h4>SELECTED GAME MODE :- {gameMode === "normal" ? "NORMAL" : "PRACTICE"}</h4>
