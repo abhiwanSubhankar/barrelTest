@@ -103,7 +103,9 @@ function App() {
 
   const handlePlaceBet = () => {
 
-    if (betAmount > 0) {
+
+
+    if (betAmount > 0  || gameMode === "practice" ) {
 
       sessionStorage.setItem("betAmount", JSON.stringify({
         betAmount
