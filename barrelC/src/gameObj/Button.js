@@ -11,7 +11,8 @@ export default class Button extends Phaser.GameObjects.Container {
 
         this.button = this.scene.add.sprite(0, 0, key1).setInteractive({useHandCursor: true});
         if (key1 === "yellowButton1") this.button.setScale(0.7);
-        this.text = this.scene.add.text(0, 0, text, {fontSize: "30px", fill: "white",fontStyle: "bold",});
+        if (key1 === "blueButton1") this.button.setScale(1.5);
+        this.text = this.scene.add.text(0, 0, text, {fontSize: "30px", fill: "white", fontStyle: "bold"});
         Phaser.Display.Align.In.Center(this.text, this.button);
 
         this.add(this.button);

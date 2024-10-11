@@ -7,12 +7,13 @@ const BetMenuM = ({
     setBetAmount,
     handlePlaceBet,
     setGameMode,
-    deviceType
+    deviceType,
+    handleChange
 }) => {
 
 
     return (<div style={{
-        width:"100%",
+        width: "100%",
         height: "100vh"
     }}>
         <div>
@@ -21,7 +22,7 @@ const BetMenuM = ({
 
         <div>
             <div>
-            <h3>BALANCE</h3>
+                <h3>BALANCE</h3>
                 <h4 className='balance'>{currentCoins}</h4>
                 <br />
                 {gameMode !== "practice" && <h3>BET SIZE</h3>}
@@ -47,18 +48,10 @@ const BetMenuM = ({
                             if (e.key === 'e' || e.key === 'E' || e.key === "-") {
                                 e.preventDefault();
                             }
-                            // console.log(e.key);
 
                         }}
-                        onChange={(e) => {
-
-                            let val = +e.target.value;
-
-                            if (val > 0 && val < 1000000) {
-                                setBetAmount(val)
-                            }
-
-                        }} />
+                        onChange={(e) => handleChange(e)}
+                    />
 
                     <button className='incdecButton' disabled={started} onClick={() => {
                         setBetAmount((pre) => +pre + 1)
@@ -87,9 +80,9 @@ const BetMenuM = ({
                         setGameMode(e.target.value)
                         sessionStorage.setItem("gameMode", e.target.value);
                     }}>
-                  <option value="">SELECT GAME MODE</option>
-                <option value="practice"> PRACTICE </option>
-                <option value="normal">NORMAL</option>
+                    <option value="">SELECT GAME MODE</option>
+                    <option value="practice"> PRACTICE </option>
+                    <option value="normal">NORMAL</option>
                 </select>
             </div>
         </div>

@@ -86,12 +86,7 @@ const saveScore = async (username, score) => {
 };
 
 
-
-
-
-
-
-export {placeBet,getBalance};
+export {placeBet,getBalance,updatePlayerBalance,saveScore};
 
 
 

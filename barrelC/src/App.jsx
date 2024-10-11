@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import GameScene from './GameScene';
 import EndScene from './scenes/gameOver';
@@ -31,6 +31,20 @@ function App() {
   });
 
   const navigate = useNavigate();
+
+
+
+  const handleChange = (e) => {
+
+    let val = e.target.value;
+    console.log("val.startsWith('0')", val.startsWith('0'))
+
+    if (val === '0') {
+      setBetAmount(''); // Prevent a single '0' from being input
+    } else {
+      setBetAmount(val.replace(/^0+/, '')); // Strip any leading zeros
+    }
+  }
 
 
   useEffect(() => {
@@ -103,9 +117,12 @@ function App() {
 
   const handlePlaceBet = () => {
 
+    if (betAmount > 0 || gameMode === "practice") {
 
-
-    if (betAmount > 0  || gameMode === "practice" ) {
+      if (betAmount > currentCoins) {
+        alert("You don't have sufficient balance to Place the bet !");
+        return;
+      }
 
       sessionStorage.setItem("betAmount", JSON.stringify({
         betAmount
@@ -121,7 +138,6 @@ function App() {
     } else {
       alert("Bet Amount should be more than 1 or 1");
     }
-
   }
 
   const updateScoreCB = useCallback((data) => {
@@ -208,9 +224,10 @@ function App() {
 
                 <input
                   type="number"
+                  id={"numberInput"}
                   className='balance'
                   placeholder='Enter Bet Amount'
-                  min={0}
+                  min={1}
                   max={10000000}
                   disabled={started}
                   value={betAmount}
@@ -222,15 +239,8 @@ function App() {
                     // console.log(e.key);
 
                   }}
-                  onChange={(e) => {
-
-                    let val = +e.target.value;
-
-                    if (val > 0 && val < 1000000) {
-                      setBetAmount(val)
-                    }
-
-                  }} />
+                  onChange={(e) => handleChange(e)}
+                />
 
                 <button className='incdecButton' disabled={started} onClick={() => {
                   setBetAmount((pre) => +pre + 1)
@@ -286,6 +296,7 @@ function App() {
           handlePlaceBet={handlePlaceBet}
           setGameMode={setGameMode}
           deviceType={deviceType}
+          handleChange={handleChange}
         ></BetMenuM>
       }></Route>
 
