@@ -49,7 +49,7 @@ export default class EndScene extends Phaser.Scene {
         this.add.text(
             this.game.config.width / 2 - (this.deviceType === "mobile" ? 130 : 350),
             this.game.config.height / 2 - 120,
-            `You have own ${this.deviceType === "mobile" ? "\n" : ""} $${(this.betAmount * this.score).toFixed(2)}.`,
+            `You have won ${this.deviceType === "mobile" ? "\n" : ""} $${(this.betAmount * this.score).toFixed(2)}.`,
             {
                 fontSize: `${this.deviceType === "mobile" ? 35 : 65}px`,
                 fill: "#FFE358",

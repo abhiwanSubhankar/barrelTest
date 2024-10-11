@@ -558,7 +558,7 @@ class GameScene extends Phaser.Scene {
         this.barrels.children.iterate((barrel) => {
             if (barrel && barrel.strengthText) {
                 barrel.strengthText.x = barrel.x;
-                barrel.strengthText.y = barrel.y;
+                barrel.strengthText.y = this.deviceType === "mobile" ? barrel.y - 4 : barrel.y;
             }
         });
 

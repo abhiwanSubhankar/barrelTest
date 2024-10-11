@@ -26,14 +26,14 @@ export default class Button extends Phaser.GameObjects.Container {
 
                 if (gameMode === "practice") {
                     this.scene.scene.start(targetScene);
-                    publish(startGame, {
-                        started: true,
-                    });
+                    // publish(startGame, {
+                    //     started: true,
+                    // });
                 } else if (betAmount && +betAmount >= 1) {
                     this.scene.scene.start(targetScene);
-                    publish(startGame, {
-                        started: true,
-                    });
+                    // publish(startGame, {
+                    //     started: true,
+                    // });
                 } else {
                     this.errortext = this.scene.add.text(-200, -50, "Please enter a valid BetAmount", {
                         fontSize: "20px",

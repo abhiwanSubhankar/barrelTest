@@ -103,19 +103,23 @@ function App() {
 
   const handlePlaceBet = () => {
 
-    sessionStorage.setItem("betAmount", JSON.stringify({
-      betAmount
-    }));
+    if (betAmount > 0) {
 
-    publish(startGame, {
-      started: true,
-    });
+      sessionStorage.setItem("betAmount", JSON.stringify({
+        betAmount
+      }));
 
-    if (deviceType === "mobile") {
-      navigate("/loading")
+      publish(startGame, {
+        started: true,
+      });
 
-
+      if (deviceType === "mobile") {
+        navigate("/loading")
+      }
+    } else {
+      alert("Bet Amount should be more than 1 or 1");
     }
+
   }
 
   const updateScoreCB = useCallback((data) => {
