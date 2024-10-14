@@ -1,6 +1,8 @@
 import {tryCatch} from "../middlewares/error.js";
+import {Admin} from "../models/admin.model.js";
 import {Match} from "../models/match.model.js";
 import {Payments} from "../models/payment.model.js";
+import {User} from "../models/user.model.js";
 import {ErrorHandler} from "../utils/utility.js";
 
 const saveGameScore = tryCatch(async (req, res, next) => {
@@ -15,6 +17,29 @@ const saveGameScore = tryCatch(async (req, res, next) => {
     //     "betAmount": 100,
     //     "score": 0.67
     // }
+
+    //  add wining amount to the user
+
+    let user = await User.findById(userId);
+
+    if (!user) {
+        return next(new ErrorHandler("Invalid user.", 401));
+    }
+    user.ballance += +(betAmount * score).toFixed(2);
+
+    let userData = await User.findByIdAndUpdate(user._id, user, {new: true});
+
+    console.log(userData);
+
+    //  todo - debit money to house wallet.
+
+    let admin = await Admin.find({})[0];
+
+    // debit money to admin wallet.
+
+
+
+    
 
     let match = await Match.create(data);
 
@@ -41,6 +66,12 @@ const saveBetAmount = tryCatch(async (req, res, next) => {
         return next(new ErrorHandler("Please Enter a valid Bet Amount.", 401));
     }
 
+    let user = await User.findById(userId);
+
+    if (!user) {
+        return next(new ErrorHandler("Invalid user.", 401));
+    }
+
     let paymentData = {
         userId,
         amount: betAmount,
@@ -49,6 +80,20 @@ const saveBetAmount = tryCatch(async (req, res, next) => {
     };
 
     let payment = await Payments.create(paymentData);
+
+    // debit user balance
+
+    user.ballance -= betAmount;
+
+    let userData = await User.findByIdAndUpdate(user._id, user, {new: true});
+
+    console.log(userData);
+
+    //  todo - add money to house wallet.
+
+    let admin = await Admin.find({})[0];
+
+    // add money to admin wallet.
 
     return res.status(201).send({
         status: "success.",

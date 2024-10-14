@@ -3,14 +3,9 @@ import { useState } from "react";
 import styles from "./connectModal.module.css";
 
 
-const ConnectWallet = ({ isOpen, onClose, userdata }) => {
+const ConnectWallet = ({ isOpen, onClose, connectWallet }) => {
     const [formData, setFormData] = useState({
-        name: userdata?.name || '',
-        price: userdata?.price || '',
-        category: userdata?.category || 'troopers',
-        stock: userdata?.stock || 0,
-        description: userdata?.description || '',
-        image: userdata?.image || null,
+        walletAddress: `def${Date.now()}abc`
     });
 
     console.log("formdata", formData)
@@ -19,33 +14,22 @@ const ConnectWallet = ({ isOpen, onClose, userdata }) => {
         const { name, value, type, files } = e.target;
         setFormData({
             ...formData,
-            [name]: type === 'file' ? files[0] : value,
+            [name]: value,
         });
     };
 
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Form data submitted:', formData);
-
-        const data = new FormData();
-        data.append('name', formData.name);
-        data.append('price', formData.price);
-        data.append('category', formData.category);
-        data.append('stock', formData.stock);
-        data.append('description', formData.description);
-
-        // // Append the image file
-        // if (formData.image) {
-        //     data.append('image', formData.image);
-        // }
+        console.log('Form data submitted:', formData)
+        connectWallet(formData);
     };
 
 
     if (!isOpen) return null;
 
 
-    return <div className={styles.modalOverlay}>
+    return <div className={styles.modalOverlay} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalContent}>
             <h2 className={styles.heading}>Connect Wallet</h2>
 
@@ -60,8 +44,8 @@ const ConnectWallet = ({ isOpen, onClose, userdata }) => {
                         className={styles.input}
                         type="text"
                         id="name"
-                        name="name"
-                        value={formData.name}
+                        name="walletAddress"
+                        value={formData.walletAddress}
                         onChange={handleChange}
                         required
                     />
@@ -83,12 +67,12 @@ const ConnectWallet = ({ isOpen, onClose, userdata }) => {
                 {/* submit */}
 
                 <div className={styles.btnOuterDivI}>
-                    <button className={styles.button} onClick={() => { }}>
-                        Connect Wallet
-                    </button>
+                    {/* <button className={styles.button} onClick={() => { }}>
+
+                    </button> */}
 
                     <button className={styles.button} type="submit" >
-                        Create
+                        Connect Wallet
                     </button>
 
                 </div>

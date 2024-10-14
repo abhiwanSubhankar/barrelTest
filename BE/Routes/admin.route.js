@@ -21,6 +21,7 @@ router.get("/allUser", getAllUserDetails);
 router.get("/user/:id", getUserDetails);
 router.get("/payments/send", getSendPayments);
 router.get("/payments/received", getReceivedPayments);
+
 router.post("/houseCut", updateHouseDetals);
 router.get("/houseCut", getHouseDetails);
 

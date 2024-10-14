@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Phaser from 'phaser';
 import GameScene from "../GameScene";
-// import GameSceneMobile from "./GameSceneM";
 import EndScene from "../scenes/gameOver";
 
 const GameSceneM = () => {

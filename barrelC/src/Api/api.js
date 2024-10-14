@@ -7,7 +7,6 @@ import axios from "axios";
 // const baseURL=
 const URL = "https://us-central1-js-capstone-backend.cloudfunctions.net/api/games/x0F54MZKHqJe2ginwdHQ/scores/";
 
-
 //  helpers
 let baseURL = `http://localhost:8080/api/v1`;
 
@@ -44,9 +43,23 @@ const getBalance = async (userId) => {
     });
 };
 
-const placeBet = async (username, score) => {
-    await axios
-    .get(url)
+const connectCreateWallet = async (walletAddress) => {
+    return await axios
+    .post(`${baseURL}/connectWallet`, walletAddress)
+    .then((res) => {
+        console.log(res.data);
+        return successResponse(res.data);
+    })
+    .catch((er) => {
+        console.log(er);
+
+        return errorResponse(er.message, er.code);
+    });
+};
+
+const placeBet = async (userId, betAmount) => {
+    return await axios
+    .post(`${baseURL}/game/saveBetAmount`, {userId, betAmount})
     .then((res) => {
         console.log(res.data);
         return successResponse(res.data);
@@ -72,9 +85,9 @@ const updatePlayerBalance = async (username, score) => {
     });
 };
 
-const saveScore = async (username, score) => {
-    await axios
-    .get(url)
+const saveScore = async (data) => {
+    return await axios
+    .post(`${baseURL}/game/saveScore`, data)
     .then((res) => {
         console.log(res.data);
         return successResponse(res.data);
@@ -86,10 +99,7 @@ const saveScore = async (username, score) => {
     });
 };
 
-
-export {placeBet,getBalance,updatePlayerBalance,saveScore};
-
-
+export {placeBet, getBalance, updatePlayerBalance, saveScore, connectCreateWallet};
 
 // const response = await fetch(URL, {
 //     method: "POST",

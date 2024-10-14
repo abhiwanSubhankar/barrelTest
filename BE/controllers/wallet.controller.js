@@ -1,10 +1,13 @@
+import {tryCatch} from "../middlewares/error.js";
 import {User} from "../models/user.model.js";
 
-const connectWallet = async (req, res, next) => {
+const connectWallet = tryCatch(async (req, res, next) => {
     let walletAddress = req?.body.walletAddress || null;
 
+    console.log(walletAddress);
+
     if (walletAddress) {
-        let user = await User.find({walletAddress});
+        let user = await User.findOne({walletAddress});
 
         if (user) {
             // connect wallet address and return details
@@ -15,24 +18,22 @@ const connectWallet = async (req, res, next) => {
                 data: user,
             });
         } else {
-            return res.status(401).send({
-                message: "invalid wallet Address.",
+            let userData = {
+                ballance: 0,
+                walletAddress,
+            };
+
+            let user = await User.create(userData);
+            return res.status(201).send({
+                message: "user created successFully",
+                data: user,
             });
         }
-    } else {
-        let userData = {
-            ballance: 0,
-            walletAddress,
-        };
-
-        let user = await User.create(userData);
-
-        return res.status(201).send({
-            message: "user created successFully",
-            data: user,
-        });
     }
-};
+    return res.status(401).send({
+        message: "please provide a valid wallet Address.",
+    });
+});
 
 const createNewWallet = async (req, res, next) => {};
 

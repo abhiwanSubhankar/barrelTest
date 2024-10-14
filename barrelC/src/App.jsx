@@ -8,19 +8,23 @@ import { endGame, startGame, updateScore } from './CustomEvents/eventKeys';
 import PreStartScene from './scenes/preStart';
 import BetMenuM from './components/BetMenuM';
 import SplashScreen from './components/SplashScreen';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 import { Routes, Route, useNavigate } from "react-router-dom";
 import GameSceneM from './Mobile/GameSceneM.jsx';
 import ConnectWallet from './components/modals/ConnectWallet.jsx';
+import { connectCreateWallet, placeBet, saveScore } from './Api/api.js';
 // import EndScenePopup from './scenes/gameOverPopup.js';
 
 
 function App() {
   // const [gameState, setGameState] = useState();
+
+  const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("userData")) || null);
   const [showConnectModal, setShowConnectModal] = useState(false);
   const [deviceType, setDevicType] = useState("");
-  const [currentCoins, setCurrentCoins] = useState(500);
+  const [currentCoins, setCurrentCoins] = useState(userData?.ballance || 500);
   const [betAmount, setBetAmount] = useState(JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0);
   const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "");
   const [started, setStarted] = useState(JSON.parse(sessionStorage.getItem("phaserGameState")) ? true : false);
@@ -32,6 +36,35 @@ function App() {
 
   const navigate = useNavigate();
 
+  function showTost(type) {
+
+
+
+    toast('Hello World', {
+      duration: 2000,
+      position: 'top-center',
+
+      // Styling
+      style: {},
+      className: '',
+
+      // Custom Icon
+      icon: '👏',
+
+      // Change colors of success/error/loading icon
+      iconTheme: {
+        primary: '#000',
+        secondary: '#fff',
+      },
+
+      // Aria
+      ariaProps: {
+        role: 'status',
+        'aria-live': 'polite',
+      },
+    });
+  }
+
   const handleCloaseConnectModal = () => {
     setShowConnectModal(false);
   }
@@ -39,6 +72,46 @@ function App() {
     setShowConnectModal(true);
   }
 
+  const updateLocalUserBalance = useCallback((type, amount) => {
+
+    let updatedUserData = { ...userData, ballance: type === "add" ? userData.ballance + amount : userData.ballance - amount }
+
+    localStorage.setItem("userData", JSON.stringify(updatedUserData));
+  }, [userData])
+
+  // api functions
+
+  const connectWallet = async (walletAddress) => {
+    console.log(walletAddress);
+
+    let response = await connectCreateWallet(walletAddress);
+    console.log(response);
+
+    setUserData(response?.data.data);
+    localStorage.setItem("userData", JSON.stringify(response?.data.data));
+    setCurrentCoins(response?.data.data.ballance);
+    handleCloaseConnectModal();
+    toast.success("wallet Connected Successfully!");
+  }
+
+
+  const saveGameScore = (data) => {
+
+
+    saveScore(data)
+      .then((res) => {
+        console.log(res);
+
+
+      })
+      .catch((er) => {
+        console.log(er);
+
+        toast.error(data.message);
+
+      });
+
+  }
 
   const handleChange = (e) => {
 
@@ -126,31 +199,74 @@ function App() {
     if (betAmount > 0 || gameMode === "practice") {
 
       if (betAmount > currentCoins) {
-        alert("You don't have sufficient balance to Place the bet !");
+        toast.error("You don't have sufficient balance to Place the bet !");
         return;
       }
 
-      sessionStorage.setItem("betAmount", JSON.stringify({
-        betAmount
-      }));
+      if (!userData) {
 
-      publish(startGame, {
-        started: true,
-      });
-
-      if (deviceType === "mobile") {
-        navigate("/loading")
+        toast.error("Wallet is not Connected! please connect before Bet.")
+        return
       }
+
+      // let betData ={userId, betAmount}
+
+      placeBet(userData._id, betAmount).then((res) => {
+
+        console.log(res);
+
+        toast.success("Bet Placed Successfully!..");
+
+        sessionStorage.setItem("betAmount", JSON.stringify({
+          betAmount
+        }));
+
+        publish(startGame, {
+          started: true,
+        });
+
+        if (deviceType === "mobile") {
+          navigate("/loading")
+        }
+
+
+      }).catch((er) => {
+
+        toast.error("Bet Placed Unsuccessfull...")
+        console.log(er);
+
+
+      })
+
+      // console.log(userData);
+
     } else {
-      alert("Bet Amount should be more than 1 or 1");
+      toast.error("Bet Amount should be more than 1 or 1");
     }
   }
+
+
 
   const updateScoreCB = useCallback((data) => {
     console.log(data);
     if (gameMode !== "practice") {
-      let finalScore = ((+betAmount) * data.detail.score).toFixed(2);
+      let {
+        score,
+        level,
+      } = data?.detail;
+
+      let toBeSavedData = {
+        userId: userData._id,
+        level,
+        betAmount,
+        score
+      }
+
+      saveGameScore(toBeSavedData)
+
+      let finalScore = ((+betAmount) * score).toFixed(2);
       setCurrentCoins(pre => pre + +finalScore);
+      updateLocalUserBalance("add", finalScore);
       console.count("score",)
       console.log(betAmount, finalScore);
     }
@@ -160,14 +276,14 @@ function App() {
     //   sessionStorage.removeItem("phaserGameState");
     // };
 
-
-  }, [gameMode, betAmount, setCurrentCoins])
+  }, [gameMode, betAmount, setCurrentCoins, userData, updateLocalUserBalance])
 
   const startGameCB = useCallback((data) => {
     console.log("start event data", data);
     setStarted(true);
-    setCurrentCoins((pre) => pre - betAmount)
-  }, [betAmount])
+    setCurrentCoins((pre) => pre - betAmount);
+    updateLocalUserBalance("substract", betAmount);
+  }, [betAmount, updateLocalUserBalance])
 
   const endGameCB = useCallback((data) => {
     console.log("end event data", data);
@@ -208,6 +324,7 @@ function App() {
   if (deviceType === "desktop") {
     return (
       <div className="App">
+
 
         <div className='sidebar'>
           <div>
@@ -263,7 +380,7 @@ function App() {
 
             <button
               onClick={handleShowConnectModal}
-              className='button'>CONNECT WALLET</button>
+              className='button' disabled={userData}>CONNECT WALLET</button>
 
             <div>
               <h4>SELECTED GAME MODE :- {gameMode === "normal" ? "NORMAL" : "PRACTICE"}</h4>
@@ -286,8 +403,8 @@ function App() {
 
 
 
-        {showConnectModal && <ConnectWallet isOpen={showConnectModal} onClose={handleCloaseConnectModal} />}
-
+        {showConnectModal && <ConnectWallet isOpen={showConnectModal} onClose={handleCloaseConnectModal} connectWallet={connectWallet} />}
+        <Toaster />
       </div>
     );
   }
@@ -295,8 +412,8 @@ function App() {
 
   // if in mobile show the routes
   return <div className="App">
-    
-    {showConnectModal && <ConnectWallet isOpen={showConnectModal} onClose={handleCloaseConnectModal} />}
+    <Toaster />
+    {showConnectModal && <ConnectWallet isOpen={showConnectModal} onClose={handleCloaseConnectModal} connectWallet={connectWallet} />}
 
     <Routes>
       <Route path='/' element={

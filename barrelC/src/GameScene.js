@@ -625,6 +625,11 @@ class GameScene extends Phaser.Scene {
 
     destroyObj(floor, obj) {
         this.explosion = this.add.sprite(obj.x, obj.y, "groundExplosion");
+
+        if (this.woodenBarrelHitGroundSound.isPlaying) {
+            this.woodenBarrelHitGroundSound.stop();
+        }
+
         this.woodenBarrelHitGroundSound.play();
         this.explosion.play("groundExplode");
         this.explosion.setScale(this.deviceType === "mobile" ? 0.4 : 0.7);
@@ -1040,7 +1045,10 @@ class GameScene extends Phaser.Scene {
             console.log("publish update score fn called");
 
             // dispatch game over event
-            publish(updateScore, {score: this.score});
+            publish(updateScore, {
+                score: this.score,
+                level: this.gameLevel,
+            });
 
             this.scene.start("End", {totalScore: this.score});
 
