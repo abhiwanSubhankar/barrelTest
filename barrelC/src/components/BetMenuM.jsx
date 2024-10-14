@@ -8,11 +8,12 @@ const BetMenuM = ({
     handlePlaceBet,
     setGameMode,
     deviceType,
-    handleChange
+    handleChange,
+    handleShowConnectModal
 }) => {
 
 
-    return (<div style={{
+    return (<div className="sidebar" style={{
         width: "100%",
         height: "100vh"
     }}>
@@ -68,7 +69,7 @@ const BetMenuM = ({
             {gameMode === "practice" && deviceType === "mobile" && <button onClick={handlePlaceBet} className='button' disabled={started}>START PLAY</button>}
 
             <button
-                //    onClick={handlePlaceBet} 
+                onClick={handleShowConnectModal}
                 className='button'>CONNECT WALLET</button>
 
             <div>

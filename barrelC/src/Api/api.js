@@ -9,7 +9,8 @@ const URL = "https://us-central1-js-capstone-backend.cloudfunctions.net/api/game
 
 
 //  helpers
-let url = ``;
+let baseURL = `http://localhost:8080/api/v1`;
+
 function successResponse(data) {
     return {
         response: true,
@@ -29,9 +30,9 @@ function errorResponse(message, code) {
 }
 
 // main functions
-const getBalance = async () => {
+const getBalance = async (userId) => {
     await axios
-    .get(url)
+    .get(`${baseURL}/users/${userId}`)
     .then((res) => {
         console.log(res.data);
         return successResponse(res.data);

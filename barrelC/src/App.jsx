@@ -12,14 +12,14 @@ import SplashScreen from './components/SplashScreen';
 
 import { Routes, Route, useNavigate } from "react-router-dom";
 import GameSceneM from './Mobile/GameSceneM.jsx';
+import ConnectWallet from './components/modals/ConnectWallet.jsx';
 // import EndScenePopup from './scenes/gameOverPopup.js';
 
 
 function App() {
   // const [gameState, setGameState] = useState();
-
+  const [showConnectModal, setShowConnectModal] = useState(false);
   const [deviceType, setDevicType] = useState("");
-
   const [currentCoins, setCurrentCoins] = useState(500);
   const [betAmount, setBetAmount] = useState(JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0);
   const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "");
@@ -32,6 +32,12 @@ function App() {
 
   const navigate = useNavigate();
 
+  const handleCloaseConnectModal = () => {
+    setShowConnectModal(false);
+  }
+  const handleShowConnectModal = () => {
+    setShowConnectModal(true);
+  }
 
 
   const handleChange = (e) => {
@@ -202,7 +208,8 @@ function App() {
   if (deviceType === "desktop") {
     return (
       <div className="App">
-        <div>
+
+        <div className='sidebar'>
           <div>
             <img src="/lOGO.svg" alt="logo" width={"80%"} draggable={false} />
           </div>
@@ -255,7 +262,7 @@ function App() {
             {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started}>PLACE BET</button>}
 
             <button
-              // onClick={handlePlaceBet}
+              onClick={handleShowConnectModal}
               className='button'>CONNECT WALLET</button>
 
             <div>
@@ -277,6 +284,10 @@ function App() {
 
         <canvas id='gameCanvas' width={sizes.width} height={sizes.height}></canvas>
 
+
+
+        {showConnectModal && <ConnectWallet isOpen={showConnectModal} onClose={handleCloaseConnectModal} />}
+
       </div>
     );
   }
@@ -284,6 +295,8 @@ function App() {
 
   // if in mobile show the routes
   return <div className="App">
+    
+    {showConnectModal && <ConnectWallet isOpen={showConnectModal} onClose={handleCloaseConnectModal} />}
 
     <Routes>
       <Route path='/' element={
@@ -297,6 +310,7 @@ function App() {
           setGameMode={setGameMode}
           deviceType={deviceType}
           handleChange={handleChange}
+          handleShowConnectModal={handleShowConnectModal}
         ></BetMenuM>
       }></Route>
 
