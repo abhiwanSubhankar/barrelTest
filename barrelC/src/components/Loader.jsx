@@ -9,12 +9,10 @@ const Loader = ({ progress }) => {
         progressRef.current.style.width = `${progress}%`
     }, [progress]);
     return (
-        <div className=' loader'>
-            <p className='' style={{
-                textAlign: "center"
-            }}>Loading...</p>
-            <div className=''>
-                <div ref={progressRef} className='loaderBg h-full rounded-full'></div>
+        <div className='loader'>
+            <p className='text'>Loading...</p>
+            <div className='progressBar'>
+                <div ref={progressRef} className='loaderBg'></div>
                 <div className='boltu'></div>
             </div>
         </div>
