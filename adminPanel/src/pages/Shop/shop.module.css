@@ -1,0 +1,86 @@
+.tableContainer {
+    width: 98%;
+    margin: auto;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    /* overflow-y: scroll; */
+    /* padding: 0rem; */
+    /* justify-content: space-between;
+    align-items: center; */
+    /* position: relative; */
+    /* display: flex; */
+    /* height: 100%;
+    overflow: scroll; */
+    
+}
+
+.categoryName {
+    background-color: aliceblue;
+    padding: 8px;
+    font-weight: 800;
+    font-size: x-large;
+    border-radius: 2rem;
+    margin: 0px 15px;
+    margin-bottom: 10px;
+    padding-left: 25px;
+    position: sticky;
+    top: 0;
+
+
+}
+
+.rowSkeleton {
+    margin: 0rem 1rem;
+    max-width: 95%;
+}
+
+.categorySection {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+    background-color: #A4CCF3;
+    overflow-x: hidden;
+    margin-bottom: 20px;
+    border-radius: 1rem;
+    padding-top: 10px;
+}
+
+.categoryCardsWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0 30px;
+}
+
+.categorySection::-webkit-scrollbar {
+    margin-left: 5px;
+    padding: 2px;
+    width: 0.5rem;
+    position: absolute;
+    right: 0;
+    border-radius: 0.5rem;
+    border: 0.5px solid lightgray;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 3px 2px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+}
+
+.categorySection::-webkit-scrollbar-thumb {
+    border-radius: 0.5rem;
+    background: linear-gradient(#0EC7D3 17%,
+            #0e50d3 60%,
+            #0130FD 98%,
+            #0130FD 100%);
+}
+
+.createTokenButton {
+    background-color: #0F75D3;
+    border: none;
+    width: 98%;
+    padding: 5px;
+    margin: 10px;
+    border-radius: 2rem;
+    cursor: pointer;
+    color: white;
+    font-weight: 700;
+    font-size: large;
+}

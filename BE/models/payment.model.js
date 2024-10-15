@@ -5,7 +5,7 @@ const paymentSchema = new Schema({
     amount: {type: Number, required: true},
     type: {
         type: String,
-        enum: ["send", "received"],
+        enum: ["debit", "credit"],
         required: true,
         trim: true,
     },

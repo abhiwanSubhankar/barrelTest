@@ -7,46 +7,30 @@ import {ErrorHandler} from "../utils/utility.js";
 
 const saveGameScore = tryCatch(async (req, res, next) => {
     let data = req?.body;
-
     let {userId, level, betAmount, score} = data;
 
-    // sample body
-    // {
-    //     "userId": "6703e6d2201d524c303d7d85",
-    //     "level": 8,
-    //     "betAmount": 100,
-    //     "score": 0.67
-    // }
-
     //  add wining amount to the user
-
     let user = await User.findById(userId);
-
     if (!user) {
         return next(new ErrorHandler("Invalid user.", 401));
     }
-    user.ballance += +(betAmount * score).toFixed(2);
 
+    user.ballance += +(betAmount * score).toFixed(2);
     let userData = await User.findByIdAndUpdate(user._id, user, {new: true});
 
     console.log(userData);
 
     //  todo - debit money to house wallet.
-
     let admin = await Admin.find({})[0];
 
     // debit money to admin wallet.
-
-
-
-    
 
     let match = await Match.create(data);
 
     let paymentData = {
         userId,
         amount: betAmount,
-        type: "received", // winning amount received to the palyer
+        type: "debit", // debit from admin
         reason: "winning amount.",
     };
 
@@ -57,9 +41,9 @@ const saveGameScore = tryCatch(async (req, res, next) => {
         data: match,
     });
 });
+
 const saveBetAmount = tryCatch(async (req, res, next) => {
     let data = req?.body;
-
     let {userId, betAmount} = data;
 
     if (+betAmount <= 0) {
@@ -67,7 +51,6 @@ const saveBetAmount = tryCatch(async (req, res, next) => {
     }
 
     let user = await User.findById(userId);
-
     if (!user) {
         return next(new ErrorHandler("Invalid user.", 401));
     }
@@ -75,22 +58,17 @@ const saveBetAmount = tryCatch(async (req, res, next) => {
     let paymentData = {
         userId,
         amount: betAmount,
-        type: "send", // winning amount received to the palyer
+        type: "credit", // credited to the admin
         reason: "bet amount placed in game.",
     };
 
     let payment = await Payments.create(paymentData);
-
-    // debit user balance
-
     user.ballance -= betAmount;
 
     let userData = await User.findByIdAndUpdate(user._id, user, {new: true});
-
     console.log(userData);
 
     //  todo - add money to house wallet.
-
     let admin = await Admin.find({})[0];
 
     // add money to admin wallet.

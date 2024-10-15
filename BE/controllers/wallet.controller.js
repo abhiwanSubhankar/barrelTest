@@ -3,12 +3,10 @@ import {User} from "../models/user.model.js";
 
 const connectWallet = tryCatch(async (req, res, next) => {
     let walletAddress = req?.body.walletAddress || null;
-
-    console.log(walletAddress);
+    let deaultBalance = 5000;
 
     if (walletAddress) {
         let user = await User.findOne({walletAddress});
-
         if (user) {
             // connect wallet address and return details
             // connect wallet();
@@ -19,7 +17,7 @@ const connectWallet = tryCatch(async (req, res, next) => {
             });
         } else {
             let userData = {
-                ballance: 0,
+                balance: deaultBalance,
                 walletAddress,
             };
 

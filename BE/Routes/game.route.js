@@ -12,8 +12,7 @@ router.get("/", async (req, res) => {
 // save score and bet amount payment stats
 router.post("/saveScore", saveGameScore);
 router.post("/saveBetAmount", saveBetAmount);
-
-// router.get("/leaderBoard", leaderBoard);
 router.get("/avgScore", getAvgScore);
+// router.get("/leaderBoard", leaderBoard);
 
 export default router;

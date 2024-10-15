@@ -1,0 +1,12 @@
+body {
+    background-image: url('./bg.svg');
+    background-position: top center;
+    background-repeat: no-repeat;
+    /* background-color:   #522561; */
+    background-color:   #4E8FE2;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}

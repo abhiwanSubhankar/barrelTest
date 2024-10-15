@@ -1,0 +1,13 @@
+.base {
+    background: rgb(1, 48, 253);
+    background: linear-gradient(45deg, rgba(1, 48, 253, 1) 25%, rgba(14, 199, 211, 1) 71%);
+
+    padding: 0.5rem;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    width: fit-content;
+}
+

@@ -1,5 +1,3 @@
-// import {User} from "../models/user.model.js";
-
 import {User} from "../models/user.model.js";
 
 const getAllUserDetails = async (req, res, next) => {
@@ -14,7 +12,7 @@ const getAllUserDetails = async (req, res, next) => {
 
 const getUserDetails = async (req, res, next) => {
     try {
-        let userId = req?.params.id;
+        let {userId} = req?.body;
 
         if (!userId) {
             return res.status(401).send({
@@ -40,10 +38,6 @@ const getUserDetails = async (req, res, next) => {
             error
         });
     }
-};
-
-const userLogin = async (req, res, next) => {
-    let loginData = req?.body;
 };
 
 export {getAllUserDetails, getUserDetails};

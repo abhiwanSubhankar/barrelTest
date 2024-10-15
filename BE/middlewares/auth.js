@@ -6,11 +6,9 @@ import jwt from "jsonwebtoken";
 const isAdmin = tryCatch(async (req, res, next) => {
     const authHeader = req.headers["authorization"];
 
-    // if (!token) return next(new ErrorHandler("You are not authorized, only Admin can access this... ", 401));
-
     if (authHeader && authHeader.startsWith("Bearer ")) {
         const token = authHeader.split(" ")[1];
-        const adminId = await jwt.verify(token, "secretkeyKeith001");
+        const adminId = jwt.verify(token, "secretkeyKeith001");
 
         let admin = await Admin.findById(adminId._id);
 
@@ -19,8 +17,7 @@ const isAdmin = tryCatch(async (req, res, next) => {
         }
 
         req.adminId = adminId._id;
-
-        // return res.send(adminId._id);
+        
         next();
     } else {
         return next(new ErrorHandler("You are not authorized, only Admin can access this... ", 401));

@@ -1,0 +1,27 @@
+
+::-webkit-scrollbar {
+    margin-left: 5px;
+    padding: 2px;
+    width: 0.5rem;
+    position: absolute;
+    right: 0;
+    border-radius: 0.5rem;
+    border: 0.5px solid lightgray;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 3px 2px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 0.5rem;
+    background: linear-gradient(#0EC7D3 17%,
+            #0e50d3 60%,
+            #0130FD 98%,
+            #0130FD 100%);
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-button {
+    display: none;
+}

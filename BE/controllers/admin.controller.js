@@ -1,5 +1,6 @@
 import {tryCatch} from "../middlewares/error.js";
 import {Admin} from "../models/admin.model.js";
+import {Match} from "../models/match.model.js";
 import {Payments} from "../models/payment.model.js";
 import {ErrorHandler} from "../utils/utility.js";
 import jwt from "jsonwebtoken";
@@ -7,45 +8,46 @@ import jwt from "jsonwebtoken";
 const adminLogin = tryCatch(async (req, res, next) => {
     let {email, password, walletDetails, cutPercentage, defaultRoomFee} = req?.body;
 
-    let admin = await Admin.find({email});
-
-    admin = admin[0];
-
-    console.log({email, password, walletDetails, cutPercentage, defaultRoomFee}, admin[0]);
+    let admin = await Admin.findOne({email});
 
     if (!admin) {
-        return next(new ErrorHandler("Invalid email or password.", 400));
+        return next(new ErrorHandler("Invalid email or password 1.", 400));
     }
 
     if (admin.password !== password) {
-        return next(new ErrorHandler("Invalid email or password.", 400));
+        return next(new ErrorHandler("Invalid email or password. 2", 400));
     }
 
-    let token = await jwt.sign({_id: admin._id}, "secretkeyKeith001");
+    if (admin._doc.email !== email) {
+        return next(new ErrorHandler("Invalid email or password. 3", 400));
+    }
 
-    res.status(200).send({
+    let token = jwt.sign({_id: admin._id}, "secretkeyKeith001");
+
+    res.status(200).json({
         ststus: "success.",
         data: {
             token,
+            email: admin._doc.email,
         },
     });
 });
 
-const getSendPayments = tryCatch(async (req, res, next) => {
-    let allSendPayments = await Payments.find({type: "send"});
+const getDebitedPayments = tryCatch(async (req, res, next) => {
+    let allDebitedPayments = await Payments.find({type: "debit"});
 
     return res.status(200).send({
         ststus: "success",
-        data: allSendPayments,
+        data: allDebitedPayments,
     });
 });
 
-const getReceivedPayments = tryCatch(async (req, res, next) => {
-    let allReceivedPayments = await Payments.find({type: "received"});
+const getCreditedPayments = tryCatch(async (req, res, next) => {
+    let allCreditedPayments = await Payments.find({type: "credit"});
 
     return res.status(200).send({
         ststus: "success",
-        data: allReceivedPayments,
+        data: allCreditedPayments,
     });
 });
 
@@ -57,15 +59,16 @@ const updateHouseDetals = tryCatch(async (req, res, next) => {
     if (walletDetails) {
         adminDetails.walletDetails = walletDetails;
     }
+
     if (cutPercentage) {
         adminDetails.cutPercentage = cutPercentage;
     }
+
     if (defaultRoomFee) {
         adminDetails.defaultRoomFee = defaultRoomFee;
     }
 
     // update admin data
-
     let updatedData = await Admin.findByIdAndUpdate(adminDetails._id, adminDetails, {new: true});
 
     return res.status(200).send({
@@ -82,5 +85,13 @@ const getHouseDetails = tryCatch(async (req, res, next) => {
         data: adminDetails[0],
     });
 });
+const getAllMatches = tryCatch(async (req, res, next) => {
+    let allMatches = await Match.find({});
 
-export {adminLogin, getSendPayments, getReceivedPayments, getHouseDetails, updateHouseDetals};
+    res.status(200).send({
+        status: "success.",
+        data: allMatches,
+    });
+});
+
+export {adminLogin, getDebitedPayments, getCreditedPayments, getHouseDetails, updateHouseDetals, getAllMatches};

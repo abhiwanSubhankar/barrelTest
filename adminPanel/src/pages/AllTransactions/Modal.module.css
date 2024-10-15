@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(77 77 77 / 50%);
+    backdrop-filter: blur(5px); /* Add blur effect */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  .heading {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    text-align: left;
+    margin-bottom: 20px;
+  }
+  .modalContent {
+    background-color: #ffffff6e;
+
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .dataRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd; /* Add border to the bottom of each row */
+  }
+  
+  .dataRow:last-child {
+    border-bottom: none; /* Remove border from the last row */
+  }
+  
+  .dataRow strong {
+    margin-right: 20px; /* Consistent gap between strong and data */
+  }
+  
+  .closeButton {
+    background: linear-gradient(
+        #ff0000 37%,
+        #ff0000 60%,
+        #990000 98%,
+        #990000 100%
+      );
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    display: block;
+text-align: right;
+  }
+  .btnOuterDiv{
+    display: flex;
+    justify-content: right;
+  }

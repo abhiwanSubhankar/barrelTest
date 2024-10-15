@@ -1,0 +1,121 @@
+.loginContainer {
+  height: fit-content;
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  margin-top: 5rem;
+}
+
+.loginContainerInner {
+  margin: 0 auto;
+  padding: 20px;
+  width: 80%;
+  height: 70%;
+  border: 1px solid #f5cccc;
+  border-radius: 2rem;
+  background-color: #ffffff6e;
+  align-items: center;
+}
+
+.heading {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #99442a;
+  font-size: 2rem;
+  font-family: cursive;
+}
+
+.formOuterDiv {
+  margin: auto;
+  padding: 2rem;
+  width: 60%;
+  /* border: 2px solid gray; */
+  border-radius: 10px;
+  background-color: #dae3ed8f;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+  margin-bottom: 30px;
+}
+
+.form {
+  display: flex;
+  width: 100%;
+  margin: auto;
+  /* margin: 0rem 12rem; */
+  flex-direction: column;
+  /* border: 2px solid red */
+}
+
+.formGroup {
+  margin-bottom: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.label {
+  margin-bottom: 5px;
+  margin-left: 10px;
+  color: #000000;
+  font-weight: bold;
+}
+
+.input {
+  border: 1px solid #ccc;
+  border-radius: 1rem;
+  padding: 0.6rem;
+  font-size: 16px;
+  background-color: #ffffff6e;
+  box-shadow: 1px 2px 4px rgb(57 56 56);
+}
+
+.button {
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  /* background: linear-gradient(#FF0000 37%, #FF0000 60%, #990000 98%, #990000 100%); */
+  background-color: #0075FF;
+  color: #fff;
+  /* font-size: 1.6rem; */
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+.input::placeholder {
+  color: #000000;
+}
+
+.logo {
+  /* margin: -90px auto -50px auto; */
+  margin: -90px auto -20px auto;
+  width: 270px;
+}
+
+.logoWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.logoWrapper>img {
+  max-width: 240px;
+}
+
+.setVisiblity {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin-right: 10px ;
+  margin-bottom: 3px;
+  cursor: pointer;
+  padding: 5px 5px 0 5px;
+  border-radius: 50%;
+}
+
+.setVisiblity:active{
+  background-color: #8e8e8ea3;
+}

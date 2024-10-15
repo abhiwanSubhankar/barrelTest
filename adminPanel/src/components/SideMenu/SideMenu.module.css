@@ -1,0 +1,134 @@
+/* components/SideMenu/SideMenu.module.css */
+.sideMenuOuterDiv h2 {
+  text-align: left;
+  margin: 0 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding-bottom: 2px;
+  border-bottom: 1.5px solid rgba(48, 93, 166, 0.725);
+  font-size: small;
+  font-weight: 600;
+  border-radius: 0 0 0 8px;
+  padding-left: 5px;
+}
+
+.sideMenuOuterDiv {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 15rem;
+  height: 100%;
+}
+
+.sideMenuOuterDiv img {
+  margin: -50px 0 0 2rem;
+  /* aspect-ratio: 2/3; */
+}
+
+.sideMenu {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 5px;
+  gap: 5px;
+}
+
+.adminSec {
+  display: flex;
+  justify-items: end;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center
+}
+
+.adminTest {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: -10px;
+}
+
+.iconWrapper {
+  padding: 0.6rem;
+  border-radius: 2rem;
+  background-color: rgba(48, 93, 166, 0.725);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btnOuterDiv button {
+  cursor: pointer;
+}
+
+.activeButtonSvg {
+
+  background: linear-gradient(to right, #0130FD 0%, #0Ec7D3 100%);
+}
+
+.sideMenu button {
+  background: transparent;
+  border: none;
+}
+
+.btnOuterDiv {
+  width: 80%;
+  padding: 6px;
+  margin-bottom: 10px;
+  color: black;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 16px;
+  border-radius: 1rem;
+  display: flex;
+  background-color: transparent;
+  gap: 1rem;
+}
+
+.button {
+  width: 80%;
+  padding: 7px;
+  margin-bottom: 0px;
+  color: black;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 16px;
+  border-radius: 1rem;
+  background-color: transparent;
+}
+
+.btnOuterDiv:hover,
+.activeButton {
+  background-color: #4E8FE2;
+  border-radius: 1rem;
+  box-shadow: 1px 2px 6px rgb(207 202 202);
+}
+
+.btnOuterDiv:active {
+  background-color: #666;
+}
+
+.btnOuterDiv:focus {
+  outline: none;
+}
+
+.btnOuterDiv button:focus {
+  outline: none;
+}
+
+.btnOuterDiv:focus-visible {
+  outline: 2px solid #fff;
+}
+
+.button:focus-visible {
+  outline: 2px solid #fff;
+}
+
+.logout{
+  border-radius: 8px;
+  cursor: "pointer";
+  background: "lightgray";
+  color:#fff;
+}
