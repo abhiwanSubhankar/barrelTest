@@ -15,7 +15,9 @@ const saveGameScore = tryCatch(async (req, res, next) => {
         return next(new ErrorHandler("Invalid user.", 401));
     }
 
-    user.ballance += +(betAmount * score).toFixed(2);
+    let finalScore = +(betAmount * score).toFixed(2);
+    console.log("save ballance called", finalScore);
+    user.balance += finalScore;
     let userData = await User.findByIdAndUpdate(user._id, user, {new: true});
 
     console.log(userData);
@@ -27,9 +29,11 @@ const saveGameScore = tryCatch(async (req, res, next) => {
 
     let match = await Match.create(data);
 
+    console.log("final score.;", finalScore);
+
     let paymentData = {
         userId,
-        amount: betAmount,
+        amount: finalScore,
         type: "debit", // debit from admin
         reason: "winning amount.",
     };
@@ -63,7 +67,9 @@ const saveBetAmount = tryCatch(async (req, res, next) => {
     };
 
     let payment = await Payments.create(paymentData);
-    user.ballance -= betAmount;
+    user.balance -= betAmount;
+
+    console.log("placed Bet called");
 
     let userData = await User.findByIdAndUpdate(user._id, user, {new: true});
     console.log(userData);

@@ -1,14 +1,8 @@
-// import "regenerator-runtime/runtime";
-
 import axios from "axios";
 
-// const fetch = require("node-fetch");
-
-// const baseURL=
-const URL = "https://us-central1-js-capstone-backend.cloudfunctions.net/api/games/x0F54MZKHqJe2ginwdHQ/scores/";
-
 //  helpers
-let baseURL = `http://localhost:8080/api/v1`;
+// let baseURL = `http://localhost:8080/api/v1`;
+let baseURL = `https://barreltest.onrender.com/api/v1`;
 
 function successResponse(data) {
     return {
@@ -17,6 +11,7 @@ function successResponse(data) {
         data,
     };
 }
+
 function errorResponse(message, code) {
     return {
         response: false,

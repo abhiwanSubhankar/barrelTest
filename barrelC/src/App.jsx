@@ -24,7 +24,7 @@ function App() {
   const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("userData")) || null);
   const [showConnectModal, setShowConnectModal] = useState(false);
   const [deviceType, setDevicType] = useState("");
-  const [currentCoins, setCurrentCoins] = useState(userData?.ballance || 500);
+  const [currentCoins, setCurrentCoins] = useState(userData?.balance || 500);
   const [betAmount, setBetAmount] = useState(JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0);
   const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "");
   const [started, setStarted] = useState(JSON.parse(sessionStorage.getItem("phaserGameState")) ? true : false);
@@ -91,28 +91,21 @@ function App() {
 
     setUserData(response?.data.data);
     localStorage.setItem("userData", JSON.stringify(response?.data.data));
-    setCurrentCoins(response?.data.data.ballance);
+    setCurrentCoins(response?.data.data.balance);
     handleCloaseConnectModal();
     toast.success("wallet Connected Successfully!");
   }
 
 
   const saveGameScore = (data) => {
-
-
     saveScore(data)
       .then((res) => {
         console.log(res);
-
-
       })
       .catch((er) => {
         console.log(er);
-
         toast.error(data.message);
-
       });
-
   }
 
   const handleChange = (e) => {
@@ -255,7 +248,7 @@ function App() {
       let {
         score,
         level,
-      } = data?.detail;
+      } = data.detail;
 
       let toBeSavedData = {
         userId: userData._id,
