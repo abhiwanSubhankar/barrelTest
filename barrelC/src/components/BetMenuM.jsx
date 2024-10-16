@@ -9,7 +9,8 @@ const BetMenuM = ({
     setGameMode,
     deviceType,
     handleChange,
-    handleShowConnectModal
+    handleShowConnectModal,
+    userData,
 }) => {
 
 
@@ -70,6 +71,7 @@ const BetMenuM = ({
 
             <button
                 onClick={handleShowConnectModal}
+                disabled={userData ? true : false}
                 className='button'>CONNECT WALLET</button>
 
             <div>

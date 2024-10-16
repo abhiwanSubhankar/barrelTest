@@ -191,7 +191,12 @@ function App() {
 
   const handlePlaceBet = () => {
 
-    if (betAmount > 0 || gameMode === "practice") {
+    if (gameMode !== "practice") {
+
+      if (betAmount <= 0) {
+        toast.error("Bet Amount should be more than 1 or 1");
+        return;
+      }
 
       if (betAmount > currentCoins) {
         toast.error("You don't have sufficient balance to Place the bet !");
@@ -216,27 +221,21 @@ function App() {
           betAmount
         }));
 
-        publish(startGame, {
-          started: true,
-        });
-
-        if (deviceType === "mobile") {
-          navigate("/loading")
-        }
-
-
       }).catch((er) => {
 
         toast.error("Bet Placed Unsuccessfull...")
         console.log(er);
-
-
       })
-
       // console.log(userData);
+    }
 
-    } else {
-      toast.error("Bet Amount should be more than 1 or 1");
+
+    publish(startGame, {
+      started: true,
+    });
+
+    if (deviceType === "mobile") {
+      navigate("/loading")
     }
   }
 
@@ -423,6 +422,7 @@ function App() {
           deviceType={deviceType}
           handleChange={handleChange}
           handleShowConnectModal={handleShowConnectModal}
+          userData={userData}
         ></BetMenuM>
       }></Route>
 

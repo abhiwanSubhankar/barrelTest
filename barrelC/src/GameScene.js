@@ -113,7 +113,8 @@ class GameScene extends Phaser.Scene {
                 // endFrame: 23, // Total frames in the sprite sheet
             } // info for the spiteSheet.
         );
-        // this.load.spritesheet(
+
+        // // this.load.spritesheet(
         //     "explosion", // spiteSheet name
         //     "/bigboom.png", // spite sheet asset path
         //     {
@@ -271,12 +272,10 @@ class GameScene extends Phaser.Scene {
             // repeat: -1,
             // duration: 2000,
         });
+
         this.anims.create({
             key: "groundExplode", // this create animation key not the pre load invock key.
-            frames: this.anims.generateFrameNumbers(
-                "groundExplosion"
-                // {start: 0, end: 7}
-            ),
+            frames: this.anims.generateFrameNumbers("groundExplosion", {start: 0, end: 76}),
             frameRate: 20,
             hideOnComplete: true,
             // repeat: -1,
@@ -575,7 +574,9 @@ class GameScene extends Phaser.Scene {
 
         let betAmount = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount;
 
-        if (this.gameMode !== "practice") {
+        let localGameMode = sessionStorage.getItem("gameMode") || "practice";
+
+        if (localGameMode !== "practice") {
             let multiplayerTextValue = this.score * betAmount;
 
             this.textM.setText(`$${multiplayerTextValue.toFixed(2)}`);

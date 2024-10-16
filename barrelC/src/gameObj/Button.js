@@ -36,7 +36,7 @@ export default class Button extends Phaser.GameObjects.Container {
                     //     started: true,
                     // });
                 } else {
-                    this.errortext = this.scene.add.text(-200, -50, "Please enter a valid BetAmount", {
+                    this.errortext = this.scene.add.text(-200, -70, "Please enter a valid BetAmount", {
                         fontSize: "20px",
                         fill: "red",
                         fontWidth: 900,
