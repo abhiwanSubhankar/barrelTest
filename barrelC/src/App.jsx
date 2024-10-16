@@ -74,9 +74,11 @@ function App() {
 
   const updateLocalUserBalance = useCallback((type, amount) => {
 
-    let updatedUserData = { ...userData, ballance: type === "add" ? userData.ballance + amount : userData.ballance - amount }
+    if (userData) {
+      let updatedUserData = { ...userData, ballance: type === "add" ? userData.ballance + amount : userData.ballance - amount };
+      localStorage.setItem("userData", JSON.stringify(updatedUserData));
+    }
 
-    localStorage.setItem("userData", JSON.stringify(updatedUserData));
   }, [userData])
 
   // api functions

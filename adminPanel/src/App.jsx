@@ -48,10 +48,10 @@ function App() {
             />
 
 
-            <Route
+            {/* <Route
               path="/adminledger"
               element={<ProtectedRoute element={<AdminHouseCut />} />}
-            />
+            /> */}
 
             {/*
             <Route

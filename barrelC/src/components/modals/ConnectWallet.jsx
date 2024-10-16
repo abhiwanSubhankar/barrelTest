@@ -1,11 +1,12 @@
 
 import { useState } from "react";
 import styles from "./connectModal.module.css";
+import toast from "react-hot-toast";
 
 
 const ConnectWallet = ({ isOpen, onClose, connectWallet }) => {
     const [formData, setFormData] = useState({
-        walletAddress: `def${Date.now()}abc`
+        walletAddress: ""
     });
 
     console.log("formdata", formData)
@@ -22,7 +23,12 @@ const ConnectWallet = ({ isOpen, onClose, connectWallet }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Form data submitted:', formData)
-        connectWallet(formData);
+
+        if (formData.walletAddress) {
+            connectWallet(formData);
+        } else {
+            toast.error("Please enter a valid wallet address.");
+        }
     };
 
 
@@ -46,6 +52,7 @@ const ConnectWallet = ({ isOpen, onClose, connectWallet }) => {
                         id="name"
                         name="walletAddress"
                         value={formData.walletAddress}
+                        placeholder={`def${Date.now()}abc`}
                         onChange={handleChange}
                         required
                     />

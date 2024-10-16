@@ -107,7 +107,7 @@ const SideMenu = () => {
           </div>
 
           {/* admin lodger */}
-          <div
+          {/* <div
             onClick={() => handleNavigation("/adminledger")}
             className={`${styles.button} ${isActive("/adminledger")} ${styles.btnOuterDiv
               } `}
@@ -126,7 +126,7 @@ const SideMenu = () => {
             </div>
 
             <button>Admin Ledger</button>
-          </div>
+          </div> */}
 
           {/* debit transaction */}
           <div
