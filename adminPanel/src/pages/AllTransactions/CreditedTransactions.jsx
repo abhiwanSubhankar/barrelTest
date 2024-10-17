@@ -15,7 +15,7 @@ const CreditedTransactions = () => {
   const [AllTransaction, setAllTransaction] = useState([]);
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(15);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
@@ -38,7 +38,10 @@ const CreditedTransactions = () => {
     }).then((data) => {
 
       console.log("transaction data", data);
-      setAllTransaction(data?.data.data)
+      // setAllTransaction(data?.data.data);
+
+      let reversedData=data?.data.data.reverse();
+      setData(reversedData)
       setLoading(false);
 
     }).catch((er) => {
@@ -85,7 +88,6 @@ const CreditedTransactions = () => {
               <th>Payment ID</th>
               <th>Sender ID</th>
               <th>Amount</th>
-              <th>Type</th>
               <th>Reason</th>
             </tr>
           </thead>
@@ -98,14 +100,14 @@ const CreditedTransactions = () => {
                   </td>
                 </tr>
               ))
-              : AllTransaction?.map((item, idx) => (
+              : currentData?.map((item, idx) => (
                 <tr key={item?._id}>
                   <td>{idx + 1}</td>
                   <td>{truncateAddress(item?._id)}</td>
                   <td>{truncateAddress(item?.userId)}</td>
                   <td>{item?.amount}</td>
-                  <td>{item?.type}</td>
                   <td>{item?.reason}</td>
+                  {/* <td>{item?.type}</td> */}
 
                   {/* <td>
                     <button
@@ -121,37 +123,46 @@ const CreditedTransactions = () => {
         </table>
       </div>
 
-      {/* <div className={styles.divider}></div> */}
+      <div className={styles.divider}></div>
 
-      {/* <div className={styles.footer}>
+      <div className={styles.footer}>
         <div className={styles.rowsPerPage}>
           <label htmlFor="rowsPerPage">Rows per page:</label>
           <select
             id="rowsPerPage"
             value={rowsPerPage}
-            onChange={(e) => setRowsPerPage(parseInt(e.target.value))}
+            onChange={(e) => {
+              setRowsPerPage(parseInt(e.target.value));
+              setCurrentPage(1);
+            }}
           >
             <option value="5">5</option>
             <option value="10">10</option>
+            <option value="15">15</option>
             <option value="20">20</option>
+            <option value="25">25</option>
+            <option value="30">30</option>
+            <option value="35">35</option>
           </select>
         </div>
-        <div>
-          {firstIndex + 1}-{Math.min(lastIndex, data.length)} of {data.length}
-        </div>
+
         <div className={styles.nextPrevBtnsDiv}>
           <div className={styles.prevBtn} onClick={prevPage}>
             <SkipPreviousIcon />
           </div>
           <div>
-            <ArrowBackIosIcon className={styles.arrowbtn} />
-            <ArrowForwardIosIcon className={styles.arrowbtn} />
+            {firstIndex + 1}-{Math.min(lastIndex, data.length)} of {data.length}
           </div>
           <div className={styles.nextBtn} onClick={nextPage}>
             <SkipNextIcon />
           </div>
         </div>
-      </div> */}
+
+        <div className={styles.pageNo}>
+          page:{currentPage}
+        </div>
+
+      </div>
 
       {/* Render the modal and pass the selected data */}
       {/* <Modal

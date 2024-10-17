@@ -15,7 +15,7 @@ const BattlezoneHistory = () => {
   const initialData = sampleData;
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(15);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
@@ -30,7 +30,9 @@ const BattlezoneHistory = () => {
       }
     }).then((data) => {
       console.log("all games data", data.data);
-      setAllGames(data?.data.data)
+      // setAllGames(data?.data.data);
+      let reversedData = data?.data.data.reverse();
+      setData(reversedData);
       setLoading(false);
 
     }).catch((er) => {
@@ -39,17 +41,17 @@ const BattlezoneHistory = () => {
 
   }, [token]);
 
-  useEffect(() => {
-    const dataWithSerialNumbers = allGames?.map((item, index) => ({
-      ...item,
-      serialNumber: (index + 1).toString().padStart(2, "0"),
-    }));
-    // Set a delay before setting the data and loading state
-    setTimeout(() => {
-      setData(dataWithSerialNumbers);
-      setLoading(false);
-    }, 1000);
-  }, [initialData, currentPage, rowsPerPage]);
+  // useEffect(() => {
+  //   const dataWithSerialNumbers = allGames?.map((item, index) => ({
+  //     ...item,
+  //     serialNumber: (index + 1).toString().padStart(2, "0"),
+  //   }));
+  //   // Set a delay before setting the data and loading state
+  //   setTimeout(() => {
+  //     setData(dataWithSerialNumbers);
+  //     setLoading(false);
+  //   }, 1000);
+  // }, [initialData, currentPage, rowsPerPage]);
 
   const lastIndex = currentPage * rowsPerPage;
   const firstIndex = lastIndex - rowsPerPage;
@@ -68,13 +70,14 @@ const BattlezoneHistory = () => {
   };
 
   const openModal = (item) => {
-    setSelectedData(item); // Set the selected item data
-    setShowModal(true); // Show the modal
+    setSelectedData(item);
+    setShowModal(true);
   };
 
   const closeModal = () => {
-    setShowModal(false); // Hide the modal
+    setShowModal(false);
   };
+
   const truncateAddress = (address) => {
     if (!address) return "";
     const start = address.slice(0, 6);
@@ -100,11 +103,11 @@ const BattlezoneHistory = () => {
               ? Array.from({ length: rowsPerPage }).map((_, index) => (
                 <tr key={index}>
                   <td>
-                    <Skeleton height={40} className={styles.rowSkeleton} />
+                    <Skeleton height={20} className={styles.rowSkeleton} />
                   </td>
                 </tr>
               ))
-              : allGames?.map((item, idx) => (
+              : currentData?.map((item, idx) => (
                 <tr key={item._id}>
                   <td>{idx + 1}</td>
                   <td>{truncateAddress(item?.userId)}</td>
@@ -125,39 +128,46 @@ const BattlezoneHistory = () => {
         </table>
       </div>
 
-      {/* <div className={styles.divider}></div> */}
+      <div className={styles.divider}></div>
 
-      {/* 
+
       <div className={styles.footer}>
         <div className={styles.rowsPerPage}>
           <label htmlFor="rowsPerPage">Rows per page:</label>
           <select
             id="rowsPerPage"
             value={rowsPerPage}
-            onChange={(e) => setRowsPerPage(parseInt(e.target.value))}
+            onChange={(e) => {
+              setRowsPerPage(parseInt(e.target.value))
+              setCurrentPage(1);
+            }}
           >
             <option value="5">5</option>
             <option value="10">10</option>
+            <option value="15">15</option>
             <option value="20">20</option>
+            <option value="25">25</option>
+            <option value="30">30</option>
+            <option value="35">35</option>
           </select>
         </div>
-        <div>
-          {firstIndex + 1}-{Math.min(lastIndex, data.length)} of {data.length}
-        </div>
+
         <div className={styles.nextPrevBtnsDiv}>
           <div className={styles.prevBtn} onClick={prevPage}>
             <SkipPreviousIcon />
           </div>
           <div>
-            <ArrowBackIosIcon className={styles.arrowbtn} />
-            <ArrowForwardIosIcon className={styles.arrowbtn} />
+            {firstIndex + 1}-{Math.min(lastIndex, data.length)} of {data.length}
           </div>
           <div className={styles.nextBtn} onClick={nextPage}>
             <SkipNextIcon />
           </div>
         </div>
-      </div> 
-      */}
+        <div className={styles.pageNo}>
+          page:{currentPage}
+        </div>
+      </div>
+
 
       {/* Render the modal and pass the selected data */}
       <Modal

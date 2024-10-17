@@ -1,5 +1,239 @@
 .container {
-    height: 35rem;
+  height: 35rem;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1.25rem;
+  margin: 0rem 3rem;
+  color: black;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.heading {
+  margin: 1rem;
+  font-size: 2rem;
+}
+
+.tableContainer {
+  height: 93%;
+  width: 100%;
+  /* max-height: 44rem;
+    min-height: 44rem; */
+  padding: 0rem;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  overflow-y: auto;
+  position: relative;
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* justify-content: center; */
+  width: 100%;
+  padding-top: 1rem;
+  margin-top: 0rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  text-align: center;
+  border-collapse: collapse;
+  position: relative;
+  /* background: #e5e1e1; */
+}
+
+.table thead {
+  margin-bottom: 0.5rem;
+  /* position: sticky;
+    top: 1rem; */
+
+}
+
+.table thead {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-bottom: 1px solid black;
+  /* color: red; */
+  text-align: center;
+}
+
+.table tbody {
+  display: block;
+  /* max-height: 39rem; */
+  /* Same as tableContainer height */
+  overflow-y: auto;
+}
+
+.table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-bottom: 1px solid black;
+}
+
+.pageNo{
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+.tableHead th {
+  font-size: 1rem;
+  position: sticky;
+  top: 0;
+  /* background-color: #fff; */
+  border-bottom: 0.1rem solid #404040;
+  z-index: 2;
+}
+
+.tableBody td {
+  font-size: 0.8rem;
+  letter-spacing: 0.1rem;
+  font-weight: 100;
+  /* line-height: -0.5rem; */
+  /* border-bottom: 0.1rem solid #404040; */
+}
+/* .tableBody td:nth-child(1) {
+ width: 50px;
+} */
+/* .tableBody td:last-child {
+ width: max-content;
+}
+.tableHead th:last-child {
+ width: 250px; 
+}
+.tableBody td:first-child {
+ width: 60px;
+}
+.tableHead th:first-child {
+ width: 60px; 
+} */
+
+.button {
+  text-align: center;
+  padding: 0.3rem 0.8rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  width: 4rem;
+  height: 2.1rem;
+  color: white;
+  background: linear-gradient(#ff0000 37%,
+      #ff0000 60%,
+      #990000 98%,
+      #990000 100%);
+
+  border: none;
+  font-size: 0.9rem;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  margin: 1rem;
+  letter-spacing: 0.1rem;
+}
+
+.divider {
+  width: 100%;
+  /* position: absolute; */
+  bottom: 2rem;
+  height: 0.1rem;
+  background-color: #404040;
+}
+
+.footer {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  padding-right: 2rem;
+}
+
+.rowsPerPage {
+  display: flex;
+}
+
+.rowsPerPage label {
+  margin-right: 0.7rem;
+}
+
+.rowsPerPage select {
+  margin-right: 0.7rem;
+  background-color: transparent !important;
+  color: black;
+  border: none !important;
+}
+
+.rowsPerPage option {
+  color: black;
+}
+
+.nextPrevBtnsDiv {
+  display: flex;
+  width: 8rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 0.8rem;
+}
+
+.prevBtn {
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.nextBtn {
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.arrowbtn {
+  width: 1rem;
+}
+
+.tableBody::-webkit-scrollbar {
+  margin-left: 5px;
+  padding: 2px;
+  width: 0.5rem;
+  position: absolute;
+  right: 0;
+  border-radius: 0.5rem;
+  border: 0.5px solid lightgray;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 3px 2px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+}
+
+.tableBody::-webkit-scrollbar-thumb {
+  border-radius: 0.5rem;
+  background: linear-gradient(#0EC7D3 17%,
+      #0e50d3 60%,
+      #0130FD 98%,
+      #0130FD 100%);
+}
+
+
+.tableBody::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tableBody::-webkit-scrollbar-button {
+  display: none;
+}
+
+.rowSkeleton {
+  margin: 0rem 1rem;
+  max-width: 95%;
+}
+
+@media (max-width: 500px) {
+  .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-right: 0rem;
+  }
+
+  /* @media (max-width: 376px) { */
+  .container {
+    height: 85vh;
     flex-direction: column;
     background: rgba(255, 255, 255, 0);
     border-radius: 16px;
@@ -8,420 +242,205 @@
     -webkit-backdrop-filter: blur(5px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 1.25rem;
-    margin: 0rem 3rem;
-    color: black;
-    font-family: "Plus Jakarta Sans", sans-serif;
+    margin: 0rem 0.2rem;
+    color: white;
+    padding: 0rem 1rem;
+    /* font-family: navDriveLinkFont; */
   }
-  
-  .heading {
-    margin: 1rem;
-    font-size: 2rem;
-  }
-  
+
   .tableContainer {
     width: 100%;
-    /* max-height: 44rem;
-    min-height: 44rem; */
-    height: 94%;
-    padding: 0rem;
+    height: 70vh;
     justify-content: space-between;
     align-items: center;
-    font-family: "Plus Jakarta Sans", sans-serif;
+    /* font-family: navDriveLinkFont; */
     overflow-y: auto;
     position: relative;
   }
-  
-  .table {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* justify-content: center; */
-    width: 100%;
-    padding-top: 3rem;
-    margin-top: 0rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    text-align: center;
-    border-collapse: collapse;
-  }
-  
-  .table thead {
-    /* margin-bottom: 1rem; */
-  }
-  
-  .table thead {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-    border-bottom: 1px solid black;
-  }
-  
-  .table tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-    border-bottom: 1px solid black;
-    /* margin-bottom: 1rem; */
-  }
-  
-  .table tbody {
-    display: block;
-    max-height: 39rem;
-    /* Same as tableContainer height */
-    overflow-y: auto;
-  }
-  
+
   .tableHead th {
-    font-size: 1rem;
+    font-size: 0.8rem;
     position: sticky;
     top: 0;
     /* background-color: #fff; */
     border-bottom: 0.1rem solid #404040;
     z-index: 2;
   }
-  
+
   .tableBody td {
-    font-size: 0.8rem;
+    font-size: 0.5rem;
     letter-spacing: 0.1rem;
-    font-weight: 100;
+    font-weight: 600;
     line-height: 1.5rem;
     /* border-bottom: 0.1rem solid #404040; */
   }
-  
+
   .button {
     text-align: center;
-    padding: 0.3rem 0.8rem;
+    padding: 0.1rem 0.2rem;
     border-radius: 0.6rem;
     cursor: pointer;
-    width: 4rem;
+    width: 3rem;
     height: 2.1rem;
     color: white;
-    background: linear-gradient(
-      #ff0000 37%,
-      #ff0000 60%,
-      #990000 98%,
-      #990000 100%
-    );
-  
+    background-image: linear-gradient(to right, #218db3, #66bad8);
     border: none;
-    font-size: 0.9rem;
+    font-size: 0.6rem;
+    text-align: center;
     font-family: "Plus Jakarta Sans", sans-serif;
-    margin: 1rem;
-    letter-spacing: 0.1rem;
+    margin-bottom: 0.3rem;
+    /* letter-spacing: 0.1rem; */
   }
-  
+
   .divider {
-    width: 100%;
-    /* position: absolute; */
+    width: 0;
+    position: absolute;
     bottom: 2rem;
     height: 0.1rem;
     background-color: #404040;
   }
-  
-  .footer {
-    display: flex;
-    justify-content: right;
-    align-items: center;
-    padding-right: 2rem;
+}
+
+@media (min-width: 501px) and (max-width: 768px) {
+
+  /* @media (max-width: 376px) { */
+  .container {
+    height: 31rem;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 1.25rem;
+    margin: 0rem 0.2rem;
+    color: white;
+    padding: 0rem 1rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
   }
-  
-  .rowsPerPage label {
-    margin-right: 0.7rem;
-  }
-  
-  .rowsPerPage select {
-    margin-right: 0.7rem;
-    background-color: transparent !important;
-    color: black;
-    border: none !important;
-  }
-  
-  .rowsPerPage option {
-    color: black;
-  }
-  
-  .nextPrevBtnsDiv {
-    display: flex;
-    width: 7rem;
+
+  .tableContainer {
+    width: 100%;
+    height: 25rem;
     justify-content: space-between;
-    margin-left: 0.8rem;
+    align-items: center;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    overflow-y: auto;
+    position: relative;
   }
-  
-  .prevBtn {
+
+  .tableHead th {
+    font-size: 0.8rem;
+    position: sticky;
+    top: 0;
+    /* background-color: #fff; */
+    border-bottom: 0.1rem solid #404040;
+    z-index: 2;
+  }
+
+  .tableBody td {
+    font-size: 0.5rem;
+    letter-spacing: 0.1rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+    /* border-bottom: 0.1rem solid #404040; */
+  }
+
+  .button {
+    text-align: center;
+    padding: 0.1rem 0.2rem;
+    border-radius: 0.6rem;
     cursor: pointer;
+    width: 3rem;
+    height: 2.1rem;
+    color: white;
+    background-image: linear-gradient(to right, #218db3, #66bad8);
+    border: none;
+    font-size: 0.6rem;
+    text-align: center;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    margin-bottom: 0.3rem;
+    /* letter-spacing: 0.1rem; */
   }
-  
-  .nextBtn {
-    cursor: pointer;
-  }
-  
-  .arrowbtn {
-    width: 1rem;
-  }
-  
-  .tableBody::-webkit-scrollbar {
-    margin-left: 5px;
-    padding: 2px;
-    width: 0.5rem;
+
+  .divider {
+    width: 0;
     position: absolute;
-    right: 0;
-    border-radius: 0.5rem;
-    border:0.5px solid lightgray;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 3px 2px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+    bottom: 2rem;
+    height: 0.1rem;
+    background-color: #404040;
   }
-  
-  .tableBody::-webkit-scrollbar-thumb {
-    border-radius: 0.5rem;
-    background: linear-gradient(
-      #0EC7D3 17%,
-      #0e50d3 60%,
-      #0130FD 98%,
-      #0130FD 100%
-    );
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+
+  /* @media (max-width: 376px) { */
+  .container {
+    height: 31rem;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 1.25rem;
+    margin: 0rem 0.2rem;
+    color: white;
+    padding: 0rem 1rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
   }
-  
-  /* .tableBody::-webkit-scrollbar-thumb:hover {
-    border-radius: 0.5rem;
-  
+
+  .tableContainer {
+    width: 100%;
+    height: 25rem;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .tableHead th {
+    font-size: 0.8rem;
+    position: sticky;
+    top: 0;
+    /* background-color: #fff; */
+    border-bottom: 0.1rem solid #404040;
+    z-index: 2;
+  }
+
+  .tableBody td {
+    font-size: 0.5rem;
+    letter-spacing: 0.1rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+    /* border-bottom: 0.1rem solid #404040; */
+  }
+
+  .button {
+    text-align: center;
+    padding: 0.1rem 0.2rem;
+    border-radius: 0.6rem;
     cursor: pointer;
-    background: linear-gradient(
-      #0EC7D3 37%,
-      #0e50d3 60%,
-      #0130FD 98%,
-      #0130FD 100%
-    );
-  } */
-  
-  .tableBody::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
+    width: 3rem;
+    height: 2.1rem;
+    color: white;
+    background-image: linear-gradient(to right, #218db3, #66bad8);
+    border: none;
+    font-size: 0.6rem;
+    text-align: center;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    margin-bottom: 0.3rem;
+    /* letter-spacing: 0.1rem; */
   }
-  
-  .tableBody::-webkit-scrollbar-button {
-    display: none;
+
+  .divider {
+    width: 0;
+    position: absolute;
+    bottom: 2rem;
+    height: 0.1rem;
+    background-color: #404040;
   }
-  
-  .rowSkeleton {
-    /* margin: 0rem 1rem; */
-    max-width: 95%;
-  }
-  
-  @media (max-width: 500px) {
-    .footer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding-right: 0rem;
-    }
-  
-    /* @media (max-width: 376px) { */
-    .container {
-      height: 85vh;
-      flex-direction: column;
-      background: rgba(255, 255, 255, 0);
-      border-radius: 16px;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 1.25rem;
-      margin: 0rem 0.2rem;
-      color: white;
-      padding: 0rem 1rem;
-      /* font-family: navDriveLinkFont; */
-    }
-  
-    .tableContainer {
-      width: 100%;
-      height: 70vh;
-      justify-content: space-between;
-      align-items: center;
-      /* font-family: navDriveLinkFont; */
-      overflow-y: auto;
-      position: relative;
-    }
-  
-    .tableHead th {
-      font-size: 0.8rem;
-      position: sticky;
-      top: 0;
-      /* background-color: #fff; */
-      border-bottom: 0.1rem solid #404040;
-      z-index: 2;
-    }
-  
-    .tableBody td {
-      font-size: 0.5rem;
-      letter-spacing: 0.1rem;
-      font-weight: 600;
-      line-height: 1.5rem;
-      /* border-bottom: 0.1rem solid #404040; */
-    }
-  
-    .button {
-      text-align: center;
-      padding: 0.1rem 0.2rem;
-      border-radius: 0.6rem;
-      cursor: pointer;
-      width: 3rem;
-      height: 2.1rem;
-      color: white;
-      background-image: linear-gradient(to right, #218db3, #66bad8);
-      border: none;
-      font-size: 0.6rem;
-      text-align: center;
-      font-family: "Plus Jakarta Sans", sans-serif;
-      margin-bottom: 0.3rem;
-      /* letter-spacing: 0.1rem; */
-    }
-  
-    .divider {
-      width: 0;
-      position: absolute;
-      bottom: 2rem;
-      height: 0.1rem;
-      background-color: #404040;
-    }
-  }
-  
-  @media (min-width: 501px) and (max-width: 768px) {
-    /* @media (max-width: 376px) { */
-    .container {
-      height: 31rem;
-      flex-direction: column;
-      background: rgba(255, 255, 255, 0);
-      border-radius: 16px;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 1.25rem;
-      margin: 0rem 0.2rem;
-      color: white;
-      padding: 0rem 1rem;
-      font-family: "Plus Jakarta Sans", sans-serif;
-    }
-  
-    .tableContainer {
-      width: 100%;
-      height: 25rem;
-      justify-content: space-between;
-      align-items: center;
-      font-family: "Plus Jakarta Sans", sans-serif;
-      overflow-y: auto;
-      position: relative;
-    }
-  
-    .tableHead th {
-      font-size: 0.8rem;
-      position: sticky;
-      top: 0;
-      /* background-color: #fff; */
-      border-bottom: 0.1rem solid #404040;
-      z-index: 2;
-    }
-  
-    .tableBody td {
-      font-size: 0.5rem;
-      letter-spacing: 0.1rem;
-      font-weight: 600;
-      line-height: 1.5rem;
-      /* border-bottom: 0.1rem solid #404040; */
-    }
-  
-    .button {
-      text-align: center;
-      padding: 0.1rem 0.2rem;
-      border-radius: 0.6rem;
-      cursor: pointer;
-      width: 3rem;
-      height: 2.1rem;
-      color: white;
-      background-image: linear-gradient(to right, #218db3, #66bad8);
-      border: none;
-      font-size: 0.6rem;
-      text-align: center;
-      font-family: "Plus Jakarta Sans", sans-serif;
-      margin-bottom: 0.3rem;
-      /* letter-spacing: 0.1rem; */
-    }
-  
-    .divider {
-      width: 0;
-      position: absolute;
-      bottom: 2rem;
-      height: 0.1rem;
-      background-color: #404040;
-    }
-  }
-  
-  @media (min-width: 769px) and (max-width: 1024px) {
-    /* @media (max-width: 376px) { */
-    .container {
-      height: 31rem;
-      flex-direction: column;
-      background: rgba(255, 255, 255, 0);
-      border-radius: 16px;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 1.25rem;
-      margin: 0rem 0.2rem;
-      color: white;
-      padding: 0rem 1rem;
-      font-family: "Plus Jakarta Sans", sans-serif;
-    }
-  
-    .tableContainer {
-      width: 100%;
-      height: 25rem;
-      justify-content: space-between;
-      align-items: center;
-      font-family: "Plus Jakarta Sans", sans-serif;
-      overflow-y: auto;
-      position: relative;
-    }
-  
-    .tableHead th {
-      font-size: 0.8rem;
-      position: sticky;
-      top: 0;
-      /* background-color: #fff; */
-      border-bottom: 0.1rem solid #404040;
-      z-index: 2;
-    }
-  
-    .tableBody td {
-      font-size: 0.5rem;
-      letter-spacing: 0.1rem;
-      font-weight: 600;
-      line-height: 1.5rem;
-      /* border-bottom: 0.1rem solid #404040; */
-    }
-  
-    .button {
-      text-align: center;
-      padding: 0.1rem 0.2rem;
-      border-radius: 0.6rem;
-      cursor: pointer;
-      width: 3rem;
-      height: 2.1rem;
-      color: white;
-      background-image: linear-gradient(to right, #218db3, #66bad8);
-      border: none;
-      font-size: 0.6rem;
-      text-align: center;
-      font-family: "Plus Jakarta Sans", sans-serif;
-      margin-bottom: 0.3rem;
-      /* letter-spacing: 0.1rem; */
-    }
-  
-    .divider {
-      width: 0;
-      position: absolute;
-      bottom: 2rem;
-      height: 0.1rem;
-      background-color: #404040;
-    }
-  }
-  
+}

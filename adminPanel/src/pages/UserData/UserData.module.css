@@ -18,11 +18,16 @@
   font-size: 2rem;
 }
 
+.pageNo {
+  font-weight: 600;
+  margin-left: 10px;
+}
+
 .tableContainer {
+  height: 93%;
   width: 100%;
   /* max-height: 44rem;
-  min-height: 44rem; */
-  height: 90%;
+    min-height: 44rem; */
   padding: 0rem;
   justify-content: space-between;
   align-items: center;
@@ -37,16 +42,21 @@
   align-items: center;
   /* justify-content: center; */
   width: 100%;
-  padding-top: 3rem;
+  padding-top: 1rem;
   margin-top: 0rem;
   padding-left: 1rem;
   padding-right: 1rem;
   text-align: center;
   border-collapse: collapse;
+  position: relative;
+  /* background: #e5e1e1; */
 }
 
 .table thead {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  /* position: sticky;
+    top: 1rem; */
+
 }
 
 .table thead {
@@ -54,6 +64,14 @@
   width: 100%;
   table-layout: fixed;
   border-bottom: 1px solid black;
+  /* color: red; */
+}
+
+.table tbody {
+  display: block;
+  /* max-height: 39rem; */
+  /* Same as tableContainer height */
+  overflow-y: auto;
 }
 
 .table tbody tr {
@@ -61,15 +79,9 @@
   width: 100%;
   table-layout: fixed;
   border-bottom: 1px solid black;
-  /* margin-bottom: 1rem; */
 }
 
-.table tbody {
-  display: block;
-  max-height: 39rem;
-  /* Same as tableContainer height */
-  overflow-y: auto;
-}
+
 
 .tableHead th {
   font-size: 1rem;
@@ -96,12 +108,10 @@
   width: 4rem;
   height: 2.1rem;
   color: white;
-  background: linear-gradient(
-    #ff0000 37%,
-    #ff0000 60%,
-    #990000 98%,
-    #990000 100%
-  );
+  background: linear-gradient(#ff0000 37%,
+      #ff0000 60%,
+      #990000 98%,
+      #990000 100%);
 
   border: none;
   font-size: 0.9rem;
@@ -123,7 +133,10 @@
   justify-content: right;
   align-items: center;
   padding-right: 2rem;
-  margin-top: 30px;
+}
+
+.rowsPerPage {
+  display: flex;
 }
 
 .rowsPerPage label {
@@ -143,53 +156,45 @@
 
 .nextPrevBtnsDiv {
   display: flex;
-  width: 7rem;
+  width: 8rem;
   justify-content: space-between;
+  align-items: center;
   margin-left: 0.8rem;
 }
 
 .prevBtn {
   cursor: pointer;
+  margin-top: 5px;
 }
 
 .nextBtn {
   cursor: pointer;
+  margin-top: 5px;
 }
 
 .arrowbtn {
-  width: .5rem;
-  cursor: pointer;
+  width: 1rem;
 }
 
 .tableBody::-webkit-scrollbar {
+  margin-left: 5px;
+  padding: 2px;
   width: 0.5rem;
   position: absolute;
   right: 0;
   border-radius: 0.5rem;
+  border: 0.5px solid lightgray;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 3px 2px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
 }
 
 .tableBody::-webkit-scrollbar-thumb {
   border-radius: 0.5rem;
-
-  background: linear-gradient(
-    #ff0000 37%,
-    #ff0000 60%,
-    #990000 98%,
-    #990000 100%
-  );
+  background: linear-gradient(#0EC7D3 17%,
+      #0e50d3 60%,
+      #0130FD 98%,
+      #0130FD 100%);
 }
 
-.tableBody::-webkit-scrollbar-thumb:hover {
-  border-radius: 0.5rem;
-
-  cursor: pointer;
-  background: linear-gradient(
-    #ff0000 37%,
-    #ff0000 60%,
-    #990000 98%,
-    #990000 100%
-  );
-}
 
 .tableBody::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
@@ -202,6 +207,42 @@
 .rowSkeleton {
   margin: 0rem 1rem;
   max-width: 95%;
+}
+
+/* search */
+
+
+.searchContainer {
+  display: flex;
+  align-items: center;
+  border: 2px solid #384e81;
+  border-radius: 20px;
+  padding: 0 7px;
+  margin-bottom: 20px;
+  background: local;
+  width: 300px;
+  float: right;
+  margin: 10px 25px;
+}
+
+.searchIcon {
+  width: 20px;
+  /* margin-right: 5px; */
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: local;
+  padding: 7px;
+  color: #384e81;
+  /* font-weight: 500; */
+}
+
+.searchInput::placeholder {
+  color: #384e81;
 }
 
 @media (max-width: 500px) {
@@ -224,7 +265,7 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 1.25rem;
     margin: 0rem 0.2rem;
-    color: black;
+    color: white;
     padding: 0rem 1rem;
     /* font-family: navDriveLinkFont; */
   }
@@ -283,6 +324,7 @@
 }
 
 @media (min-width: 501px) and (max-width: 768px) {
+
   /* @media (max-width: 376px) { */
   .container {
     height: 31rem;
@@ -295,7 +337,7 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 1.25rem;
     margin: 0rem 0.2rem;
-    color: black;
+    color: white;
     padding: 0rem 1rem;
     font-family: "Plus Jakarta Sans", sans-serif;
   }
@@ -354,6 +396,7 @@
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
+
   /* @media (max-width: 376px) { */
   .container {
     height: 31rem;
@@ -366,7 +409,7 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 1.25rem;
     margin: 0rem 0.2rem;
-    color: black;
+    color: white;
     padding: 0rem 1rem;
     font-family: "Plus Jakarta Sans", sans-serif;
   }

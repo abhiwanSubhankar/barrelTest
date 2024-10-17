@@ -1,4 +1,3 @@
-import React from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import SideMenu from "../components/SideMenu/SideMenu";
 import styles from "./Layout.module.css";
@@ -24,7 +23,7 @@ const Layout = () => {
         return "Redeem Token";
 
       case "/matchhistory":
-        return "All Battles";
+        return "All Matches";
 
       case "/creditedTransaction":
         return "Credited Transaction";

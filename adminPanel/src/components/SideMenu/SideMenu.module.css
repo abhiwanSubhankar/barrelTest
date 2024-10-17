@@ -35,17 +35,19 @@
 
 .adminSec {
   display: flex;
-  justify-items: end;
+  /* justify-items: end; */
+  justify-content: center;
   flex-direction: row;
   gap: 5px;
-  align-items: center
+  align-items: center;
+  margin-left: -30px;
 }
 
 .adminTest {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-top: -10px;
+  margin-top: -18px;
 }
 
 .iconWrapper {

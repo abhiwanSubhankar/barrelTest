@@ -70,10 +70,12 @@ function Login() {
               <input
                 type="email"
                 id="email"
+                name="email"
                 placeholder="Your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={styles.input}
+                required
               />
             </div>
             <div className={styles.formGroup}>
@@ -83,10 +85,12 @@ function Login() {
               <input
                 type={showPassword ? "text" : "password"}
                 id="password"
+                name="password"
                 placeholder="Your Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={styles.input}
+                required
               />
               <div className={styles.setVisiblity} onClick={() => {
                 setShowPassword(!showPassword)

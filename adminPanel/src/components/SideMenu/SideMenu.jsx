@@ -30,7 +30,7 @@ const SideMenu = () => {
       <img src={logo} alt="" width={"70%"} />
 
       <div style={{ flex: 0.92 }}>
-        <h2>Components</h2>
+        {/* <h2>Components</h2> */}
         <div className={styles.sideMenu}>
           {/* user data */}
           <div
@@ -339,11 +339,18 @@ const SideMenu = () => {
 
       <div className={styles.adminSec}>
         <div>
-          <img src={"/admin_profile.svg"} alt="admin-profile" width="24" height="24" />
+          <img src={"/admin_profile.svg"} alt="admin-profile" width="29" height="29" />
         </div>
         <div className={styles.adminTest}>
-          <span style={{ fontSize: "0.8rem" }}>{adminEmail}</span>
-          <span style={{ fontSize: ".6rem", color: "#4D77BA" }}>
+          <span style={{
+            fontSize: "0.9rem",
+            fontWeight: "600"
+          }}>{adminEmail}</span>
+          <span style={{
+            fontSize: ".7rem",
+            color: "#4D77BA",
+            fontWeight: "600"
+          }}>
             Admin Account
           </span>
         </div>
@@ -358,8 +365,8 @@ const SideMenu = () => {
           <img
             src={"/Logout.svg"}
             className="logout"
-            width={22}
-            height={22}
+            width={27}
+            height={27}
             alt="logout"
           />
         </div>
