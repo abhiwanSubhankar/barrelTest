@@ -1,12 +1,14 @@
 import styles from "./UserData.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import axios from "axios";
 import { base_url } from "../../baseUrl/baseUrl.js";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import toast from "react-hot-toast";
 
 const UserData = () => {
 
@@ -15,10 +17,13 @@ const UserData = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(15);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const token = JSON.parse(sessionStorage.getItem("token"));
+  let searchQuery = useOutletContext();
+
+  // console.log("quarry from outlet", searchQuery)
 
 
   useEffect(() => {
@@ -45,26 +50,20 @@ const UserData = () => {
     return `${start}...${end}`;
   };
 
-
-  // useEffect(() => {
-  //   const dataWithSerialNumbers = initialData.map((item, index) => ({
-  //     ...item,
-  //     serialNumber: (index + 1).toString().padStart(2, "0"),
-  //   }));
-  //   // Set a delay before setting the data and loading state
-  //   setTimeout(() => {
-  //     setData(dataWithSerialNumbers);
-  //     setLoading(false);
-  //   }, 1000);
-  // }, [initialData, currentPage, rowsPerPage]);
-
   const lastIndex = currentPage * rowsPerPage;
   const firstIndex = lastIndex - rowsPerPage;
   const currentData = query ? filteredData.slice(firstIndex, lastIndex) : data.slice(firstIndex, lastIndex);
 
   const nextPage = () => {
-    if (lastIndex < data.length) {
-      setCurrentPage(currentPage + 1);
+    if (query) {
+      if (lastIndex < filteredData.length) {
+        setCurrentPage(currentPage + 1);
+      }
+    } else {
+
+      if (lastIndex < data.length) {
+        setCurrentPage(currentPage + 1);
+      }
     }
   };
 
@@ -73,14 +72,11 @@ const UserData = () => {
       setCurrentPage(currentPage - 1);
     }
   };
-  const navigate = useNavigate();
 
   const handleViewClick = (item) => {
     const id = item?._id;
     navigate(`/user/${id}`, { state: { user: item } });
   };
-
-
 
   // Function to check if any value in the object matches the search string
   const search = (array, query) => {
@@ -91,42 +87,40 @@ const UserData = () => {
     });
   };
 
-  const handleSearch = (e) => {
-    const searchQuery = e.target.value;
-    setQuery(searchQuery);
-
-    let searchedData = search(data, searchQuery);
+  const handleSearch = useCallback((query) => {
+    setQuery(query);
+    let searchedData = search(data, query);
     setFilteredData(searchedData);
-    console.log("searched Data", searchedData);
+    // console.log("searched Data", searchedData);
+  }, [data]);
 
+  useEffect(() => {
+    handleSearch(searchQuery);
+    setCurrentPage(1);
+  }, [searchQuery, handleSearch])
+
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        toast.success("copied to clipboard!.");
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
   };
 
   return (
     <SkeletonTheme baseColor="transparent" highlightColor="#ddd">
       {/* <div className={styles.container}> */}
-
       <div className={styles.tableContainer}>
-
-        <div className={styles.searchContainer}>
-          <img
-            src="https://img.icons8.com/ios-glyphs/30/000000/search.png"
-            alt="Search Icon"
-            className={styles.searchIcon}
-          />
-          <input
-            type="text"
-            placeholder="Search..."
-            value={query}
-            onChange={handleSearch}
-            className={styles.searchInput}
-          />
-        </div>
         <table className={styles.table}>
           <thead className={styles.tableHead}>
             <tr>
               <th>S.NO.</th>
+              <th>User ID</th>
               <th>Wallet Address</th>
               <th>Balance</th>
+              <th>Date</th>
             </tr>
           </thead>
           <tbody className={styles.tableBody}>
@@ -138,13 +132,24 @@ const UserData = () => {
                   </td>
                   <td><Skeleton /></td>
                   <td><Skeleton /></td>
+                  <td><Skeleton /></td>
+                  <td><Skeleton /></td>
                 </tr>
               ))
               : (query ? filteredData : currentData)?.map((item, idx) => (
                 <tr key={idx}>
                   <td>{idx + 1}</td>
-                  <td>{truncateAddress(item?.walletAddress)}</td>
+                  <td>{truncateAddress(item?._id)}</td>
+                  <td className={styles.walletAddress}>{truncateAddress(item?.walletAddress)}
+                    <button
+                      style={{ background: "local", border: "none" }}
+                      onClick={() => handleCopy(item?.walletAddress)}
+                    >
+                      <ContentCopyIcon />
+                    </button>
+                  </td>
                   <td>{item?.balance}</td>
+                  <td>{(item?.createdAt ? item.createdAt : item.updatedAt).split("T")[0]}</td>
 
                   {/* <td>
                     <Button
@@ -188,7 +193,7 @@ const UserData = () => {
           </div>
 
           <div>
-            {firstIndex + 1}-{Math.min(lastIndex, data.length)} of {data.length}
+            {firstIndex + 1}-{Math.min(lastIndex, query ? filteredData.length : data.length)} of {query ? filteredData.length : data.length}
           </div>
 
           <div className={styles.nextBtn} onClick={nextPage}>
@@ -201,10 +206,8 @@ const UserData = () => {
         </div>
 
       </div>
-
       {/* </div> */}
     </SkeletonTheme>
-
   );
 };
 

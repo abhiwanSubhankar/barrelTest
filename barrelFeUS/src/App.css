@@ -1,0 +1,147 @@
+.cc {
+    color: #ff8c00;
+}
+
+.App {
+    display: flex;
+    background: #858585;
+}
+
+.sidebar {
+    width: 25%;
+    text-align: center;
+    /* border-radius: 15px 0 0 15px; */
+    background: radial-gradient(50.01% 50.01% at 50.43% 24.99%, #712E81 0%, #2F1753 100%);
+    background-position: center;
+    /* position: absolute; */
+    /* height: 100vh; */
+    color: #000;
+    border-right: 3px solid black;
+    box-sizing: border-box;
+}
+
+.App>canvas {
+    width: calc(100% - 25%);
+    height: 100vh;
+}
+
+#gameCanvasMobile {
+    width: 100vw;
+    height: 100vh;
+}
+
+
+
+
+.balance {
+    border: 1.98px solid rgba(217, 143, 230, 1);
+    border-radius: 8px;
+    max-width: 60%;
+    align-self: center;
+    /* width: 60%; */
+    /* margin: 10px auto; */
+    padding: 5px 10px;
+    background: local;
+    text-align: center;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+h4,
+h3 {
+    margin: auto;
+    color: #fff;
+    padding-bottom: 10px;
+}
+
+.button {
+    background: rgb(243, 224, 119);
+    background: linear-gradient(59deg, rgb(240, 215, 77) 22%, rgba(241, 164, 88, 1) 60%);
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 5px 20px;
+    color: rgb(231, 231, 231);
+    text-shadow: 1px 1px #262626;
+    border: none;
+    margin-bottom: 30px;
+    cursor: pointer;
+    transition: all 0.5s;
+    display: block;
+    margin: 30px auto;
+}
+
+.button:active {
+    background: linear-gradient(59deg, rgba(241, 164, 88, 1) 22%, rgb(240, 215, 77) 60%);
+}
+
+.button:disabled {
+    background: linear-gradient(59deg, rgba(119, 82, 45, 0.776) 22%, rgba(116, 104, 37, 0.674) 60%);
+    color: rgb(157, 157, 157);
+    cursor: not-allowed;
+}
+
+.incdecButton {
+    background: local;
+    border: none;
+    width: 30px;
+    cursor: pointer;
+
+}
+
+.incdecButton:disabled {
+    cursor: not-allowed;
+}
+
+.incdecButton>img {
+    width: 100%;
+}
+
+.betAmountWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
+    gap: 10px;
+}
+
+select>option {
+    background-color: #712E81;
+}
+
+select>option:active {
+    background-color: #542460;
+}
+
+
+/* input field pre defined inc dec button hide */
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* For Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+button,
+img {
+    -webkit-user-select: none;
+    /* Safari, Chrome */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer */
+    user-select: none;
+    /* Standard */
+}

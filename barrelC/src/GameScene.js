@@ -15,6 +15,10 @@ class GameScene extends Phaser.Scene {
         this.levelText;
         this.gameEnd = false;
 
+        this.lastSpawnX = null;
+        this.minSpawnDistance = 150;
+        this.barrelsBlustAfterMinReqLevel = false;
+
         // Cooldown bar setup
         this.cooldown = 100;
         this.cooldownTimer = 0;
@@ -114,15 +118,6 @@ class GameScene extends Phaser.Scene {
             } // info for the spiteSheet.
         );
 
-        // // this.load.spritesheet(
-        //     "explosion", // spiteSheet name
-        //     "/bigboom.png", // spite sheet asset path
-        //     {
-        //         frameWidth: 800, // Width of each frame
-        //         frameHeight: 800, // Height of each frame
-        //         // endFrame: 23, // Total frames in the sprite sheet
-        //     } // info for the spiteSheet.
-        // );
         this.load.spritesheet(
             "wheelFront", // spiteSheet name
             "/front.png", // spite sheet asset path
@@ -154,15 +149,12 @@ class GameScene extends Phaser.Scene {
         this.load.audio("woodenBarrelHitGround", "/sounds/wooden-barrel-hit-ground.mp3");
 
         // controll Buttons
-
         this.load.image("shootBtn", "/shootBtn.svg");
         this.load.image("leftAro", "/leftAro.svg");
         this.load.image("rightAro", "/rightAro.svg");
     }
 
     create() {
-        //add sound to the game
-
         // Create sound objects
         this.explosionSound = this.sound.add("explosion");
         this.woodenBarrelHitGroundSound = this.sound.add("woodenBarrelHitGround");
@@ -258,9 +250,6 @@ class GameScene extends Phaser.Scene {
             // .setDepth(1);
         }
 
-        //  Creating explosion animation
-        // this.add.sprite(400, 300, "explosion").setScale(2).displayHeight = 80;
-
         this.anims.create({
             key: "explode", // this create animation key not the pre load invock key.
             frames: this.anims.generateFrameNumbers(
@@ -314,12 +303,10 @@ class GameScene extends Phaser.Scene {
         // // .setOrigin(0, 0);
         // // setCircle(width, offsetX, offsetY)
         // this.player.setCircle(this.player.width / 2 - 17, 10, 8);
-
         // this.player.body.setCircle(this.player.width / 2 - 7, 40, 30);
         // this.player.setCircle(48, this.player.width / 2 - 26, this.player.height / 2 - 26);
 
         this.cannonImg = this.add.image(0, 0, "cannonImg").setDepth(2);
-
         this.cannonShadow = this.add.image(this.cannonImg.x, this.cannonImg.y + 90, "cannonShadow").setDepth(2);
 
         // Assuming the wheels are separate images, position them under the cannonImg
@@ -351,7 +338,6 @@ class GameScene extends Phaser.Scene {
 
         // Create barrel group
         this.barrels = this.physics.add.group();
-
         // .setSize(this.barrels.width / 4, this.barrels.height / 4)
         // .setOffset(this.barrels.width / 10, this.barrels.height / 10);
 
@@ -390,10 +376,6 @@ class GameScene extends Phaser.Scene {
         });
 
         // >>>>>>>>>>>>>>>>>>>> game spawn logic
-        // Variables to hold barrel spawn timers
-        // this.lastCashSpawn = 0;
-        // this.lastDeathSpawn = 0;
-
         // Barrels, cashpod and bombs falling logic
         this.spawnObject = this.time.addEvent({
             delay: this.spawnSpeed, // Adjust the delay of appring barrel/cp/bomb as needed in ms
@@ -473,7 +455,6 @@ class GameScene extends Phaser.Scene {
 
         // Shooting and collision / overlap logic
         this.physics.add.overlap(this.bullets, this.barrels, this.hitBarrel, null, this);
-
         this.physics.add.overlap(this.bullets, this.cashPots, this.hitCashPot, null, this);
         this.physics.add.overlap(this.bullets, this.bombs, this.hitBomb, null, this);
 
@@ -492,11 +473,9 @@ class GameScene extends Phaser.Scene {
     update(time, delta) {
         // description time and delta
         /*
-
        @Time (time parameter) The time parameter represents the current time in milliseconds since the Phaser game started. This value is incremented every time the update method is called, which is usually every frame (i.e., every time the game renders a new frame). You can think of time as a timestamp that indicates the current moment in the game's lifetime.
 
         @Delta (delta parameter) The delta parameter, on the other hand, represents the time difference in milliseconds between the current frame and the previous frame. In other words, it's the time elapsed since the last update call. This value is useful for creating smooth animations and movements, as it allows you to update your game objects based on the time that has passed since the last update.
-
        */
 
         // Player movement
@@ -520,8 +499,6 @@ class GameScene extends Phaser.Scene {
                 this.wheelSound.stop();
             }
         }
-
-        // new auto shoot.
 
         // When spacebar is pressed down
         if (this.spaceBar.isDown && !this.shooting) {
@@ -582,25 +559,6 @@ class GameScene extends Phaser.Scene {
             this.textM.setText(`$${multiplayerTextValue.toFixed(2)}`);
             // this.levelText.setText(`Lavel :- ${this.gameLevel}`);
         }
-
-        // update car wheels
-
-        // Update the position of the wheels to stay aligned with the car
-        // this.wheel1.x = this.car.x - 20;
-        // this.wheel2.x = this.car.x + 20;
-
-        // this.car.setVelocityX(0);
-        // Reset the car's velocity
-        // this.carContainer.body.setVelocityX(0);
-
-        // // Check for left or right input
-        // if (this.cursors.left.isDown) {
-        //     this.carContainer.body.setVelocityX(-200); // Move car to the left
-        //     this.rotateWheels(-1); // Rotate wheels clockwise
-        // } else if (this.cursors.right.isDown) {
-        //     this.carContainer.body.setVelocityX(200); // Move car to the right
-        //     this.rotateWheels(1); // Rotate wheels counterclockwise
-        // }
     }
 
     rotateWheels(direction) {
@@ -637,12 +595,6 @@ class GameScene extends Phaser.Scene {
         if (obj.strengthText) obj.strengthText.destroy();
         obj.destroy();
     }
-
-    // trying for in canvas form
-    // textAreaChanged() {
-    //     var text = this.formUtil.getTextAreaValue("area51");
-    //     console.log(text);
-    // }
 
     shootBullet() {
         if (this.bulletsRemaining > 0 && this.canShoot) {
@@ -709,7 +661,12 @@ class GameScene extends Phaser.Scene {
 
         if (spawnBomb === 1) {
             this.spawnBomb(width);
-        } else if (spawnCashPot === 1 && this.gameLevel > 6 && this.cashPots.getChildren().length < 1) {
+        } else if (
+            spawnCashPot === 1 &&
+            this.barrelsBlustAfterMinReqLevel &&
+            this.gameLevel > 6 &&
+            this.cashPots.getChildren().length < 1
+        ) {
             this.spawnCashPot(width);
         } else {
             this.spawnBarrel(width);
@@ -799,13 +756,20 @@ class GameScene extends Phaser.Scene {
     spawnCashPot(width, multiplier) {
         let x = Phaser.Math.Between(30, width);
 
+        if (this.lastSpawnX !== null && Math.abs(x - this.lastSpawnX) < this.minSpawnDistance) {
+            // If too close, adjust the position by adding the minimum distance
+            x += this.minSpawnDistance;
+            // Ensure it doesn't go beyond the game bounds
+            if (x > width) x = width;
+        }
+
         // Create the cashPot
         let cashPot = this.cashPots.create(x, 0, "cashpot");
         cashPot.setVelocityY(this.setVelocityY); // Adjust falling speed
 
         // this.cashPotSound.play();
+        this.lastSpawnX = x;
 
-        // cashPot.setCircle(27);
         cashPot.setCircle(30, cashPot.width / 2 - 30, cashPot.height / 2 - 15);
         // cashPot.setScale(this.deviceType === "mobile" ? 0.7 : 1);
         cashPot.setScale(this.deviceType === "mobile" ? 0.5 : 1);
@@ -855,6 +819,12 @@ class GameScene extends Phaser.Scene {
 
     spawnBomb(width) {
         let x = Phaser.Math.Between(30, width);
+        if (this.lastSpawnX !== null && Math.abs(x - this.lastSpawnX) < this.minSpawnDistance) {
+            // If too close, adjust the position by adding the minimum distance
+            x += this.minSpawnDistance;
+            // Ensure it doesn't go beyond the game bounds
+            if (x > width) x = width;
+        }
 
         // Create the bomb
         let bomb = this.bombs.create(x, 0, "bomb");
@@ -866,6 +836,8 @@ class GameScene extends Phaser.Scene {
             bomb.width / 2 - 32, // offSetX
             bomb.height / 2 - (this.deviceType === "mobile" ? 15 : 20) // offSetY
         );
+
+        this.lastSpawnX = x;
         // bomb.setOffset(1, 3);
         if (this.deviceType === "mobile") {
             bomb.setScale(0.7, 0.7);
@@ -877,6 +849,13 @@ class GameScene extends Phaser.Scene {
     spawnBarrel(width) {
         let x = Phaser.Math.Between(30, width);
 
+        if (this.lastSpawnX !== null && Math.abs(x - this.lastSpawnX) < this.minSpawnDistance) {
+            // If too close, adjust the position by adding the minimum distance
+            x += this.minSpawnDistance;
+            // Ensure it doesn't go beyond the game bounds
+            if (x > width) x = width;
+        }
+
         // Create the barrel
         let barrel = this.barrels.create(x, 0, "barrel");
         barrel.setVelocityY(this.setVelocityY); // Adjust falling speed
@@ -884,6 +863,8 @@ class GameScene extends Phaser.Scene {
         // this.player.setSize(this.player.width / 4, this.player.height / 4).setOffset(this.player.width / 10, this.player.height / 10)
         barrel.setCircle(26, barrel.width / 2 - 25, barrel.height / 2 - (this.deviceType === "mobile" ? 15 : 20));
         // barrel.setScale(this.deviceType === "mobile" ? 0.8 : 1.2);
+
+        this.lastSpawnX = x;
 
         if (this.deviceType === "mobile") {
             barrel.setScale(0.7, 0.7);
@@ -928,47 +909,20 @@ class GameScene extends Phaser.Scene {
 
         // Check if the barrel should be destroyed
         if (barrel.strength <= 0) {
+            if (!this.barrelsBlustAfterMinReqLevel && this.gameLevel > 6) {
+                this.barrelsBlustAfterMinReqLevel = true;
+            }
             this.updateScore(barrel.value);
-
             // Destroy the barrel and the text
             barrel.destroy();
             this.explosionSound.play();
             barrel.strengthText.destroy();
-
-            // Optional: Display an explosion  added effect
-            // this.add.text(barrel.x, barrel.y, "Boom!", {fontSize: "32px", color: "#FF0000"});
-
-            // this.wheelFront = this.add.sprite(barrel.x, barrel.y, "wheelFront");
-            // this.wheelFront.play("rotateWheel");
-
             this.explosion = this.add.sprite(barrel.x, barrel.y, "explosion");
             this.explosion.play("explode");
             this.explosion.setScale(this.deviceType === "mobile" ? 0.4 : 0.8);
 
             let gameMode = sessionStorage.getItem("gameMode");
             gameMode !== "practice" && this.updateLavel();
-            // console.log("barre game mode",gameMode)
-
-            // try {
-            //     // {
-            //     //     method: "POST",
-            //     //     headers: {
-            //     //         "Content-Type": "application/json",
-            //     //     },
-            //     //     body: JSON.stringify({message: "Boom!"})
-
-            //     axios
-            //     .post("http://localhost:8080", {data: "boom"})
-            //     // .then((res) => res.json())
-            //     .then((res) => {
-            //         console.log("return data", res);
-            //     })
-            //     .catch((er) => {
-            //         console.log(er);
-            //     });
-            // } catch (error) {
-            //     console.log(error);
-            // }
         }
     }
 

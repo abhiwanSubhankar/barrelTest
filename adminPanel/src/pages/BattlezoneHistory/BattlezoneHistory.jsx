@@ -1,26 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import styles from "./BattlezoneHistory.module.css";
-import sampleData from "./leaders.js";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import Modal from "./Modal";
 import { base_url } from "../../baseUrl/baseUrl.js";
 import axios from "axios";
+import { useOutletContext } from "react-router-dom";
 
 const BattlezoneHistory = () => {
-  const initialData = sampleData;
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
-  const [allGames, setAllGames] = useState([]);
   const token = JSON.parse(sessionStorage.getItem("token"));
+  const [query, setQuery] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
+  let searchQuery = useOutletContext();
 
   useEffect(() => {
     setLoading(true);
@@ -41,25 +40,20 @@ const BattlezoneHistory = () => {
 
   }, [token]);
 
-  // useEffect(() => {
-  //   const dataWithSerialNumbers = allGames?.map((item, index) => ({
-  //     ...item,
-  //     serialNumber: (index + 1).toString().padStart(2, "0"),
-  //   }));
-  //   // Set a delay before setting the data and loading state
-  //   setTimeout(() => {
-  //     setData(dataWithSerialNumbers);
-  //     setLoading(false);
-  //   }, 1000);
-  // }, [initialData, currentPage, rowsPerPage]);
-
   const lastIndex = currentPage * rowsPerPage;
   const firstIndex = lastIndex - rowsPerPage;
-  const currentData = data.slice(firstIndex, lastIndex);
+  const currentData = query ? filteredData.slice(firstIndex, lastIndex) : data.slice(firstIndex, lastIndex);;
 
   const nextPage = () => {
-    if (lastIndex < data.length) {
-      setCurrentPage(currentPage + 1);
+    if (query) {
+      if (lastIndex < filteredData.length) {
+        setCurrentPage(currentPage + 1);
+      }
+    } else {
+
+      if (lastIndex < data.length) {
+        setCurrentPage(currentPage + 1);
+      }
     }
   };
 
@@ -84,6 +78,26 @@ const BattlezoneHistory = () => {
     const end = address.slice(-6);
     return `${start}...${end}`;
   };
+  // Function to check if any value in the object matches the search string
+  const search = (array, query) => {
+    return array.filter(obj => {
+      return Object.values(obj).some(value =>
+        value.toString().toLowerCase().includes(query.toLowerCase())
+      );
+    });
+  };
+
+  const handleSearch = useCallback((query) => {
+    setQuery(query);
+    let searchedData = search(data, query);
+    setFilteredData(searchedData);
+    // console.log("searched Data", searchedData);
+  }, [data]);
+
+  useEffect(() => {
+    handleSearch(searchQuery);
+    setCurrentPage(1);
+  }, [searchQuery, handleSearch])
 
   return (
     <SkeletonTheme baseColor="transparent" highlightColor="#ddd">
@@ -93,9 +107,11 @@ const BattlezoneHistory = () => {
             <tr>
               <th>S.NO.</th>
               <th>User ID</th>
+              <th>Game ID</th>
               <th>Bet Amount</th>
               <th>Score</th>
               <th>Level played</th>
+              <th>Date</th>
             </tr>
           </thead>
           <tbody className={styles.tableBody}>
@@ -107,13 +123,15 @@ const BattlezoneHistory = () => {
                   </td>
                 </tr>
               ))
-              : currentData?.map((item, idx) => (
+              : (query ? filteredData : currentData)?.map((item, idx) => (
                 <tr key={item._id}>
                   <td>{idx + 1}</td>
                   <td>{truncateAddress(item?.userId)}</td>
+                  <td>{truncateAddress(item?._id)}</td>
                   <td>{item?.betAmount}</td>
                   <td>{item?.score.toFixed(2)}</td>
                   <td>{item?.level}</td>
+                  <td>{(item?.createdAt ? item.createdAt : item.updatedAt).split("T")[0]}</td>
                   {/* <td>
                       <button
                         className={styles.button}
@@ -157,7 +175,7 @@ const BattlezoneHistory = () => {
             <SkipPreviousIcon />
           </div>
           <div>
-            {firstIndex + 1}-{Math.min(lastIndex, data.length)} of {data.length}
+            {firstIndex + 1}-{Math.min(lastIndex, query ? filteredData.length : data.length)} of {query ? filteredData.length : data.length}
           </div>
           <div className={styles.nextBtn} onClick={nextPage}>
             <SkipNextIcon />
@@ -170,11 +188,11 @@ const BattlezoneHistory = () => {
 
 
       {/* Render the modal and pass the selected data */}
-      <Modal
+      {/* <Modal
         showModal={showModal}
         closeModal={closeModal}
         data={selectedData}
-      />
+      /> */}
     </SkeletonTheme>
   );
 };

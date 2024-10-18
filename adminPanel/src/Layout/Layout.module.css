@@ -33,12 +33,55 @@
 
 .headingDiv {
   /* flex: 1; */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background-color: #ffffff6e;
   border-radius: 2rem;
-  padding: 0.8rem 0 0 1.5rem;
+  padding: 0.5rem 0 0.3rem 0;
   display: flex;
   font-family: 'Poppins', sans-serif;
   height: 3rem;
+
+}
+
+.headingDiv h2 {
+  padding-top: 0.6rem;
+  padding-left: 1.5rem;
+}
+
+/* search */
+.searchContainer {
+  display: flex;
+  align-items: center;
+  border: 2px solid #384e81;
+  border-radius: 20px;
+  padding: 0 7px;
+  margin-bottom: 20px;
+  background: local;
+  width: 300px;
+  float: right;
+  margin: 25px;
+}
+
+.searchIcon {
+  width: 20px;
+  /* margin-right: 5px; */
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: local;
+  padding: 7px;
+  color: #384e81;
+  /* font-weight: 500; */
+}
+
+.searchInput::placeholder {
+  color: #384e81;
 }
 
 .contentDiv {

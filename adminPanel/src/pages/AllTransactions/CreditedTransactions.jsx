@@ -1,18 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import styles from "./AllTransaction.module.css";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import Modal from "./Modal.jsx";
 import { base_url } from "../../baseUrl/baseUrl.js";
 import axios from "axios";
+import { useOutletContext } from "react-router-dom";
 
 const CreditedTransactions = () => {
-
-  const [AllTransaction, setAllTransaction] = useState([]);
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -20,6 +17,9 @@ const CreditedTransactions = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
   const token = JSON.parse(sessionStorage.getItem("token"));
+  const [query, setQuery] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
+  let searchQuery = useOutletContext();
 
 
   const truncateAddress = (address) => {
@@ -40,7 +40,7 @@ const CreditedTransactions = () => {
       console.log("transaction data", data);
       // setAllTransaction(data?.data.data);
 
-      let reversedData=data?.data.data.reverse();
+      let reversedData = data?.data.data.reverse();
       setData(reversedData)
       setLoading(false);
 
@@ -52,14 +52,21 @@ const CreditedTransactions = () => {
 
   const lastIndex = currentPage * rowsPerPage;
   const firstIndex = lastIndex - rowsPerPage;
-  const currentData = data.slice(firstIndex, lastIndex);
+  const currentData = query ? filteredData.slice(firstIndex, lastIndex) : data.slice(firstIndex, lastIndex);
 
   console.log("current Data", currentData);
   console.log("current data Data", data);
 
   const nextPage = () => {
-    if (lastIndex < data.length) {
-      setCurrentPage(currentPage + 1);
+    if (query) {
+      if (lastIndex < filteredData.length) {
+        setCurrentPage(currentPage + 1);
+      }
+    } else {
+
+      if (lastIndex < data.length) {
+        setCurrentPage(currentPage + 1);
+      }
     }
   };
 
@@ -78,6 +85,27 @@ const CreditedTransactions = () => {
     setShowModal(false);
   };
 
+  // Function to check if any value in the object matches the search string
+  const search = (array, query) => {
+    return array.filter(obj => {
+      return Object.values(obj).some(value =>
+        value.toString().toLowerCase().includes(query.toLowerCase())
+      );
+    });
+  };
+
+  const handleSearch = useCallback((query) => {
+    setQuery(query);
+    let searchedData = search(data, query);
+    setFilteredData(searchedData);
+    // console.log("searched Data", searchedData);
+  }, [data]);
+
+  useEffect(() => {
+    handleSearch(searchQuery);
+    setCurrentPage(1);
+  }, [searchQuery, handleSearch])
+
   return (
     <SkeletonTheme baseColor="transparent" highlightColor="#ddd">
       <div className={styles.tableContainer}>
@@ -89,6 +117,7 @@ const CreditedTransactions = () => {
               <th>Sender ID</th>
               <th>Amount</th>
               <th>Reason</th>
+              <th>Date</th>
             </tr>
           </thead>
           <tbody className={styles.tableBody}>
@@ -107,7 +136,7 @@ const CreditedTransactions = () => {
                   <td>{truncateAddress(item?.userId)}</td>
                   <td>{item?.amount}</td>
                   <td>{item?.reason}</td>
-                  {/* <td>{item?.type}</td> */}
+                  <td>{(item?.createdAt ? item.createdAt : item.updatedAt).split("T")[0]}</td>
 
                   {/* <td>
                     <button
@@ -151,7 +180,7 @@ const CreditedTransactions = () => {
             <SkipPreviousIcon />
           </div>
           <div>
-            {firstIndex + 1}-{Math.min(lastIndex, data.length)} of {data.length}
+            {firstIndex + 1}-{Math.min(lastIndex, query ? filteredData.length : data.length)} of {query ? filteredData.length : data.length}
           </div>
           <div className={styles.nextBtn} onClick={nextPage}>
             <SkipNextIcon />
