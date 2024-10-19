@@ -644,14 +644,8 @@ class GameScene extends Phaser.Scene {
 
     spawnEntry() {
         // between 1 to 10 getting 1 is 10% chance
-        //  if want to increase the chance modyfy the range accordingly
-
-        // console.log("spawn speed", this.spawnSpeed);
-        let spawnCashPot = Phaser.Math.Between(1, 20);
-
         let width = this.game.config.width - 50;
-
-        // Bomb has appear more friquent than cashpods
+        let spawnCashPot = Phaser.Math.Between(1, 20);
         let spawnBomb = Phaser.Math.Between(1, 5);
 
         if (spawnBomb === 1) {
@@ -691,8 +685,8 @@ class GameScene extends Phaser.Scene {
         //     this.spawnBomb(width); //spawn death Barrels
         //     this.lastDeathSpawn = timeNow;
         // }
-
         // this.spawnBarrel(width);
+
         // save game state to use after reload.
         this.saveGameState();
     }
@@ -759,7 +753,7 @@ class GameScene extends Phaser.Scene {
         }
 
         // Create the cashPot
-        let cashPot = this.cashPots.create(x, 0, "cashpot");
+        let cashPot = this.cashPots.create(x, -20, "cashpot");
         cashPot.setVelocityY(this.setVelocityY); // Adjust falling speed
 
         // this.cashPotSound.play();
@@ -817,7 +811,7 @@ class GameScene extends Phaser.Scene {
         }
 
         // Create the bomb
-        let bomb = this.bombs.create(x, 0, "bomb");
+        let bomb = this.bombs.create(x, -20, "bomb");
         bomb.setVelocityY(this.setVelocityY); // Adjust falling speed
         // bomb.setScale(this.deviceType === "mobile" ? 0.7 : 1);
         // bomb.setCircle(bomb.width / 2);
@@ -847,7 +841,7 @@ class GameScene extends Phaser.Scene {
         }
 
         // Create the barrel
-        let barrel = this.barrels.create(x, 0, "barrel");
+        let barrel = this.barrels.create(x, -20, "barrel");
         barrel.setVelocityY(this.setVelocityY); // Adjust falling speed
         // barrel.setOffset(-5,-10)
         // this.player.setSize(this.player.width / 4, this.player.height / 4).setOffset(this.player.width / 10, this.player.height / 10)
