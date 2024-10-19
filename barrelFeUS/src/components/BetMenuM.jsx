@@ -25,7 +25,7 @@ const BetMenuM = ({
         <div>
             <div>
                 <h3>BALANCE</h3>
-                <h4 className='balance'>{currentCoins}</h4>
+                <h4 className='balance'>{+currentCoins.toFixed(2)}</h4>
                 <br />
                 {gameMode !== "practice" && <h3>BET SIZE</h3>}
 

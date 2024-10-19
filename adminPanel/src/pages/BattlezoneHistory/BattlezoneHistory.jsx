@@ -8,6 +8,8 @@ import Modal from "./Modal";
 import { base_url } from "../../baseUrl/baseUrl.js";
 import axios from "axios";
 import { useOutletContext } from "react-router-dom";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import toast from "react-hot-toast";
 
 const BattlezoneHistory = () => {
   const [data, setData] = useState([]);
@@ -99,6 +101,16 @@ const BattlezoneHistory = () => {
     setCurrentPage(1);
   }, [searchQuery, handleSearch])
 
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        toast.success("copied to clipboard!.");
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
+
   return (
     <SkeletonTheme baseColor="transparent" highlightColor="#ddd">
       <div className={styles.tableContainer}>
@@ -126,7 +138,14 @@ const BattlezoneHistory = () => {
               : (query ? filteredData : currentData)?.map((item, idx) => (
                 <tr key={item._id}>
                   <td>{idx + 1}</td>
-                  <td>{truncateAddress(item?.userId)}</td>
+                  <td>{truncateAddress(item?.userId)}
+                    <button
+                      className={styles.copyButton}
+                      onClick={() => handleCopy(item?.userId)}
+                    >
+                      <ContentCopyIcon />
+                    </button>
+                  </td>
                   <td>{truncateAddress(item?._id)}</td>
                   <td>{item?.betAmount}</td>
                   <td>{item?.score.toFixed(2)}</td>

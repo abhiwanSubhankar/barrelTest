@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-// import axios from "axios";
 import {publish} from "./CustomEvents/events";
 import {updateScore} from "./CustomEvents/eventKeys";
 import CtrlButton from "./gameObj/ControllButton";
@@ -168,13 +167,10 @@ class GameScene extends Phaser.Scene {
             loop: false,
             // volume: 0.5,
         });
-        // ^ game sounds
 
         this.background = this.add.image(0, 0, "bg").setOrigin(0, 0);
-
         // set Display size is make the backgroung spread to full height and width
         this.background.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
-        // this.background = this.add.image(0, -80, "bg").setOrigin(0, 0).setScale(0.95);
 
         this.bgImageGround = this.physics.add
         .image(0, this.game.config.height - (this.deviceType === "mobile" ? 130 : 140), "bgGround")
@@ -184,7 +180,6 @@ class GameScene extends Phaser.Scene {
         // .setScale(this.deviceType === "mobile" ? 0.8 : 1);
 
         // add score text and img > game info
-        // img
         this.add
         .image(this.game.config.width - 130, 25, "showScore")
         .setOrigin(0, 0)
@@ -233,7 +228,6 @@ class GameScene extends Phaser.Scene {
             this.textBetAmount = this.add
             .text(this.game.config.width - 70, 100, `$${bet}`, {
                 font: `bold ${this.deviceType === "mobile" ? 20 : 25}px Arial`,
-                // fontSize: "16px",
                 fill: "gray",
                 fontStyle: "bold",
             })
@@ -665,7 +659,7 @@ class GameScene extends Phaser.Scene {
         } else if (
             spawnCashPot === 1 &&
             this.barrelsBlustAfterMinReqLevel &&
-            this.gameLevel > 6 &&
+            +this.gameLevel > 7 &&
             this.cashPots.getChildren().length < 1
         ) {
             this.spawnCashPot(width);
@@ -718,7 +712,7 @@ class GameScene extends Phaser.Scene {
             // set fall velocity
             // this.setVelocityY += this.gameSpeed * this.gameLevel;
             this.setVelocityY += 5 * this.gameLevel;
-            // update the exesting velocity
+            // update the exesting falling object velocity
             this.updateExistingBarrelCashpotBombsVelocityY();
 
             this.shootingInterval -= this.gameLevel * 5;
@@ -728,7 +722,7 @@ class GameScene extends Phaser.Scene {
                 this.playerVelocity += incVel;
             }
 
-            if (this.spawnSpeed > 200) {
+            if (this.spawnSpeed > 250) {
                 this.spawnObject.delay = this.spawnSpeed;
                 //= Math.max(this.spawnObject.delay - 100, 50); // Ensures delay does not go negative
             }
@@ -800,8 +794,6 @@ class GameScene extends Phaser.Scene {
         cashPot.strength = cashPotValue; // Random value
         cashPot.value = cashPotValue;
 
-        // Create a text object to display the strength
-        // Store the text object inside the cashPot for easy updating
         cashPot.strengthText = this.add.text(
             cashPot.x - (cashPot.value > 10 ? 17 : 15),
             cashPot.y + 4,
@@ -812,9 +804,6 @@ class GameScene extends Phaser.Scene {
                 fontStyle: "bold",
             }
         );
-        // .setOrigin(0.5);
-
-        // Ensures the text appears on top of the barrel
         cashPot.strengthText.setDepth(1);
     }
 
@@ -910,7 +899,7 @@ class GameScene extends Phaser.Scene {
 
         // Check if the barrel should be destroyed
         if (barrel.strength <= 0) {
-            if (!this.barrelsBlustAfterMinReqLevel && this.gameLevel > 6) {
+            if (!this.barrelsBlustAfterMinReqLevel && this.gameLevel > 7) {
                 this.barrelsBlustAfterMinReqLevel = true;
             }
             this.updateScore(barrel.value, "barrel");
@@ -942,28 +931,22 @@ class GameScene extends Phaser.Scene {
         cashPot.strengthText.destroy();
         let gameMode = sessionStorage.getItem("gameMode");
         gameMode !== "practice" && this.updateLavel();
-
-        // console.log("cash Pod game mode",gameMode)
     }
 
     hitBomb(bullet, bomb) {
-        // End game logic
-
         this.explosionSound.play();
         this.explosion = this.add.sprite(bomb.x, bomb.y, "explosion");
         this.explosion.play("explode");
         this.explosion.setScale(this.deviceType === "mobile" ? 0.4 : 0.8);
-
         this.gameOver();
     }
 
-    // Update the visual representation of the magazine bar
     updateMagazineBar() {
         // Clear previous graphics
         this.magazineBar.clear();
-
         // Calculate the width of the bar based on the remaining bullets
-        let barWidth = 200 * (this.bulletsRemaining / this.magazineSize); // Full width is 200px
+        // Full width is 200px
+        let barWidth = 200 * (this.bulletsRemaining / this.magazineSize);
         let barHeight = 20;
 
         // Draw the magazine bar background (empty state)
@@ -1031,10 +1014,6 @@ class GameScene extends Phaser.Scene {
     }
 
     resetGameState() {
-        //  reset the game screen
-        // this.setGameCurrentCoins(50)
-
-        // reset
         this.score = 0;
         this.gameScore = 0;
         // resetting magazine Size.
@@ -1051,6 +1030,7 @@ class GameScene extends Phaser.Scene {
         this.spawnSpeed = 1000;
         this.setVelocityY = 80;
         this.gameEnd = false;
+        this.barrelsBlustAfterMinReqLevel = false;
     }
 
     saveGameState() {
@@ -1090,6 +1070,7 @@ class GameScene extends Phaser.Scene {
             barrels: barrelsData,
             bombs: bombsData,
             cashPots: cashpotData,
+            barrelsBlustAfterMinReqLevel: this.barrelsBlustAfterMinReqLevel,
         };
 
         // console.log("barrel bomb, cashpot", gameState, this.cashPots, this.barrels, this.bombs);
@@ -1111,7 +1092,7 @@ class GameScene extends Phaser.Scene {
             this.bulletsRemaining = gameState.bulletsRemaining;
 
             this.setVelocityY = gameState.gameVelocity;
-
+            this.barrelsBlustAfterMinReqLevel = gameState.barrelsBlustAfterMinReqLevel;
             //  create every barrel with the saved value.
 
             gameState.bombs.forEach((bombData) => {

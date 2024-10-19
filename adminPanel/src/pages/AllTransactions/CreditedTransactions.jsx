@@ -8,6 +8,8 @@ import Modal from "./Modal.jsx";
 import { base_url } from "../../baseUrl/baseUrl.js";
 import axios from "axios";
 import { useOutletContext } from "react-router-dom";
+import toast from "react-hot-toast";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 const CreditedTransactions = () => {
   const [data, setData] = useState([]);
@@ -104,7 +106,23 @@ const CreditedTransactions = () => {
   useEffect(() => {
     handleSearch(searchQuery);
     setCurrentPage(1);
-  }, [searchQuery, handleSearch])
+  }, [searchQuery, handleSearch]);
+
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        toast.success("copied to clipboard!.");
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
+
+  function capitalizeWords(str) {
+    return str.split(' ').map(word => {
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    }).join(' ');
+  }
 
   return (
     <SkeletonTheme baseColor="transparent" highlightColor="#ddd">
@@ -133,9 +151,16 @@ const CreditedTransactions = () => {
                 <tr key={item?._id}>
                   <td>{idx + 1}</td>
                   <td>{truncateAddress(item?._id)}</td>
-                  <td>{truncateAddress(item?.userId)}</td>
+                  <td>{truncateAddress(item?.userId)}
+                    <button
+                      className={styles.copyButton}
+                      onClick={() => handleCopy(item?.userId)}
+                    >
+                      <ContentCopyIcon />
+                    </button>
+                  </td>
                   <td>{item?.amount}</td>
-                  <td>{item?.reason}</td>
+                  <td>{capitalizeWords(item?.reason)}</td>
                   <td>{(item?.createdAt ? item.createdAt : item.updatedAt).split("T")[0]}</td>
 
                   {/* <td>

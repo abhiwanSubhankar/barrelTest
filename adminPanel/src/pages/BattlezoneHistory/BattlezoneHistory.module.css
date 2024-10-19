@@ -11,6 +11,7 @@
   margin: 0rem 3rem;
   color: black;
   font-family: "Plus Jakarta Sans", sans-serif;
+ 
 }
 
 .heading {
@@ -208,6 +209,12 @@
 .rowSkeleton {
   margin: 0rem 1rem;
   max-width: 95%;
+}
+
+.copyButton{
+  cursor: pointer;
+  background: local;
+  border: none;
 }
 
 @media (max-width: 500px) {

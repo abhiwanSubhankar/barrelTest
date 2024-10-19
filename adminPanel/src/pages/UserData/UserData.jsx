@@ -139,10 +139,17 @@ const UserData = () => {
               : (query ? filteredData : currentData)?.map((item, idx) => (
                 <tr key={idx}>
                   <td>{idx + 1}</td>
-                  <td>{truncateAddress(item?._id)}</td>
+                  <td>{truncateAddress(item?._id)}
+                    <button
+                      className={styles.copyButton}
+                      onClick={() => handleCopy(item?._id)}
+                    >
+                      <ContentCopyIcon />
+                    </button>
+                  </td>
                   <td className={styles.walletAddress}>{truncateAddress(item?.walletAddress)}
                     <button
-                      style={{ background: "local", border: "none" }}
+                      className={styles.copyButton}
                       onClick={() => handleCopy(item?.walletAddress)}
                     >
                       <ContentCopyIcon />

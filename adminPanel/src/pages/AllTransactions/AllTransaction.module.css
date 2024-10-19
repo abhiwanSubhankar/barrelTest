@@ -13,6 +13,12 @@
   font-family: "Plus Jakarta Sans", sans-serif;
 }
 
+.copyButton{
+  cursor: pointer;
+  background: local;
+  border: none;
+}
+
 .heading {
   margin: 1rem;
   font-size: 2rem;
