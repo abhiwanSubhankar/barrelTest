@@ -19,8 +19,6 @@ import { connectCreateWallet, placeBet, saveScore } from './Api/api.js';
 
 
 function App() {
-  // const [gameState, setGameState] = useState();
-
   const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("userData")) || null);
   const [showConnectModal, setShowConnectModal] = useState(false);
   const [deviceType, setDevicType] = useState("");
@@ -28,6 +26,8 @@ function App() {
   const [betAmount, setBetAmount] = useState(JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0);
   const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "");
   const [started, setStarted] = useState(JSON.parse(sessionStorage.getItem("phaserGameState")) ? true : false);
+  const [isLoading, setIsLoading] = useState(false);
+
   // game window size
   const [sizes, setSizes] = useState({
     height: window.innerHeight,
@@ -210,7 +210,7 @@ function App() {
       }
 
       // let betData ={userId, betAmount}
-
+      setIsLoading(true);
       placeBet(userData._id, betAmount).then((res) => {
 
         console.log(res);
@@ -225,6 +225,8 @@ function App() {
 
         toast.error("Bet Placed Unsuccessfull...")
         console.log(er);
+      }).finally(() => {
+        setIsLoading(false);
       })
       // console.log(userData);
     }
@@ -370,7 +372,7 @@ function App() {
             </div>
 
             <br />
-            {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started}>PLACE BET</button>}
+            {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started || isLoading}>{isLoading ? "Placing Bet..." : "PLACE BET"}</button>}
 
             <button
               onClick={handleShowConnectModal}

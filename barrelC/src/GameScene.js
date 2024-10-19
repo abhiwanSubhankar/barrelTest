@@ -776,24 +776,24 @@ class GameScene extends Phaser.Scene {
 
         let values = [2, 3, 5, 8, 10, 15, 25, 40, 75, 100];
 
-        // function getRandomNumber() {
-        //     // Generate a random number between 0 and 1
-        //     let randomNum = Math.random();
-
-        //     // Scale it to the range [0.01, 0.25]
-        //     return 0.01 + randomNum * (0.25 - 0.01);
-        // }
         function getRandomNumber() {
             // Generate a random number between 0 and 1
             let randomNum = Math.random();
 
-            // Scale it to the range [0, 9]
-            return Math.floor(0 + randomNum * 9);
+            // Scale it to the range [0.01, 0.25]
+            return (0.01 + randomNum * (0.25 - 0.01)).toFixed(2);
         }
+        // function getRandomNumber() {
+        //     // Generate a random number between 0 and 1
+        //     let randomNum = Math.random();
+
+        //     // Scale it to the range [0, 9]
+        //     return Math.floor(0 + randomNum * 9);
+        // }
 
         // Phaser.Math.Between(0.01, 0.25);
-        // let cashPotValue = getRandomNumber().toFixed(2);
-        let cashPotValue = values[getRandomNumber()];
+        let cashPotValue = getRandomNumber();
+        // let cashPotValue = values[getRandomNumber()];
         // let cashPotValue = multiplier;
 
         cashPot.strength = cashPotValue; // Random value
