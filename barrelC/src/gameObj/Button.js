@@ -25,6 +25,8 @@ export default class Button extends Phaser.GameObjects.Container {
 
                 let gameMode = sessionStorage.getItem("gameMode");
 
+                // if (!sessionStorage.getItem("isOpenConnectModal")) return;
+
                 if (gameMode === "practice") {
                     this.scene.scene.start(targetScene);
                     publish(startGame, {

@@ -35,7 +35,7 @@ class GameScene extends Phaser.Scene {
         this.canShoot = true; // Whether the player can shoot
         this.reloadSpeed = 1; // Speed of reload (adjust as needed)
         this.reloadDelay = 1000; // Delay before starting reload (1 second)
-   
+
         this.lastShotTime = 0; // To track when the last shot was fired
         this.isReloading = false; // To track if the player is reloading
 
@@ -49,7 +49,7 @@ class GameScene extends Phaser.Scene {
         this.gameLevel = 1;
         this.gamePreviousLevel = 1;
         this.gameSpeed = 50;
-        this.spawnSpeed = 1000;
+        this.spawnSpeed = 700;
         this.spawnObject; // storing the timer function for spawning barrel,bobmb,cashpod
 
         // others
@@ -172,11 +172,14 @@ class GameScene extends Phaser.Scene {
         this.background.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
         this.bgImageGround = this.physics.add
-        .image(0, this.game.config.height - (this.deviceType === "mobile" ? 130 : 140), "bgGround")
+        // .image(0, this.game.config.height - (this.deviceType === "mobile" ? 130 : 140), "bgGround")
+        .image(0, this.game.config.height - Math.floor((this.game.config.height * 15) / 100), "bgGround")
         .setOrigin(0, 0)
         .setDepth(-1)
         .setImmovable(true);
         // .setScale(this.deviceType === "mobile" ? 0.8 : 1);
+
+        // this.bgImageGround.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
         // add score text and img > game info
         this.add
@@ -783,7 +786,7 @@ class GameScene extends Phaser.Scene {
         let cashPotValue = values[getRandomNumber()];
         // let cashPotValue = multiplier;
 
-        cashPot.strength = cashPotValue; 
+        cashPot.strength = cashPotValue;
         cashPot.value = cashPotValue;
         cashPot.strengthText = this.add.text(
             cashPot.x - (cashPot.value > 10 ? 17 : 15),
@@ -836,7 +839,7 @@ class GameScene extends Phaser.Scene {
         }
 
         // Create the barrel
-        let barrel = this.barrels.create(x, -20, "barrel");
+        let barrel = this.barrels.create(x, 0, "barrel");
         barrel.setVelocityY(this.setVelocityY); // Adjust falling speed
         // barrel.setOffset(-5,-10)
         barrel.setCircle(26, barrel.width / 2 - 25, barrel.height / 2 - (this.deviceType === "mobile" ? 15 : 20));
@@ -856,7 +859,7 @@ class GameScene extends Phaser.Scene {
         }
 
         let barrelStrength = getRandomNumber().toFixed(2);
-        barrel.strength = barrelStrength; 
+        barrel.strength = barrelStrength;
         barrel.value = barrelStrength;
         // Create a text object to display the strength
         barrel.strengthText = this.add
@@ -1135,7 +1138,6 @@ class GameScene extends Phaser.Scene {
                 cashPot.strengthText.setDepth(1);
                 cashPot.setScale(this.deviceType === "mobile" ? 0.5 : 1);
             });
-
         }
     }
 }

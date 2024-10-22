@@ -15,8 +15,10 @@ class GameScene extends Phaser.Scene {
         this.gameEnd = false;
 
         this.lastSpawnX = null;
-        this.minSpawnDistance = 150;
+        this.minSpawnDistance = 50;
         this.barrelsBlustAfterMinReqLevel = false;
+        this.cashPotAppendLevel = [8, 12, 16, 18, 21, 24, 27, 29, 33, 35];
+        this.cashPotAppendCurrentLevel = null;
 
         // Cooldown bar setup
         this.cooldown = 100;
@@ -45,10 +47,10 @@ class GameScene extends Phaser.Scene {
         this.balance = 100; // Example initial balance
 
         //  game Lavel
-        this.gameLevel = 1;
+        this.gameLevel = localStorage.getItem("baseLevel") || 1;
         this.gamePreviousLevel = 1;
         this.gameSpeed = 50;
-        this.spawnSpeed = 1000;
+        this.spawnSpeed = 850;
         this.spawnObject; // storing the timer function for spawning barrel,bobmb,cashpod
 
         // others
@@ -172,7 +174,7 @@ class GameScene extends Phaser.Scene {
         this.background.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
         this.bgImageGround = this.physics.add
-        .image(0, this.game.config.height - (this.deviceType === "mobile" ? 130 : 140), "bgGround")
+        .image(0, this.game.config.height - Math.floor((this.game.config.height * 15) / 100), "bgGround")
         .setOrigin(0, 0)
         .setDepth(-1)
         .setImmovable(true);
@@ -314,12 +316,11 @@ class GameScene extends Phaser.Scene {
         .setDepth(1);
 
         this.player = this.add
-        .container(this.game.config.width - this.game.config.width / 2, this.game.config.height - 150, [
-            this.cannonShadow,
-            this.wheel2,
-            this.cannonImg,
-            this.wheel1,
-        ])
+        .container(
+            this.game.config.width - this.game.config.width / 2,
+            this.game.config.height - Math.floor((this.game.config.height * 20) / 100),
+            [this.cannonShadow, this.wheel2, this.cannonImg, this.wheel1]
+        )
         .setDepth(2);
         // Enable physics for the container (not individual objects)
         this.physics.world.enable(this.player);
@@ -643,15 +644,15 @@ class GameScene extends Phaser.Scene {
     spawnEntry() {
         // between 1 to 10 getting 1 is 10% chance
         let width = this.game.config.width - 50;
-        let spawnCashPot = Phaser.Math.Between(1, 20);
+        // let spawnCashPot = Phaser.Math.Between(1, 20);
         let spawnBomb = Phaser.Math.Between(1, 5);
 
         if (spawnBomb === 1) {
             this.spawnBomb(width);
         } else if (
-            spawnCashPot === 1 &&
+            // spawnCashPot === 1 &&
             this.barrelsBlustAfterMinReqLevel &&
-            this.gameLevel > 7 &&
+            this.cashPotAppendLevel.includes(this.gameLevel) &&
             this.cashPots.getChildren().length < 1
         ) {
             this.spawnCashPot(width);
@@ -693,7 +694,7 @@ class GameScene extends Phaser.Scene {
         const score = this.score;
 
         // Dynamic game level calculation
-        this.gameLevel = Math.floor(score * 10) + 1;
+        this.gameLevel = +localStorage.getItem("baseLevel") + (Math.floor(score * 10) + 1);
 
         if (this.gameLevel !== this.gamePreviousLevel) {
             //  increasing game speed and spawning object by game lavel.
@@ -712,13 +713,17 @@ class GameScene extends Phaser.Scene {
                 this.playerVelocity += incVel;
             }
 
-            if (this.spawnSpeed > 250) {
+            if (this.spawnSpeed > 200) {
                 this.spawnObject.delay = this.spawnSpeed;
                 //= Math.max(this.spawnObject.delay - 100, 50); // Ensures delay does not go negative
             }
 
             if (this.shootingInterval > 50) {
                 this.shootTimer.delay = this.shootingInterval;
+            }
+
+            if (this.gameLevel - this.gamePreviousLevel <= 3) {
+                this.gameLevel = this.gamePreviousLevel + 1;
             }
 
             this.gamePreviousLevel = this.gameLevel;
@@ -741,128 +746,142 @@ class GameScene extends Phaser.Scene {
     spawnCashPot(width, multiplier) {
         let x = Phaser.Math.Between(30, width);
 
+        let isOverlaped = false;
+
         if (this.lastSpawnX !== null && Math.abs(x - this.lastSpawnX) < this.minSpawnDistance) {
-            // If too close, adjust the minimum distance
-            x += this.minSpawnDistance;
-            // Ensure it doesn't go beyond the game bounds
-            if (x > width) x = width;
+            isOverlaped = true;
         }
 
-        // Create the cashPot
-        let cashPot = this.cashPots.create(x, -20, "cashpot");
-        cashPot.setVelocityY(this.setVelocityY); // Adjust falling speed
+        if (!isOverlaped) {
+            // Create the cashPot
+            let cashPot = this.cashPots.create(x, -20, "cashpot");
+            cashPot.setVelocityY(this.setVelocityY); // Adjust falling speed
 
-        // this.cashPotSound.play();
-        this.lastSpawnX = x;
+            // this.cashPotSound.play();
+            this.lastSpawnX = x;
 
-        cashPot.setCircle(30, cashPot.width / 2 - 30, cashPot.height / 2 - 15);
-        // cashPot.setScale(this.deviceType === "mobile" ? 0.7 : 1);
-        cashPot.setScale(this.deviceType === "mobile" ? 0.5 : 1);
+            cashPot.setCircle(30, cashPot.width / 2 - 30, cashPot.height / 2 - 15);
+            // cashPot.setScale(this.deviceType === "mobile" ? 0.7 : 1);
+            cashPot.setScale(this.deviceType === "mobile" ? 0.5 : 1);
 
-        let values = [2, 3, 5, 8, 10, 15, 25, 40, 75, 100];
+            let values = [2, 3, 5, 8, 10, 15, 25, 40, 75, 100];
 
-        function getRandomNumber() {
-            // Generate a random number between 0 and 1
-            let randomNum = Math.random();
+            // function getRandomNumber() {
+            //     // Generate a random number between 0 and 1
+            //     let randomNum = Math.random();
 
-            // Scale it to the range [0.01, 0.25]
-            return (0.01 + randomNum * (0.25 - 0.01)).toFixed(2);
-        }
-        // function getRandomNumber() {
-        //     // Generate a random number between 0 and 1
-        //     let randomNum = Math.random();
+            //     // Scale it to the range [0.01, 0.25]
+            //     return (0.01 + randomNum * (0.25 - 0.01)).toFixed(2);
+            // }
+            function getRandomNumber() {
+                // Generate a random number between 0 and 1
+                let randomNum = Math.random();
 
-        //     // Scale it to the range [0, 9]
-        //     return Math.floor(0 + randomNum * 9);
-        // }
-
-        // Phaser.Math.Between(0.01, 0.25);
-        let cashPotValue = getRandomNumber();
-        // let cashPotValue = values[getRandomNumber()];
-        // let cashPotValue = multiplier;
-
-        cashPot.strength = cashPotValue;
-        cashPot.value = cashPotValue;
-        cashPot.strengthText = this.add.text(
-            cashPot.x - (cashPot.value > 10 ? 17 : 15),
-            cashPot.y + 4,
-            `${cashPot.strength}x`,
-            {
-                fontSize: `${this.deviceType === "mobile" ? 20 : 24}px`,
-                fill: "black",
-                fontStyle: "bold",
+                // Scale it to the range [0, 9]
+                return Math.floor(0 + randomNum * 9);
             }
-        );
-        cashPot.strengthText.setDepth(1);
+
+            // Phaser.Math.Between(0.01, 0.25);
+            // let cashPotValue = getRandomNumber();
+            let cashPotValue = values[getRandomNumber()];
+            // let cashPotValue = multiplier;
+
+            cashPot.strength = cashPotValue;
+            cashPot.value = cashPotValue;
+            cashPot.strengthText = this.add.text(
+                cashPot.x - (cashPot.value > 10 ? 17 : 15),
+                cashPot.y + 4,
+                `${cashPot.strength}x`,
+                {
+                    fontSize: `${this.deviceType === "mobile" ? 20 : 24}px`,
+                    fill: "black",
+                    fontStyle: "bold",
+                }
+            );
+            cashPot.strengthText.setDepth(1);
+            this.barrelsBlustAfterMinReqLevel = false;
+        }
     }
 
     spawnBomb(width) {
         let x = Phaser.Math.Between(30, width);
+
+        let isOverlaped = false;
+
         if (this.lastSpawnX !== null && Math.abs(x - this.lastSpawnX) < this.minSpawnDistance) {
             // If too close, adjust the position by adding the minimum distance
-            x += this.minSpawnDistance;
-            // Ensure it doesn't go beyond the game bounds
-            if (x > width) x = width;
+            // x += this.minSpawnDistance;
+            // // Ensure it doesn't go beyond the game bounds
+            // if (x > width) x = width;
+            isOverlaped = true;
         }
 
-        // Create the bomb
-        let bomb = this.bombs.create(x, -20, "bomb");
-        bomb.setVelocityY(this.setVelocityY); // Adjust falling speed
-        // bomb.setScale(this.deviceType === "mobile" ? 0.7 : 1);
-        // bomb.setCircle(bomb.width / 2);
-        bomb.setCircle(
-            26, //width
-            bomb.width / 2 - 32, // offSetX
-            bomb.height / 2 - (this.deviceType === "mobile" ? 15 : 20) // offSetY
-        );
-        this.lastSpawnX = x;
-        if (this.deviceType === "mobile") {
-            bomb.setScale(0.7, 0.7);
-        } else {
-            bomb.setScale(1.3, 1);
+        if (!isOverlaped) {
+            // Create the bomb
+            let bomb = this.bombs.create(x, -20, "bomb");
+            bomb.setVelocityY(this.setVelocityY); // Adjust falling speed
+            // bomb.setScale(this.deviceType === "mobile" ? 0.7 : 1);
+            // bomb.setCircle(bomb.width / 2);
+            bomb.setCircle(
+                26, //width
+                bomb.width / 2 - 32, // offSetX
+                bomb.height / 2 - (this.deviceType === "mobile" ? 15 : 20) // offSetY
+            );
+            this.lastSpawnX = x;
+            if (this.deviceType === "mobile") {
+                bomb.setScale(0.7, 0.7);
+            } else {
+                bomb.setScale(1.3, 1);
+            }
         }
     }
 
     spawnBarrel(width) {
         let x = Phaser.Math.Between(30, width);
 
+        let isOverlaped = false;
+
         if (this.lastSpawnX !== null && Math.abs(x - this.lastSpawnX) < this.minSpawnDistance) {
             // If too close, adjust the position by adding the minimum distance
-            x += this.minSpawnDistance;
-            if (x > width) x = width;
+            // x += this.minSpawnDistance;
+            // if (x > width) x = width;
+            console.log("overlapped");
+            isOverlaped = true;
         }
 
-        // Create the barrel
-        let barrel = this.barrels.create(x, -20, "barrel");
-        barrel.setVelocityY(this.setVelocityY); // Adjust falling speed
-        // barrel.setOffset(-5,-10)
-        barrel.setCircle(26, barrel.width / 2 - 25, barrel.height / 2 - (this.deviceType === "mobile" ? 15 : 20));
-        // barrel.setScale(this.deviceType === "mobile" ? 0.8 : 1.2);
+        if (!isOverlaped) {
+            // Create the barrel
+            let barrel = this.barrels.create(x, -20, "barrel");
+            barrel.setVelocityY(this.setVelocityY); // Adjust falling speed
+            // barrel.setOffset(-5,-10)
+            barrel.setCircle(26, barrel.width / 2 - 25, barrel.height / 2 - (this.deviceType === "mobile" ? 15 : 20));
+            // barrel.setScale(this.deviceType === "mobile" ? 0.8 : 1.2);
 
-        this.lastSpawnX = x;
+            this.lastSpawnX = x;
 
-        if (this.deviceType === "mobile") {
-            barrel.setScale(0.7, 0.7);
-        } else {
-            barrel.setScale(1.3, 1);
+            if (this.deviceType === "mobile") {
+                barrel.setScale(0.7, 0.7);
+            } else {
+                barrel.setScale(1.3, 1);
+            }
+
+            function getRandomNumber() {
+                let randomNum = Math.random();
+                return 0.01 + randomNum * (0.25 - 0.01);
+            }
+
+            let barrelStrength = getRandomNumber().toFixed(2);
+            barrel.strength = barrelStrength;
+            barrel.value = barrelStrength;
+            // Create a text object to display the strength
+            barrel.strengthText = this.add
+            .text(barrel.x, barrel.y, `${isOverlaped ? "##" : barrel.strength}x`, {
+                fontSize: this.deviceType === "mobile" ? "8px" : "15px",
+                fill: "#ffffff",
+            })
+            .setOrigin(0.5, this.deviceType === "mobile" ? 2.6 : 2.4);
+            barrel.strengthText.setDepth(1);
         }
-
-        function getRandomNumber() {
-            let randomNum = Math.random();
-            return 0.01 + randomNum * (0.25 - 0.01);
-        }
-
-        let barrelStrength = getRandomNumber().toFixed(2);
-        barrel.strength = barrelStrength;
-        barrel.value = barrelStrength;
-        // Create a text object to display the strength
-        barrel.strengthText = this.add
-        .text(barrel.x, barrel.y, `${barrel.strength}x`, {
-            fontSize: this.deviceType === "mobile" ? "8px" : "15px",
-            fill: "#ffffff",
-        })
-        .setOrigin(0.5, this.deviceType === "mobile" ? 2.6 : 2.4);
-        barrel.strengthText.setDepth(1);
     }
 
     hitBarrel(bullet, barrel) {
@@ -876,8 +895,10 @@ class GameScene extends Phaser.Scene {
 
         // Check if the barrel should be destroyed
         if (barrel.strength <= 0) {
-            if (!this.barrelsBlustAfterMinReqLevel && this.gameLevel > 6) {
-                this.barrelsBlustAfterMinReqLevel = true;
+            if (!this.barrelsBlustAfterMinReqLevel && this.cashPotAppendLevel.includes(this.gameLevel)) {
+                if (this.cashPotAppendCurrentLevel == null || this.cashPotAppendCurrentLevel !== this.gameLevel) {
+                    this.barrelsBlustAfterMinReqLevel = true;
+                }
             }
             this.updateScore(barrel.value);
             // Destroy the barrel and the text
@@ -996,9 +1017,10 @@ class GameScene extends Phaser.Scene {
         // resetting game Lavel
         this.gameLevel = 1;
         this.gameSpeed = 20;
-        this.spawnSpeed = 1000;
+        this.spawnSpeed = 700;
         this.setVelocityY = 80;
         this.gameEnd = false;
+        this.barrelsBlustAfterMinReqLevel = false;
     }
 
     saveGameState() {
@@ -1037,6 +1059,7 @@ class GameScene extends Phaser.Scene {
             barrels: barrelsData,
             bombs: bombsData,
             cashPots: cashpotData,
+            barrelsBlustAfterMinReqLevel: this.barrelsBlustAfterMinReqLevel,
         };
 
         // console.log("barrel bomb, cashpot", gameState, this.cashPots, this.barrels, this.bombs);
@@ -1057,6 +1080,7 @@ class GameScene extends Phaser.Scene {
             this.bulletsRemaining = gameState.bulletsRemaining;
 
             this.setVelocityY = gameState.gameVelocity;
+            this.barrelsBlustAfterMinReqLevel = gameState.barrelsBlustAfterMinReqLevel;
 
             //  create every object with the saved value.
 

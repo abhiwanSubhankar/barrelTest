@@ -14,7 +14,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { Routes, Route, useNavigate } from "react-router-dom";
 import GameSceneM from './Mobile/GameSceneM.jsx';
 import ConnectWallet from './components/modals/ConnectWallet.jsx';
-import { connectCreateWallet, placeBet, saveScore } from './Api/api.js';
+import { connectCreateWallet, getAvgScore, placeBet, saveScore } from './Api/api.js';
 // import EndScenePopup from './scenes/gameOverPopup.js';
 
 
@@ -67,9 +67,11 @@ function App() {
 
   const handleCloaseConnectModal = () => {
     setShowConnectModal(false);
+    sessionStorage.setItem("isOpenConnectModal", false)
   }
   const handleShowConnectModal = () => {
     setShowConnectModal(true);
+    sessionStorage.setItem("isOpenConnectModal", true)
   }
 
   const updateLocalUserBalance = useCallback((type, amount) => {
@@ -211,24 +213,32 @@ function App() {
 
       // let betData ={userId, betAmount}
       setIsLoading(true);
-      let toastId = toast.loading("Payment is under process. please Don't close or reload tab.")
-      placeBet(userData._id, betAmount).then((res) => {
+      let toastId = toast.loading("Payment is under process. please Don't close or reload tab.");
 
-        console.log(res);
 
-        toast.success("Bet Placed Successfully!..", { id: toastId });
+      getAvgScore().then((res) => {
 
-        sessionStorage.setItem("betAmount", JSON.stringify({
-          betAmount
-        }));
+        console.log("baselevel", res.data.data.averageScore, Math.floor(res.data.data.averageScore * 10) + 1);
+        localStorage.setItem("baseLevel", Math.floor(res.data.data.averageScore * 10) + 1);
+
+        placeBet(userData._id, betAmount).then((res) => {
+          toast.success("Bet Placed Successfully!..", { id: toastId });
+          sessionStorage.setItem("betAmount", JSON.stringify({
+            betAmount
+          }));
+        }).catch((er) => {
+          toast.error("Bet Placed Unsuccessfull...", { id: toastId })
+          console.log(er);
+        }).finally(() => {
+          setIsLoading(false);
+        })
 
       }).catch((er) => {
-
         toast.error("Bet Placed Unsuccessfull...", { id: toastId })
         console.log(er);
-      }).finally(() => {
-        setIsLoading(false);
       })
+
+
       // console.log(userData);
     }
 
@@ -277,9 +287,11 @@ function App() {
 
   const startGameCB = useCallback((data) => {
     console.log("start event data", data);
-    setStarted(true);
-    setCurrentCoins((pre) => pre - betAmount);
-    updateLocalUserBalance("substract", betAmount);
+    if (!showConnectModal) {
+      setStarted(true);
+      setCurrentCoins((pre) => pre - betAmount);
+      updateLocalUserBalance("substract", betAmount);
+    }
   }, [betAmount, updateLocalUserBalance])
 
   const endGameCB = useCallback((data) => {

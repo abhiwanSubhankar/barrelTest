@@ -67,9 +67,11 @@ function App() {
 
   const handleCloaseConnectModal = () => {
     setShowConnectModal(false);
+    sessionStorage.setItem("isOpenConnectModal", false)
   }
   const handleShowConnectModal = () => {
     setShowConnectModal(true);
+    sessionStorage.setItem("isOpenConnectModal", true)
   }
 
   const updateLocalUserBalance = useCallback((type, amount) => {
@@ -229,7 +231,7 @@ function App() {
 
       }).catch((er) => {
 
-        toast.error("Bet Placed Unsuccessfull...",  { id: toastId })
+        toast.error("Bet Placed Unsuccessfull...", { id: toastId })
         console.log(er);
       }).finally(() => {
         setIsLoading(false);
@@ -284,9 +286,11 @@ function App() {
 
   const startGameCB = useCallback((data) => {
     console.log("start event data", data);
-    setStarted(true);
-    setCurrentCoins((pre) => pre - betAmount);
-    updateLocalUserBalance("substract", betAmount);
+    if (!showConnectModal) {
+      setStarted(true);
+      setCurrentCoins((pre) => pre - betAmount);
+      updateLocalUserBalance("substract", betAmount);
+    }
   }, [betAmount, updateLocalUserBalance])
 
   const endGameCB = useCallback((data) => {

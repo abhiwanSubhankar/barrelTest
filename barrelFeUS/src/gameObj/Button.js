@@ -24,7 +24,9 @@ export default class Button extends Phaser.GameObjects.Container {
                 let betAmount = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount;
 
                 let gameMode = sessionStorage.getItem("gameMode");
-
+                console.log("isOpen", sessionStorage.getItem("isOpenConnectModal"));
+                
+                // if (sessionStorage.getItem("isOpenConnectModal")) {};
                 if (gameMode === "practice") {
                     this.scene.scene.start(targetScene);
                     publish(startGame, {

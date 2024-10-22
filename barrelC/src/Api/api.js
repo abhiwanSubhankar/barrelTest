@@ -37,6 +37,19 @@ const getBalance = async (userId) => {
         return errorResponse(er.message, er.code);
     });
 };
+const getAvgScore = async () => {
+   return await axios
+    .get(`${baseURL}/game/avgScore`)
+    .then((res) => {
+        console.log(res.data);
+        return successResponse(res.data);
+    })
+    .catch((er) => {
+        console.log(er);
+
+        return errorResponse(er.message, er.code);
+    });
+};
 
 const connectCreateWallet = async (walletAddress) => {
     return await axios
@@ -94,7 +107,7 @@ const saveScore = async (data) => {
     });
 };
 
-export {placeBet, getBalance, updatePlayerBalance, saveScore, connectCreateWallet};
+export {placeBet, getBalance, updatePlayerBalance, saveScore, connectCreateWallet,getAvgScore};
 
 // const response = await fetch(URL, {
 //     method: "POST",
