@@ -1,14 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import { ToastContainer, toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
 import toast from 'react-hot-toast';
 import styles from "./Login.module.css";
 import { base_url } from "../../baseUrl/baseUrl";
 import logo from "../../assets/logo.png";
 import axios from "axios";
-
-
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
@@ -16,39 +12,23 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    // console.log({ email, password });
-
     const formData = {
       email,
       password
     }
 
     try {
-      // Make API request
-      const response = await axios.post(`${base_url}/login`, formData
-      );
-      // console.log("response", response.data);
-
-      console.log("admin login res", response);
-
-      // Save decrypted data in session storage
+      const response = await axios.post(`${base_url}/login`, formData);
       sessionStorage.setItem("token", JSON.stringify(response?.data?.data?.token));
       sessionStorage.setItem("adminEmail", JSON.stringify(response?.data?.data?.email));
-
-      // Notify user of successful login
       toast.success("Login successful!");
-
-      // Redirect to the UserData page
       navigate("/userdata");
     } catch (error) {
       console.error("Error logging in:", error);
-
-      // Notify user of an error
       toast.error("Invalid email or password. Please try again.");
     }
   };

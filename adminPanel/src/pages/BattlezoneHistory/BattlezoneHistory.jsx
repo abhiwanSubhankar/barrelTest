@@ -4,7 +4,6 @@ import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import Modal from "./Modal";
 import { base_url } from "../../baseUrl/baseUrl.js";
 import axios from "axios";
 import { useOutletContext } from "react-router-dom";
@@ -16,8 +15,6 @@ const BattlezoneHistory = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedData, setSelectedData] = useState(null);
   const token = JSON.parse(sessionStorage.getItem("token"));
   const [query, setQuery] = useState("");
   const [filteredData, setFilteredData] = useState([]);
@@ -31,7 +28,6 @@ const BattlezoneHistory = () => {
       }
     }).then((data) => {
       console.log("all games data", data.data);
-      // setAllGames(data?.data.data);
       let reversedData = data?.data.data.reverse();
       setData(reversedData);
       setLoading(false);
@@ -39,7 +35,6 @@ const BattlezoneHistory = () => {
     }).catch((er) => {
       console.log(er);
     })
-
   }, [token]);
 
   const lastIndex = currentPage * rowsPerPage;
@@ -65,15 +60,6 @@ const BattlezoneHistory = () => {
     }
   };
 
-  const openModal = (item) => {
-    setSelectedData(item);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
-
   const truncateAddress = (address) => {
     if (!address) return "";
     const start = address.slice(0, 6);
@@ -93,7 +79,6 @@ const BattlezoneHistory = () => {
     setQuery(query);
     let searchedData = search(data, query);
     setFilteredData(searchedData);
-    // console.log("searched Data", searchedData);
   }, [data]);
 
   useEffect(() => {
@@ -204,14 +189,6 @@ const BattlezoneHistory = () => {
           page:{currentPage}
         </div>
       </div>
-
-
-      {/* Render the modal and pass the selected data */}
-      {/* <Modal
-        showModal={showModal}
-        closeModal={closeModal}
-        data={selectedData}
-      /> */}
     </SkeletonTheme>
   );
 };

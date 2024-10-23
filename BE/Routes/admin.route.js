@@ -7,6 +7,7 @@ import {
     getDebitedPayments,
     updateHouseDetals,
     getAllMatches,
+    getStatistics,
 } from "../controllers/admin.controller.js";
 import {isAdmin} from "../middlewares/auth.js";
 
@@ -24,5 +25,6 @@ router.get("/payments/credit", getCreditedPayments);
 router.post("/houseCut", updateHouseDetals);
 router.get("/houseCut", getHouseDetails);
 router.get("/allMatches", getAllMatches);
+router.post("/statistics", getStatistics);
 
 export default router;

@@ -1,7 +1,4 @@
-import React from "react";
 import { Navigate } from "react-router-dom";
-// import { ToastContainer, toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
 import toast from 'react-hot-toast';
 
 const ProtectedRoute = ({ element, ...rest }) => {
@@ -15,7 +12,6 @@ const ProtectedRoute = ({ element, ...rest }) => {
   return (
     <>
       {element}
-      {/* <ToastContainer /> */}
     </>
   );
 };

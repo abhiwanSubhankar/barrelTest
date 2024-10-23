@@ -4,27 +4,23 @@ import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import axios from "axios";
 import { base_url } from "../../baseUrl/baseUrl.js";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import toast from "react-hot-toast";
 
 const UserData = () => {
-
-  const [error, setError] = useState(null);
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(15);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const token = JSON.parse(sessionStorage.getItem("token"));
   let searchQuery = useOutletContext();
 
   // console.log("quarry from outlet", searchQuery)
-
 
   useEffect(() => {
     setLoading(true);
@@ -73,10 +69,7 @@ const UserData = () => {
     }
   };
 
-  const handleViewClick = (item) => {
-    const id = item?._id;
-    navigate(`/user/${id}`, { state: { user: item } });
-  };
+
 
   // Function to check if any value in the object matches the search string
   const search = (array, query) => {

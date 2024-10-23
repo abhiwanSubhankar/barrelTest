@@ -94,4 +94,88 @@ const getAllMatches = tryCatch(async (req, res, next) => {
     });
 });
 
-export {adminLogin, getDebitedPayments, getCreditedPayments, getHouseDetails, updateHouseDetals, getAllMatches};
+const getStatistics = tryCatch(async (req, res, next) => {
+    let {range} = req?.body;
+
+    const calculateStatisticsPromise = [
+        Match.aggregate([
+            {
+                $sort: {
+                    createdAt: -1,
+                },
+            },
+            {$limit: +range},
+            {
+                $group: {
+                    _id: null,
+                    avgScore: {
+                        $avg: "$score",
+                    },
+                },
+            },
+        ]),
+        Payments.aggregate([
+            {
+                $match: {
+                    type: "debit",
+                },
+            },
+            {
+                $sort: {
+                    createdAt: -1,
+                },
+            },
+            {$limit: +range},
+            {
+                $group: {
+                    _id: null,
+                    totalPayOut: {
+                        $sum: "$amount",
+                    },
+                },
+            },
+        ]),
+        Payments.aggregate([
+            {
+                $match: {
+                    type: "credit",
+                },
+            },
+            {
+                $sort: {
+                    createdAt: -1,
+                },
+            },
+            {$limit: +range},
+            {
+                $group: {
+                    _id: null,
+                    totalReceived: {
+                        $sum: "$amount",
+                    },
+                },
+            },
+        ]),
+    ];
+
+    let [avgScoreData, totalPayOutData, totalReceivedData] = await Promise.all(calculateStatisticsPromise);
+
+    return res.status(200).send({
+        status: "Statistics get successful.",
+        data: {
+            avgScore: avgScoreData[0].avgScore.toFixed(2),
+            totalPayOut: totalPayOutData[0].totalPayOut,
+            totalReceived: totalReceivedData[0].totalReceived,
+        },
+    });
+});
+
+export {
+    adminLogin,
+    getDebitedPayments,
+    getCreditedPayments,
+    getHouseDetails,
+    updateHouseDetals,
+    getAllMatches,
+    getStatistics,
+};

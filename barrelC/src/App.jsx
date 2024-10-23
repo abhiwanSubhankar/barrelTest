@@ -298,8 +298,8 @@ function App() {
     console.log("end event data", data);
 
     setStarted(false);
-    sessionStorage.removeItem("betAmount");
-    setBetAmount(0);
+    // sessionStorage.removeItem("betAmount");
+    // setBetAmount(0);
 
     if (deviceType === "mobile") {
       navigate("/");
@@ -408,7 +408,7 @@ function App() {
           </div>
         </div>
 
-        <canvas id='gameCanvas' width={sizes.width} height={sizes.height}></canvas>
+        <canvas id='gameCanvas' width={sizes.width} height={sizes.height} ></canvas>
 
 
 
