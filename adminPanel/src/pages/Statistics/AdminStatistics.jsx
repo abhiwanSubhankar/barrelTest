@@ -2,20 +2,21 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./Statistics.module.css";
 import { base_url } from "../../baseUrl/baseUrl";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 const AdminStatistics = () => {
   const [selectedRange, setSelectedRange] = useState(100);
   const [data, setData] = useState({
-    "avgScore": "1.41",
-    "totalPayOut": 51726.43,
-    "totalReceived": 17508.8
+    avgScore: 0.00,
+    totalPayOut: 0.00,
+    totalReceived: 0.00
   });
   const token = JSON.parse(sessionStorage.getItem("token"));
 
 
   const getStatistics = useCallback(async () => {
 
+    let toastId = toast.loading("Getting data...");
 
     axios.post(
       `${base_url}/statistics`,
@@ -32,10 +33,11 @@ const AdminStatistics = () => {
         let response = data.data.data;
         console.log("resonse", data.data.data);
         setData(response)
-        toast.success("Percentage Saved!");
+        toast.success("Successful.", { id: toastId });
 
       }).catch((err) => {
         console.log("delete error", err);
+        toast.error("Unsuccessful.", { id: toastId });
       })
 
   }, [selectedRange, token]);
