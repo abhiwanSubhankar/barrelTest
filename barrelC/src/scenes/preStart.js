@@ -67,6 +67,7 @@ export default class PreStartScene extends Phaser.Scene {
     }
     cb = function () {
         let betAmount = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount;
+        
         if (betAmount) {
             this.scene.start("GameScene");
         } else {

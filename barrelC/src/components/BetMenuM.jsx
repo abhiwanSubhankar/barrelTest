@@ -32,31 +32,32 @@ const BetMenuM = ({
                 {gameMode !== "practice" && <div className='betAmountWrapper'>
 
                     <button className='incdecButton' disabled={started} onClick={() => {
-                        betAmount > 0 && setBetAmount((pre) => pre - 1)
+                        betAmount.betAmount > 0 && setBetAmount((pre) => { return { ...betAmount, betAmount: +pre.betAmount - 1 } })
                     }}>
                         <img src="/minus.svg" alt="plus" />
                     </button>
 
                     <input
                         type="number"
+                        id={"numberInput"}
                         className='balance'
                         placeholder='Enter Bet Amount'
-                        min={0}
+                        min={1}
                         max={10000000}
-                        disabled={started}
-                        value={betAmount}
+                        disabled={started || betAmount.status}
+                        value={betAmount.betAmount}
+                        step="1"
                         onKeyDown={(e) => {
                             // Prevent the 'e' key from being typed
-                            if (e.key === 'e' || e.key === 'E' || e.key === "-") {
+                            if (e.key === 'e' || e.key === 'E' || e.key === "-" || e.key === ".") {
                                 e.preventDefault();
                             }
-
                         }}
                         onChange={(e) => handleChange(e)}
                     />
 
                     <button className='incdecButton' disabled={started} onClick={() => {
-                        setBetAmount((pre) => +pre + 1)
+                        setBetAmount((pre) => { return { ...betAmount, betAmount: +pre.betAmount + 1 } })
                     }}>
                         <img src="/plus.svg" alt="plus" />
                     </button>
@@ -65,7 +66,7 @@ const BetMenuM = ({
             </div>
 
             <br />
-            {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started}>PLACE BET</button>}
+            {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started || betAmount?.status}>PLACE BET</button>}
 
             {gameMode === "practice" && deviceType === "mobile" && <button onClick={handlePlaceBet} className='button' disabled={started}>START PLAY</button>}
 

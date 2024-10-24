@@ -47,7 +47,8 @@ class GameScene extends Phaser.Scene {
         this.balance = 100; // Example initial balance
 
         //  game Lavel
-        this.gameLevel = localStorage.getItem("baseLevel") || 1;
+        this.gameLevel = 1;
+        // this.gameLevel = localStorage.getItem("baseLevel") || 1;
         this.gamePreviousLevel = 1;
         this.gameSpeed = 50;
         this.spawnSpeed = 850;
@@ -642,8 +643,9 @@ class GameScene extends Phaser.Scene {
     }
 
     spawnEntry() {
-        // between 1 to 10 getting 1 is 10% chance
         let width = this.game.config.width - 50;
+
+        // between 1 to 10 getting 1 is 10% chance
         // let spawnCashPot = Phaser.Math.Between(1, 20);
         let spawnBomb = Phaser.Math.Between(1, 5);
 
@@ -661,6 +663,7 @@ class GameScene extends Phaser.Scene {
         }
 
         // >>>>>>. ^old Logic... v new logic
+
         // const timeNow = this.time.now;
 
         // // Calculate spawn rates
@@ -694,7 +697,8 @@ class GameScene extends Phaser.Scene {
         const score = this.score;
 
         // Dynamic game level calculation
-        this.gameLevel = +localStorage.getItem("baseLevel") + (Math.floor(score * 10) + 1);
+        this.gameLevel = Math.floor(score * 10) + 1;
+        // this.gameLevel = +localStorage.getItem("baseLevel") + (Math.floor(score * 10) + 1);
 
         if (this.gameLevel !== this.gamePreviousLevel) {
             //  increasing game speed and spawning object by game lavel.
@@ -1013,6 +1017,7 @@ class GameScene extends Phaser.Scene {
         this.lastShotTime = 0; // To track when the last shot was fired
         this.isReloading = false;
         this.shootingInterval = 200;
+        this.playerVelocity = 375;
 
         // resetting game Lavel
         this.gameLevel = 1;
@@ -1060,6 +1065,7 @@ class GameScene extends Phaser.Scene {
             bombs: bombsData,
             cashPots: cashpotData,
             barrelsBlustAfterMinReqLevel: this.barrelsBlustAfterMinReqLevel,
+            playerVelocity: this.playerVelocity,
         };
 
         // console.log("barrel bomb, cashpot", gameState, this.cashPots, this.barrels, this.bombs);
@@ -1074,7 +1080,7 @@ class GameScene extends Phaser.Scene {
             const gameState = JSON.parse(savedState);
 
             this.player.setPosition(gameState.playerPosition.x, this.game.config.height - 150);
-
+            this.playerVelocity = gameState.playerVelocity;
             this.score = gameState.score;
             this.gameLevel = gameState.gameLevel;
             this.bulletsRemaining = gameState.bulletsRemaining;

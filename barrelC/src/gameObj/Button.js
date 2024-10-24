@@ -22,6 +22,7 @@ export default class Button extends Phaser.GameObjects.Container {
             if (cb === "startScene") {
                 // console.log("start scgffgff called.");
                 let betAmount = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount;
+                let betStatus = JSON.parse(sessionStorage.getItem("betAmount"))?.status;
 
                 let gameMode = sessionStorage.getItem("gameMode");
 
@@ -33,10 +34,21 @@ export default class Button extends Phaser.GameObjects.Container {
                         started: true,
                     });
                 } else if (betAmount && +betAmount >= 1) {
-                    this.scene.scene.start(targetScene);
-                    // publish(startGame, {
-                    //     started: true,
-                    // });
+                    if (betStatus) {
+                        // publish(startGame, {
+                        //     started: true,
+                        // });
+                        this.scene.scene.start(targetScene);
+                    } else {
+                        // this.scene.scene.start(targetScene);
+                        this.errortext = this.scene.add.text(-200, -70, "Please place the bet before start the Game.", {
+                            fontSize: "20px",
+                            fill: "red",
+                            fontWidth: 900,
+                        });
+    
+                        this.add(this.errortext);
+                    }
                 } else {
                     this.errortext = this.scene.add.text(-200, -70, "Please enter a valid BetAmount", {
                         fontSize: "20px",

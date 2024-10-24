@@ -66,6 +66,8 @@ const connectCreateWallet = async (walletAddress) => {
 };
 
 const placeBet = async (userId, betAmount) => {
+    console.log("tydtdtdt",{userId, betAmount});
+    
     return await axios
     .post(`${baseURL}/game/saveBetAmount`, {userId, betAmount})
     .then((res) => {

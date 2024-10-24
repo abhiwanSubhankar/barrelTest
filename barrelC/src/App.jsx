@@ -1,32 +1,33 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import "./App.css";
 import Phaser from 'phaser';
 import GameScene from './GameScene';
 import EndScene from './scenes/gameOver';
-import "./App.css";
+import BetMenuM from './components/BetMenuM';
+import PreStartScene from './scenes/preStart';
+import GameSceneM from './Mobile/GameSceneM.jsx';
+import toast, { Toaster } from 'react-hot-toast';
+import SplashScreen from './components/SplashScreen';
+import { useCallback, useEffect, useState } from 'react';
+import { Routes, Route, useNavigate } from "react-router-dom";
+import ConnectWallet from './components/modals/ConnectWallet.jsx';
 import { publish, subscribe, unsubscribe } from './CustomEvents/events';
 import { endGame, startGame, updateScore } from './CustomEvents/eventKeys';
-import PreStartScene from './scenes/preStart';
-import BetMenuM from './components/BetMenuM';
-import SplashScreen from './components/SplashScreen';
-import toast, { Toaster } from 'react-hot-toast';
-
-
-import { Routes, Route, useNavigate } from "react-router-dom";
-import GameSceneM from './Mobile/GameSceneM.jsx';
-import ConnectWallet from './components/modals/ConnectWallet.jsx';
 import { connectCreateWallet, getAvgScore, placeBet, saveScore } from './Api/api.js';
-// import EndScenePopup from './scenes/gameOverPopup.js';
 
 
 function App() {
-  const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("userData")) || null);
-  const [showConnectModal, setShowConnectModal] = useState(false);
+  const navigate = useNavigate();
   const [deviceType, setDevicType] = useState("");
-  const [currentCoins, setCurrentCoins] = useState(userData?.balance || 500);
-  const [betAmount, setBetAmount] = useState(JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0);
-  const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "");
-  const [started, setStarted] = useState(JSON.parse(sessionStorage.getItem("phaserGameState")) ? true : false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showConnectModal, setShowConnectModal] = useState(false);
+  const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "");
+  const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("userData")) || null);
+  const [currentCoins, setCurrentCoins] = useState(userData?.balance || 500);
+  const [started, setStarted] = useState(JSON.parse(sessionStorage.getItem("phaserGameState")) ? true : false);
+  const [betAmount, setBetAmount] = useState({
+    betAmount: JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0,
+    status: JSON.parse(sessionStorage.getItem("betAmount"))?.status || false
+  });
 
   // game window size
   const [sizes, setSizes] = useState({
@@ -34,41 +35,11 @@ function App() {
     width: window.innerWidth,
   });
 
-  const navigate = useNavigate();
-
-  function showTost(type) {
-
-
-
-    toast('Hello World', {
-      duration: 2000,
-      position: 'top-center',
-
-      // Styling
-      style: {},
-      className: '',
-
-      // Custom Icon
-      icon: '👏',
-
-      // Change colors of success/error/loading icon
-      iconTheme: {
-        primary: '#000',
-        secondary: '#fff',
-      },
-
-      // Aria
-      ariaProps: {
-        role: 'status',
-        'aria-live': 'polite',
-      },
-    });
-  }
-
   const handleCloaseConnectModal = () => {
     setShowConnectModal(false);
     sessionStorage.setItem("isOpenConnectModal", false)
   }
+
   const handleShowConnectModal = () => {
     setShowConnectModal(true);
     sessionStorage.setItem("isOpenConnectModal", true)
@@ -84,7 +55,6 @@ function App() {
   }, [userData])
 
   // api functions
-
   const connectWallet = async (walletAddress) => {
     console.log(walletAddress);
 
@@ -113,13 +83,22 @@ function App() {
   const handleChange = (e) => {
 
     let val = e.target.value;
-    console.log("val.startsWith('0')", val.startsWith('0'))
+    // console.log("val.startsWith('0')", val.startsWith('0'),val)
 
     if (val === '0') {
-      setBetAmount(''); // Prevent a single '0' from being input
+      setBetAmount({
+        ...betAmount,
+        betAmount: ""
+      }); // Prevent a single '0' from being input
     } else {
-      setBetAmount(val.replace(/^0+/, '')); // Strip any leading zeros
+      let updatedVal = val.replace(/^0+/, '')
+      updatedVal = Math.floor(updatedVal);
+      setBetAmount({
+        ...betAmount,
+        betAmount: updatedVal
+      }); // Strip any leading zeros
     }
+
   }
 
 
@@ -160,7 +139,7 @@ function App() {
           default: 'arcade',
           arcade: {
             gravity: { y: 0 },
-            debug: false
+            debug: true
           }
         },
         // scene: [PreStartScene, GameScene, EndScenePopup],
@@ -195,12 +174,12 @@ function App() {
 
     if (gameMode !== "practice") {
 
-      if (betAmount <= 0) {
+      if (betAmount.betAmount < 1) {
         toast.error("Bet Amount should be more than 1 or 1");
         return;
       }
 
-      if (betAmount > currentCoins) {
+      if (betAmount.betAmount > currentCoins) {
         toast.error("You don't have sufficient balance to Place the bet !");
         return;
       }
@@ -221,10 +200,11 @@ function App() {
         console.log("baselevel", res.data.data.averageScore, Math.floor(res.data.data.averageScore * 10) + 1);
         localStorage.setItem("baseLevel", Math.floor(res.data.data.averageScore * 10) + 1);
 
-        placeBet(userData._id, betAmount).then((res) => {
+        placeBet(userData._id, betAmount.betAmount).then((res) => {
           toast.success("Bet Placed Successfully!..", { id: toastId });
           sessionStorage.setItem("betAmount", JSON.stringify({
-            betAmount
+            ...betAmount,
+            status: true
           }));
         }).catch((er) => {
           toast.error("Bet Placed Unsuccessfull...", { id: toastId })
@@ -265,13 +245,13 @@ function App() {
       let toBeSavedData = {
         userId: userData._id,
         level,
-        betAmount,
+        betAmount: betAmount.betAmount,
         score
       }
 
       saveGameScore(toBeSavedData)
 
-      let finalScore = ((+betAmount) * score).toFixed(2);
+      let finalScore = ((+betAmount.betAmount) * score).toFixed(2);
       setCurrentCoins(pre => pre + +finalScore);
       updateLocalUserBalance("add", finalScore);
       console.count("score",)
@@ -289,8 +269,10 @@ function App() {
     console.log("start event data", data);
     if (!showConnectModal) {
       setStarted(true);
-      setCurrentCoins((pre) => pre - betAmount);
-      updateLocalUserBalance("substract", betAmount);
+      if (gameMode !== "practice") {
+        setCurrentCoins((pre) => pre - betAmount.betAmount);
+        updateLocalUserBalance("substract", betAmount.betAmount);
+      }
     }
   }, [betAmount, updateLocalUserBalance])
 
@@ -299,7 +281,14 @@ function App() {
 
     setStarted(false);
     // sessionStorage.removeItem("betAmount");
-    // setBetAmount(0);
+    sessionStorage.setItem("betAmount", JSON.stringify({
+      ...betAmount,
+      status: false
+    }));
+    setBetAmount({
+      ...betAmount,
+      status: false
+    });
 
     if (deviceType === "mobile") {
       navigate("/");
@@ -350,9 +339,9 @@ function App() {
               {gameMode !== "practice" && <div className='betAmountWrapper'>
 
                 <button className='incdecButton' disabled={started} onClick={() => {
-                  betAmount > 0 && setBetAmount((pre) => pre - 1)
+                  betAmount.betAmount > 0 && setBetAmount((pre) => { return { ...betAmount, betAmount: +pre.betAmount - 1 } })
                 }}>
-                  <img src="/minus.svg" alt="plus" />
+                  <img src="/minus.svg" alt="minus" />
                 </button>
 
                 <input
@@ -362,21 +351,21 @@ function App() {
                   placeholder='Enter Bet Amount'
                   min={1}
                   max={10000000}
-                  disabled={started}
-                  value={betAmount}
+                  disabled={started || betAmount.status}
+                  value={betAmount.betAmount}
+                  step="1"
                   onKeyDown={(e) => {
                     // Prevent the 'e' key from being typed
-                    if (e.key === 'e' || e.key === 'E' || e.key === "-") {
+                    if (e.key === 'e' || e.key === 'E' || e.key === "-" || e.key === ".") {
                       e.preventDefault();
                     }
-                    // console.log(e.key);
 
                   }}
                   onChange={(e) => handleChange(e)}
                 />
 
                 <button className='incdecButton' disabled={started} onClick={() => {
-                  setBetAmount((pre) => +pre + 1)
+                  setBetAmount((pre) => { return { ...betAmount, betAmount: +pre.betAmount + 1 } })
                 }}>
                   <img src="/plus.svg" alt="plus" />
                 </button>
@@ -385,7 +374,7 @@ function App() {
             </div>
 
             <br />
-            {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started || isLoading}>{isLoading ? "Placing Bet..." : "PLACE BET"}</button>}
+            {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started || isLoading || betAmount.status}>{isLoading ? "Placing Bet..." : "PLACE BET"}</button>}
 
             <button
               onClick={handleShowConnectModal}

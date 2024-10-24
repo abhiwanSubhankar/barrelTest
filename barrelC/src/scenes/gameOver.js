@@ -45,16 +45,20 @@ export default class EndScene extends Phaser.Scene {
         this.bgImage.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
         // this.add.text(120, 50, `Your Score : ${this.score}`, {fontSize: 18});
-
+        let gm = sessionStorage.getItem("gameMode") || "practice";
         this.add.text(
             this.game.config.width / 2 - (this.deviceType === "mobile" ? 130 : 350),
             this.game.config.height / 2 - 120,
-            `You have won ${this.deviceType === "mobile" ? "\n" : ""} $${(this.betAmount * this.score).toFixed(2)}.`,
+            gm === "practice"
+                ? `You have won ${this.deviceType === "mobile" ? "\n" : ""} $0.00`
+                : `You have won ${this.deviceType === "mobile" ? "\n" : ""} $${(this.betAmount * this.score).toFixed(
+                      2
+                  )}.`,
             {
                 fontSize: `${this.deviceType === "mobile" ? 35 : 65}px`,
                 fill: "#FFE358",
                 fontStyle: "bold",
-                  align: 'center'
+                align: "center",
             }
         );
         // if()
