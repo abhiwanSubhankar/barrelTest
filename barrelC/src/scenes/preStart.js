@@ -48,6 +48,7 @@ export default class PreStartScene extends Phaser.Scene {
         // this.player.setCircle(28, this.player.width / 2 - 26, this.player.height / 2 - 26);
 
         let unfinishedGame = JSON.parse(sessionStorage.getItem("phaserGameState"));
+        let gameState = localStorage.getItem("gameState");
 
         this.startButton = new Button(
             this,
@@ -57,8 +58,8 @@ export default class PreStartScene extends Phaser.Scene {
             this.game.config.height / 2,
             "blueButton1",
             "blueButton2",
-            unfinishedGame ? "Resume" : "Start Game",
-            "GameScene",
+           ( unfinishedGame || gameState === "gameover" )? "Resume" : "Start Game",
+            gameState === "gameover" ? "End" : "GameScene",
             "startScene"
         );
 
@@ -67,7 +68,7 @@ export default class PreStartScene extends Phaser.Scene {
     }
     cb = function () {
         let betAmount = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount;
-        
+
         if (betAmount) {
             this.scene.start("GameScene");
         } else {

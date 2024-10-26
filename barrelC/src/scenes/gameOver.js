@@ -12,7 +12,7 @@ export default class EndScene extends Phaser.Scene {
 
     init(data) {
         console.log("init", data);
-        this.score = data.totalScore;
+        this.score = data.totalScore || JSON.parse(sessionStorage.getItem("gameOver"))?.score;
         this.betAmount = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0;
         this.gameMode = sessionStorage.getItem("gameMode") || "practice";
 
@@ -31,6 +31,7 @@ export default class EndScene extends Phaser.Scene {
     create() {
         // this.model = this.sys.game.globals.model;
         // submitScore(this.model.userName, this.score);
+        localStorage.setItem("gameState", "gameover");
 
         this.layout = {
             x: 0,

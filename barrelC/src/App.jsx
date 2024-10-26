@@ -200,7 +200,7 @@ function App() {
         console.log("baselevel", res.data.data.averageScore, Math.floor(res.data.data.averageScore * 10) + 1);
         localStorage.setItem("baseLevel", Math.floor(res.data.data.averageScore * 10) + 1);
 
-        placeBet(userData._id, betAmount.betAmount).then((res) => {
+        placeBet(userData._id, betAmount.betAmount).then(() => {
           toast.success("Bet Placed Successfully!..", { id: toastId });
           sessionStorage.setItem("betAmount", JSON.stringify({
             ...betAmount,
@@ -242,11 +242,14 @@ function App() {
         level,
       } = data.detail;
 
+      let localCashPotHits = JSON.parse(localStorage.getItem("cashPotHits"));
+
       let toBeSavedData = {
         userId: userData._id,
         level,
         betAmount: betAmount.betAmount,
-        score
+        score,
+        cashPotHits: localCashPotHits || []
       }
 
       saveGameScore(toBeSavedData)
@@ -254,7 +257,8 @@ function App() {
       let finalScore = ((+betAmount.betAmount) * score).toFixed(2);
       setCurrentCoins(pre => pre + +finalScore);
       updateLocalUserBalance("add", finalScore);
-      console.count("score",)
+      localStorage.removeItem("cashPotHits")
+      console.log("score", toBeSavedData)
       console.log(betAmount, finalScore);
     }
 

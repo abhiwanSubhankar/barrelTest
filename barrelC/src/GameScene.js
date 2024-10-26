@@ -156,6 +156,8 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+
+        localStorage.setItem("gameState","playing")
         // Create sound objects
         this.explosionSound = this.sound.add("explosion");
         this.woodenBarrelHitGroundSound = this.sound.add("woodenBarrelHitGround");
@@ -646,16 +648,16 @@ class GameScene extends Phaser.Scene {
         let width = this.game.config.width - 50;
 
         // between 1 to 10 getting 1 is 10% chance
-        // let spawnCashPot = Phaser.Math.Between(1, 20);
+        let spawnCashPot = Phaser.Math.Between(1, 20);
         let spawnBomb = Phaser.Math.Between(1, 5);
 
         if (spawnBomb === 1) {
             this.spawnBomb(width);
         } else if (
-            // spawnCashPot === 1 &&
-            this.barrelsBlustAfterMinReqLevel &&
-            this.cashPotAppendLevel.includes(this.gameLevel) &&
-            this.cashPots.getChildren().length < 1
+            spawnCashPot === 1
+            // this.barrelsBlustAfterMinReqLevel &&
+            // this.cashPotAppendLevel.includes(this.gameLevel) &&
+            // this.cashPots.getChildren().length < 1
         ) {
             this.spawnCashPot(width);
         } else {
@@ -747,7 +749,7 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    spawnCashPot(width, multiplier) {
+    spawnCashPot(width) {
         let x = Phaser.Math.Between(30, width);
 
         let isOverlaped = false;
@@ -926,6 +928,11 @@ class GameScene extends Phaser.Scene {
         this.explosion = this.add.sprite(cashPot.x, cashPot.y, "explosion");
         this.explosion.play("explode");
         this.explosion.setScale(this.deviceType === "mobile" ? 0.4 : 0.8);
+
+        let cashPotHits = JSON.parse(localStorage.getItem("cashPotHits")) || [];
+        cashPotHits = [...cashPotHits, cashPot.value];
+
+        localStorage.setItem("cashPotHits", JSON.stringify(cashPotHits));
 
         // removing all the element from canvas
         cashPot.destroy();
