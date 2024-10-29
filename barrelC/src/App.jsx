@@ -127,7 +127,7 @@ function App() {
           default: 'arcade',
           arcade: {
             gravity: { y: 0 },
-            debug: true
+            debug: false
           }
         },
         // scene: [PreStartScene, GameScene, EndScenePopup],

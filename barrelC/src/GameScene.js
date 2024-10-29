@@ -212,14 +212,14 @@ class GameScene extends Phaser.Scene {
             .setDepth(1);
 
             // add level text
-            this.levelText = this.add
-            .text(this.game.config.width - 120, 140, `Lavel :- ${this.gameLevel}`, {
-                font: `bold ${this.deviceType === "mobile" ? 20 : 25}px Arial`,
-                fill: "red",
-                fontStyle: "bold",
-            })
-            .setOrigin(0, 0)
-            .setDepth(1);
+            // this.levelText = this.add
+            // .text(this.game.config.width - 120, 140, `Lavel :- ${this.gameLevel}`, {
+            //     font: `bold ${this.deviceType === "mobile" ? 20 : 25}px Arial`,
+            //     fill: "red",
+            //     fontStyle: "bold",
+            // })
+            // .setOrigin(0, 0)
+            // .setDepth(1);
         }
 
         this.anims.create({
@@ -487,7 +487,7 @@ class GameScene extends Phaser.Scene {
         if (localGameMode !== "practice") {
             let multiplayerTextValue = this.score * betAmount;
             this.textM.setText(`$${multiplayerTextValue.toFixed(2)}`);
-            this.levelText.setText(`Lavel :- ${this.gameLevel}`);
+            // this.levelText.setText(`Lavel :- ${this.gameLevel}`);
         }
     }
 
