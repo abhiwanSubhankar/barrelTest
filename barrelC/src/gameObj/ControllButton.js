@@ -11,7 +11,6 @@ export default class CtrlButton extends Phaser.GameObjects.Container {
         this.button.setScale(0.7);
         this.text = this.scene.add.text(0, 0, text, {
             font: "bold 20px Arial",
-            // fontSize: "25px",
             fill: "#000",
         });
         Phaser.Display.Align.In.Center(this.text, this.button);

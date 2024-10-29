@@ -31,7 +31,7 @@ const BetMenuM = ({
 
                 {gameMode !== "practice" && <div className='betAmountWrapper'>
 
-                    <button className='incdecButton' disabled={started} onClick={() => {
+                    <button className='incdecButton' disabled={started || betAmount.status} onClick={() => {
                         betAmount.betAmount > 0 && setBetAmount((pre) => { return { ...betAmount, betAmount: +pre.betAmount - 1 } })
                     }}>
                         <img src="/minus.svg" alt="plus" />
@@ -56,7 +56,7 @@ const BetMenuM = ({
                         onChange={(e) => handleChange(e)}
                     />
 
-                    <button className='incdecButton' disabled={started} onClick={() => {
+                    <button className='incdecButton' disabled={started || betAmount.status} onClick={() => {
                         setBetAmount((pre) => { return { ...betAmount, betAmount: +pre.betAmount + 1 } })
                     }}>
                         <img src="/plus.svg" alt="plus" />

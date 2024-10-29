@@ -38,7 +38,7 @@ const getBalance = async (userId) => {
     });
 };
 const getAvgScore = async () => {
-   return await axios
+    return await axios
     .get(`${baseURL}/game/avgScore`)
     .then((res) => {
         console.log(res.data);
@@ -66,8 +66,8 @@ const connectCreateWallet = async (walletAddress) => {
 };
 
 const placeBet = async (userId, betAmount) => {
-    console.log("tydtdtdt",{userId, betAmount});
-    
+    console.log("tydtdtdt", {userId, betAmount});
+
     return await axios
     .post(`${baseURL}/game/saveBetAmount`, {userId, betAmount})
     .then((res) => {
@@ -109,7 +109,7 @@ const saveScore = async (data) => {
     });
 };
 
-export {placeBet, getBalance, updatePlayerBalance, saveScore, connectCreateWallet,getAvgScore};
+export {placeBet, getBalance, updatePlayerBalance, saveScore, connectCreateWallet, getAvgScore};
 
 // const response = await fetch(URL, {
 //     method: "POST",

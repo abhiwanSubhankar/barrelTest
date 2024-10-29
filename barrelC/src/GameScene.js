@@ -6,18 +6,26 @@ import CtrlButton from "./gameObj/ControllButton";
 class GameScene extends Phaser.Scene {
     constructor() {
         super({key: "GameScene"});
-        this.setVelocityY = 80;
+        //  game Lavel
+        // this.gameLevel = localStorage.getItem("baseLevel") || 1;
+        this.weightedAverageScore = localStorage.getItem("weightedAverageScore");
+        this.gameLevel = Math.floor(JSON.parse(localStorage.getItem("weightedAverageScore")) * 10) + 1 || 1;
+        this.gamePreviousLevel = this.gameLevel;
+        this.gameSpeed = 1 + this.gameLevel / 10;
+        this.spawnSpeed = this.gameLevel < 6 ? 850 : this.gameLevel > 6 || this.gameLevel < 9 ? 600 : 450; // fall of rate
+        this.setVelocityY = this.gameLevel < 6 ? 80 : this.gameLevel > 6 || this.gameLevel < 9 ? 120 : 160;
+        this.decayRate = 0;
         this.playerVelocity = 375;
         this.keyD;
         this.keyA;
         this.textS; // store score text
         this.levelText;
         this.gameEnd = false;
-
         this.lastSpawnX = null;
-        this.minSpawnDistance = 50;
+        this.minSpawnDistance = 80;
+        // cashpod
         this.barrelsBlustAfterMinReqLevel = false;
-        this.cashPotAppendLevel = [8, 12, 16, 18, 21, 24, 27, 29, 33, 35];
+        this.cashPotAppendLevel = [7, 8, 12, 16, 18, 21, 24, 27, 29, 33, 35];
         this.cashPotAppendCurrentLevel = null;
 
         // Cooldown bar setup
@@ -37,7 +45,6 @@ class GameScene extends Phaser.Scene {
         this.canShoot = true; // Whether the player can shoot
         this.reloadSpeed = 1; // Speed of reload (adjust as needed)
         this.reloadDelay = 1000; // Delay before starting reload (1 second)
-
         this.lastShotTime = 0; // To track when the last shot was fired
         this.isReloading = false; // To track if the player is reloading
 
@@ -45,13 +52,6 @@ class GameScene extends Phaser.Scene {
         this.score = 0;
         this.multiplier = 0;
         this.balance = 100; // Example initial balance
-
-        //  game Lavel
-        this.gameLevel = 1;
-        // this.gameLevel = localStorage.getItem("baseLevel") || 1;
-        this.gamePreviousLevel = 1;
-        this.gameSpeed = 50;
-        this.spawnSpeed = 850;
         this.spawnObject; // storing the timer function for spawning barrel,bobmb,cashpod
 
         // others
@@ -60,18 +60,8 @@ class GameScene extends Phaser.Scene {
         // Flags to track whether CtrlButtons are being held down
         this.isMovingLeft = false;
         this.isMovingRight = false;
-
-        //  devise type
         this.deviceType = window.matchMedia("(min-width: 1025px)").matches ? "desktop" : "mobile";
-        // bet Size
         this.betAmount = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0;
-
-        // game obj spawn logic state
-        // this.λ = 0.5; // Base cash barrel spawn rate
-        // this.α = 2; // Decay parameter
-        // this.β = 1.5; // Fulfill rate
-        // this.γ = 0.2; // Death/Cash ratio
-        // this.M = this.score; // Current player multiple (e.g., score or level multiplier)
     }
 
     init(data) {
@@ -88,13 +78,11 @@ class GameScene extends Phaser.Scene {
         this.load.image("player", "player.svg");
         this.load.image("cannonImg", "player2.svg");
         this.load.image("cannonShadow", "cannonShadow.png");
-        // this.load.image("player", "player.svg");
         this.load.image("bullet", "bullet1.svg");
         this.load.image("cashpot", "cashPot.svg");
         this.load.image("bomb", "bomb.svg");
         this.load.image("multiPlayerValue", "/multiplayer.svg");
         this.load.image("showScore", "/score.svg");
-
         this.load.image("bgGround", "/ground.svg");
         this.load.image("betAmount", "/betAmount.svg");
         this.load.image("wheel", "/wheel.png");
@@ -119,25 +107,6 @@ class GameScene extends Phaser.Scene {
             } // info for the spiteSheet.
         );
 
-        this.load.spritesheet(
-            "wheelFront", // spiteSheet name
-            "/front.png", // spite sheet asset path
-            {
-                frameWidth: 56, // Width of each frame
-                frameHeight: 76, // Height of each frame
-                // endFrame: 23, // Total frames in the sprite sheet
-            } // info for the spiteSheet.
-        );
-        this.load.spritesheet(
-            "wheelBack", // spiteSheet name
-            "/back.png", // spite sheet asset path
-            {
-                frameWidth: 16, // Width of each frame
-                frameHeight: 16, // Height of each frame
-                // endFrame: 23, // Total frames in the sprite sheet
-            } // info for the spiteSheet.
-        );
-
         // buttons
         this.load.image("blueButton1", "/blue_button02.png");
         this.load.image("blueButton2", "/blue_button03.png");
@@ -156,8 +125,13 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-
-        localStorage.setItem("gameState","playing")
+        if (this.deviceType === "mobile") {
+            let gamestate = localStorage.getItem("gameState");
+            if (gamestate === "gameover") {
+                this.scene.start("End");
+            }
+        }
+        localStorage.setItem("gameState", "playing");
         // Create sound objects
         this.explosionSound = this.sound.add("explosion");
         this.woodenBarrelHitGroundSound = this.sound.add("woodenBarrelHitGround");
@@ -238,14 +212,14 @@ class GameScene extends Phaser.Scene {
             .setDepth(1);
 
             // add level text
-            // this.levelText = this.add
-            // .text(this.game.config.width - 120, 140, `Lavel :- ${this.gameLevel}`, {
-            //     font: `bold ${this.deviceType === "mobile" ? 20 : 25}px Arial`,
-            //     fill: "red",
-            //     fontStyle: "bold",
-            // })
-            // .setOrigin(0, 0)
-            // .setDepth(1);
+            this.levelText = this.add
+            .text(this.game.config.width - 120, 140, `Lavel :- ${this.gameLevel}`, {
+                font: `bold ${this.deviceType === "mobile" ? 20 : 25}px Arial`,
+                fill: "red",
+                fontStyle: "bold",
+            })
+            .setOrigin(0, 0)
+            .setDepth(1);
         }
 
         this.anims.create({
@@ -269,18 +243,6 @@ class GameScene extends Phaser.Scene {
             // duration: 2000,
         });
 
-        this.anims.create({
-            key: "rotateWheel", // this create animation key not the pre load invock key.
-            frames: this.anims.generateFrameNumbers(
-                "wheelFront"
-                // {start: 0, end: 23}
-            ),
-            frameRate: 15,
-            hideOnComplete: true,
-            // repeat: 0,
-            // duration: 2000,
-        });
-
         // Create the magazine bar
         this.magazineBar = this.add.graphics().setDepth(1).fillStyle(0xff8c00).fillRect(2, 2, 200, 20);
 
@@ -293,26 +255,14 @@ class GameScene extends Phaser.Scene {
         .setOrigin(0, 0)
         .setDepth(1);
 
-        // Add player sprite with wheel animation
-        // this.player = this.physics.add
-        // .image(this.game.config.width - this.game.config.width / 2, this.game.config.height - 150, "player")
-        // .setScale(this.deviceType === "mobile" ? 0.6 : 0.8)
-        // .setCollideWorldBounds(true);
-        // // .setOrigin(0, 0);
-        // // setCircle(width, offsetX, offsetY)
-        // this.player.setCircle(this.player.width / 2 - 17, 10, 8);
-        // this.player.body.setCircle(this.player.width / 2 - 7, 40, 30);
-        // this.player.setCircle(48, this.player.width / 2 - 26, this.player.height / 2 - 26);
-
+        // Add player container
         this.cannonImg = this.add.image(0, 0, "cannonImg").setDepth(2);
         this.cannonShadow = this.add.image(this.cannonImg.x, this.cannonImg.y + 90, "cannonShadow").setDepth(2);
 
-        // Assuming the wheels are separate images, position them under the cannonImg
         this.wheel1 = this.add
         .image(this.cannonImg.x - 20, this.cannonImg.y + 60, "wheel")
         // .setScale(0.9)
         .setDepth(3);
-
         this.wheel2 = this.add
         .image(this.cannonImg.x + 20, this.cannonImg.y + 60, "wheel")
         // .setScale(0.9)
@@ -333,28 +283,20 @@ class GameScene extends Phaser.Scene {
         // this.player.setCircle(this.player.width / 2 - 17, 10, 58);
         this.player.body.setOffset(-35, -60);
 
-        // Create barrel group
+        // Create barrel,cashpot, bomb group
         this.barrels = this.physics.add.group();
-        // .setSize(this.barrels.width / 4, this.barrels.height / 4)
-        // .setOffset(this.barrels.width / 10, this.barrels.height / 10);
-
-        // Create cash pot group
         this.cashPots = this.physics.add.group();
-
-        // Create bomb group
         this.bombs = this.physics.add.group();
+        // Setup bullets
+        this.bullets = this.physics.add.group().setOrigin(0, 0);
 
         // Add controls
         // for arrow keys , shift , ctrl
         this.cursors = this.input.keyboard.createCursorKeys();
-
         // spacebar, A nad D buttons
         this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-
-        // Setup bullets
-        this.bullets = this.physics.add.group().setOrigin(0, 0);
 
         // create time event to check for reload bullets
         this.time.addEvent({
@@ -372,10 +314,9 @@ class GameScene extends Phaser.Scene {
             paused: true, // Start the timer paused / will active in auto mode
         });
 
-        // >>>>>>>>>>>>>>>>>>>> game spawn logic
         // Barrels, cashpod and bombs falling logic
         this.spawnObject = this.time.addEvent({
-            delay: this.spawnSpeed, // Adjust the delay of appring barrel/cp/bomb as needed in ms
+            delay: this.spawnSpeed, //delay of appring barrel/cp/bomb as needed in ms
             callback: this.spawnEntry,
             callbackScope: this,
             loop: true,
@@ -394,19 +335,12 @@ class GameScene extends Phaser.Scene {
                 "SHOOT"
             );
             this.shootBtn.setDepth(5);
-
             this.shootBtn.button.on("pointerdown", () => {
-                console.log("shoot Btn clicked");
-
-                //  emiting space bar event for auto and single shoot
                 this.spaceBar.isDown = true;
                 this.spaceBar.isUp = false;
             });
 
             this.shootBtn.button.on("pointerup", () => {
-                console.log("shoot Btn pointer up");
-
-                //  emiting space bar event for auto and single shoot
                 this.spaceBar.isDown = false;
                 this.spaceBar.isUp = true;
             });
@@ -552,14 +486,12 @@ class GameScene extends Phaser.Scene {
 
         if (localGameMode !== "practice") {
             let multiplayerTextValue = this.score * betAmount;
-
             this.textM.setText(`$${multiplayerTextValue.toFixed(2)}`);
-            // this.levelText.setText(`Lavel :- ${this.gameLevel}`);
+            this.levelText.setText(`Lavel :- ${this.gameLevel}`);
         }
     }
 
     rotateWheels(direction) {
-        // Rotate both wheels based on the car's movement
         // The direction argument will be 1 or -1, affecting the rotation direction
         var rotationSpeed = 0.3 * direction;
 
@@ -612,23 +544,20 @@ class GameScene extends Phaser.Scene {
 
         // Update the last shot time
         this.lastShotTime = this.time.now;
-        this.isReloading = false; // Stop reload if player shootss
+        this.isReloading = false;
     }
 
-    // Check if we need to start reloading
     checkReload() {
-        // If 1 second has passed since the last shot and we're not reloading
         if (this.time.now - this.lastShotTime > this.reloadDelay && !this.isReloading) {
-            this.isReloading = true; // Start reloading
+            this.isReloading = true;
         }
 
         // Reload bullets if we're in the reloading state
         if (this.isReloading && this.bulletsRemaining < this.magazineSize) {
-            this.bulletsRemaining += this.reloadSpeed; // Gradually reload bullets
+            this.bulletsRemaining += this.reloadSpeed;
             this.bulletsRemaining = Math.min(this.bulletsRemaining, this.magazineSize); // Max limit is the magazine size
             this.updateMagazineBar();
 
-            // Allow shooting again if bullets have been reloaded
             if (this.bulletsRemaining > 0) {
                 this.canShoot = true;
             }
@@ -644,84 +573,79 @@ class GameScene extends Phaser.Scene {
         return γ * cashSpawnRate;
     }
 
+    calculateWeightedAvgScore() {
+        let totalBetSizes = localStorage.getItem("totalBetSizes");
+        let betAmount = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount;
+        let weightedAvgScore = (betAmount * this.score) / totalBetSizes;
+        console.log("weightedAvgScore", weightedAvgScore);
+    }
+
     spawnEntry() {
         let width = this.game.config.width - 50;
 
+        let baseLevel = +localStorage.getItem("baseLevel");
+
         // between 1 to 10 getting 1 is 10% chance
-        let spawnCashPot = Phaser.Math.Between(1, 20);
+        let spawnCashPot = Phaser.Math.Between(1, 25); // 95% chance
         let spawnBomb = Phaser.Math.Between(1, 5);
+
+        // this.calculateWeightedAvgScore();
 
         if (spawnBomb === 1) {
             this.spawnBomb(width);
         } else if (
-            spawnCashPot === 1
-            // this.barrelsBlustAfterMinReqLevel &&
-            // this.cashPotAppendLevel.includes(this.gameLevel) &&
-            // this.cashPots.getChildren().length < 1
+            spawnCashPot === 1 &&
+            this.barrelsBlustAfterMinReqLevel &&
+            this.cashPotAppendLevel.includes(this.gameLevel) &&
+            this.cashPots.getChildren().length < 1
         ) {
             this.spawnCashPot(width);
         } else {
             this.spawnBarrel(width);
         }
 
-        // >>>>>>. ^old Logic... v new logic
-
-        // const timeNow = this.time.now;
-
-        // // Calculate spawn rates
-        // let cashSpawnRate = this.getCashBarrelSpawnRate(this.M, this.λ, this.α);
-        // let deathSpawnRate = this.getDeathBarrelSpawnRate(cashSpawnRate, this.γ);
-
-        // // Random numbers for cash and death barrel spawning
-        // let random1 = Math.random();
-        // let random2 = Math.random();
-
-        // // Cash barrel spawn check
-        // if (random1 < cashSpawnRate && timeNow - this.lastCashSpawn > 1000) {
-        //     let multiplier = Math.min(100, 1 / Math.pow(random1, this.β));
-        //     // Spawn cash barrel with the calculated multiplier
-        //     this.spawnCashPot(width, multiplier);
-        //     this.lastCashSpawn = timeNow;
-        // }
-
-        // // Death barrel (bomb) spawn check
-        // if (random2 < deathSpawnRate && timeNow - this.lastDeathSpawn > 1000) {
-        //     this.spawnBomb(width); //spawn death Barrels
-        //     this.lastDeathSpawn = timeNow;
-        // }
-        // this.spawnBarrel(width);
-
         // save game state to use after reload.
         this.saveGameState();
     }
 
-    updateLavel() {
+    adjustDifficulty(currentLevel) {
+        const percentageChange = Math.floor(this.score * 10) / 10;
+        const levelMultiplier = 1 + percentageChange;
+        // const levelMultiplier = 1 + percentageChange * currentLevel;
+        this.spawnSpeed = this.spawnSpeed / levelMultiplier; // Decrease spawn interval
+        // this.setVelocityY = this.setVelocityY * levelMultiplier; // Increase falling speed
+        // this.shootingInterval = this.shootingInterval / levelMultiplier;
+        this.setVelocityY += 3 * this.gameLevel;
+        this.shootingInterval -= this.gameLevel * 3;
+    }
+
+    updateLevel() {
         const score = this.score;
 
-        // Dynamic game level calculation
-        this.gameLevel = Math.floor(score * 10) + 1;
-        // this.gameLevel = +localStorage.getItem("baseLevel") + (Math.floor(score * 10) + 1);
-
+        const baseLevel = Math.floor(JSON.parse(localStorage.getItem("weightedAverageScore")) * 10) + 1;
+        this.gameLevel = baseLevel + (Math.floor(score * 10) + 1);
+        this.adjustDifficulty(this.gameLevel);
+        console.log("level cahnge not called");
         if (this.gameLevel !== this.gamePreviousLevel) {
             //  increasing game speed and spawning object by game lavel.
-            this.spawnSpeed -= this.gameSpeed * this.gameLevel;
-
+            // this.spawnSpeed -= this.gameSpeed * this.gameLevel;
             // set fall velocity
             // this.setVelocityY += this.gameSpeed * this.gameLevel;
-            this.setVelocityY += 5 * this.gameLevel;
-            // update the exesting velocity
-            this.updateExistingBarrelCashpotBombsVelocityY();
+            // this.setVelocityY += 5 * this.gameLevel;
 
-            this.shootingInterval -= this.gameLevel * 5;
+            // this.shootingInterval -= this.gameLevel * 5;
+
+            // update the exesting falling objects velocity
+            this.updateExistingBarrelCashpotBombsVelocityY();
+            console.log("level cahnge called");
 
             if (this.playerVelocity < 500) {
                 let incVel = this.gameLevel * 3;
                 this.playerVelocity += incVel;
             }
 
-            if (this.spawnSpeed > 200) {
+            if (this.spawnSpeed > 100) {
                 this.spawnObject.delay = this.spawnSpeed;
-                //= Math.max(this.spawnObject.delay - 100, 50); // Ensures delay does not go negative
             }
 
             if (this.shootingInterval > 50) {
@@ -747,11 +671,12 @@ class GameScene extends Phaser.Scene {
         this.cashPots.getChildren().map((cashPot) => {
             cashPot.setVelocityY(this.setVelocityY);
         });
+
+        
     }
 
     spawnCashPot(width) {
         let x = Phaser.Math.Between(30, width);
-
         let isOverlaped = false;
 
         if (this.lastSpawnX !== null && Math.abs(x - this.lastSpawnX) < this.minSpawnDistance) {
@@ -759,18 +684,28 @@ class GameScene extends Phaser.Scene {
         }
 
         if (!isOverlaped) {
-            // Create the cashPot
             let cashPot = this.cashPots.create(x, -20, "cashpot");
             cashPot.setVelocityY(this.setVelocityY); // Adjust falling speed
 
-            // this.cashPotSound.play();
             this.lastSpawnX = x;
-
             cashPot.setCircle(30, cashPot.width / 2 - 30, cashPot.height / 2 - 15);
-            // cashPot.setScale(this.deviceType === "mobile" ? 0.7 : 1);
             cashPot.setScale(this.deviceType === "mobile" ? 0.5 : 1);
 
-            let values = [2, 3, 5, 8, 10, 15, 25, 40, 75, 100];
+            let values = [];
+            function getCashPotValuesForLevel(level) {
+                if (level <= 7) {
+                    return [2];
+                } else if (level <= 9) {
+                    return [2, 3, 5];
+                } else if (level <= 12) {
+                    return [2, 3, 5, 8, 10, 15];
+                } else {
+                    // Higher levels, allow a few high values
+                    return [2, 3, 5, 8, 10, 15, 25, 40, 75, 100];
+                }
+            }
+
+            values = getCashPotValuesForLevel(this.gameLevel);
 
             // function getRandomNumber() {
             //     // Generate a random number between 0 and 1
@@ -780,14 +715,10 @@ class GameScene extends Phaser.Scene {
             //     return (0.01 + randomNum * (0.25 - 0.01)).toFixed(2);
             // }
             function getRandomNumber() {
-                // Generate a random number between 0 and 1
                 let randomNum = Math.random();
-
-                // Scale it to the range [0, 9]
-                return Math.floor(0 + randomNum * 9);
+                return Math.floor(0 + randomNum * values.length);
             }
 
-            // Phaser.Math.Between(0.01, 0.25);
             // let cashPotValue = getRandomNumber();
             let cashPotValue = values[getRandomNumber()];
             // let cashPotValue = multiplier;
@@ -811,7 +742,6 @@ class GameScene extends Phaser.Scene {
 
     spawnBomb(width) {
         let x = Phaser.Math.Between(30, width);
-
         let isOverlaped = false;
 
         if (this.lastSpawnX !== null && Math.abs(x - this.lastSpawnX) < this.minSpawnDistance) {
@@ -839,12 +769,12 @@ class GameScene extends Phaser.Scene {
             } else {
                 bomb.setScale(1.3, 1);
             }
+            // this.barrelsBlustAfterMinReqLevel = false;
         }
     }
 
     spawnBarrel(width) {
         let x = Phaser.Math.Between(30, width);
-
         let isOverlaped = false;
 
         if (this.lastSpawnX !== null && Math.abs(x - this.lastSpawnX) < this.minSpawnDistance) {
@@ -892,11 +822,7 @@ class GameScene extends Phaser.Scene {
 
     hitBarrel(bullet, barrel) {
         bullet.destroy();
-
-        // Decrease barrel strength by 1
         barrel.strength = (barrel.strength - 0.01).toFixed(2);
-
-        // Update the strength text
         barrel.strengthText.setText(`${barrel.strength}x`);
 
         // Check if the barrel should be destroyed
@@ -909,14 +835,14 @@ class GameScene extends Phaser.Scene {
             this.updateScore(barrel.value);
             // Destroy the barrel and the text
             barrel.destroy();
-            this.explosionSound.play();
             barrel.strengthText.destroy();
+            this.explosionSound.play();
             this.explosion = this.add.sprite(barrel.x, barrel.y, "explosion");
             this.explosion.play("explode");
             this.explosion.setScale(this.deviceType === "mobile" ? 0.4 : 0.8);
 
             let gameMode = sessionStorage.getItem("gameMode");
-            gameMode !== "practice" && this.updateLavel();
+            gameMode !== "practice" && this.updateLevel();
         }
     }
 
@@ -931,15 +857,13 @@ class GameScene extends Phaser.Scene {
 
         let cashPotHits = JSON.parse(localStorage.getItem("cashPotHits")) || [];
         cashPotHits = [...cashPotHits, cashPot.value];
-
         localStorage.setItem("cashPotHits", JSON.stringify(cashPotHits));
 
-        // removing all the element from canvas
         cashPot.destroy();
         bullet.destroy();
         cashPot.strengthText.destroy();
         let gameMode = sessionStorage.getItem("gameMode");
-        gameMode !== "practice" && this.updateLavel();
+        gameMode !== "practice" && this.updateLevel();
     }
 
     hitBomb(bullet, bomb) {
@@ -1017,20 +941,24 @@ class GameScene extends Phaser.Scene {
 
     resetGameState() {
         this.score = 0;
-        // resetting magazine Size.
         this.magazineSize = 25;
-        this.bulletsRemaining = this.magazineSize; // Current bullets available
+        this.bulletsRemaining = this.magazineSize;
         this.canShoot = true;
-        this.lastShotTime = 0; // To track when the last shot was fired
+        this.lastShotTime = 0;
         this.isReloading = false;
         this.shootingInterval = 200;
         this.playerVelocity = 375;
 
         // resetting game Lavel
-        this.gameLevel = 1;
-        this.gameSpeed = 20;
-        this.spawnSpeed = 700;
-        this.setVelocityY = 80;
+        this.weightedAverageScore = localStorage.getItem("weightedAverageScore");
+        this.gameLevel = Math.floor(JSON.parse(localStorage.getItem("weightedAverageScore")) * 10) + 1 || 1;
+        this.gamePreviousLevel = this.gameLevel - 1;
+        this.gameSpeed = 1 + this.gameLevel / 10;
+        this.spawnSpeed = this.gameLevel < 6 ? 850 : this.gameLevel > 6 || this.gameLevel < 9 ? 600 : 450; // fall of rate
+        this.setVelocityY = this.gameLevel < 6 ? 80 : this.gameLevel > 6 || this.gameLevel < 9 ? 120 : 160;
+        // this.spawnSpeed = 850 / this.gameSpeed; // fall of rate
+        // this.setVelocityY = 80 * this.gameSpeed;
+
         this.gameEnd = false;
         this.barrelsBlustAfterMinReqLevel = false;
     }
@@ -1091,7 +1019,6 @@ class GameScene extends Phaser.Scene {
             this.score = gameState.score;
             this.gameLevel = gameState.gameLevel;
             this.bulletsRemaining = gameState.bulletsRemaining;
-
             this.setVelocityY = gameState.gameVelocity;
             this.barrelsBlustAfterMinReqLevel = gameState.barrelsBlustAfterMinReqLevel;
 

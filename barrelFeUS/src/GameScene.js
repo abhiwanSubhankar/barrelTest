@@ -13,31 +13,25 @@ class GameScene extends Phaser.Scene {
         this.textS; // store score text
         this.levelText;
         this.gameEnd = false;
-
         this.lastSpawnX = null;
         this.minSpawnDistance = 150;
         this.barrelsBlustAfterMinReqLevel = false;
 
-        // Cooldown bar setup
-        this.cooldown = 100;
-        this.cooldownTimer = 0;
+        // Variables for shooting and magazine management
+        this.magazineSize = 25;
+        this.bulletsRemaining = this.magazineSize;
+        this.bulletsRemainingText;
+        this.canShoot = true;
+        this.reloadSpeed = 1;
+        this.reloadDelay = 1000;
+        this.lastShotTime = 0;
+        this.isReloading = false;
+        // implementing auto fire mode
         this.shooting = false;
         this.shootingInterval = 200;
-        // implementing auto fire mode
         this.autoMode = false;
         this.holdThreshold = 200;
         this.spaceBarHeldDuration = 0;
-
-        // Variables for shooting and magazine management
-        this.magazineSize = 25; // Starting magazine size
-        this.bulletsRemaining = this.magazineSize; // Current bullets available
-        this.bulletsRemainingText;
-        this.canShoot = true; // Whether the player can shoot
-        this.reloadSpeed = 1; // Speed of reload (adjust as needed)
-        this.reloadDelay = 1000; // Delay before starting reload (1 second)
-
-        this.lastShotTime = 0; // To track when the last shot was fired
-        this.isReloading = false; // To track if the player is reloading
 
         // Player score and balance
         this.score = 0;
@@ -70,6 +64,11 @@ class GameScene extends Phaser.Scene {
         // this.β = 1.5; // Fulfill rate
         // this.γ = 0.2; // Death/Cash ratio
         // this.M = this.score; // Current player multiple (e.g., score or level multiplier)
+
+        //  new spawn logic states
+        this.maxAverageScore = 0.92;
+        this.globalAvgScore = 1.2;
+        this.difficultyMultiplier;
     }
 
     init(data) {
@@ -113,25 +112,6 @@ class GameScene extends Phaser.Scene {
             {
                 frameWidth: 200, // Width of each frame
                 frameHeight: 200, // Height of each frame
-                // endFrame: 23, // Total frames in the sprite sheet
-            } // info for the spiteSheet.
-        );
-
-        this.load.spritesheet(
-            "wheelFront", // spiteSheet name
-            "/front.png", // spite sheet asset path
-            {
-                frameWidth: 56, // Width of each frame
-                frameHeight: 76, // Height of each frame
-                // endFrame: 23, // Total frames in the sprite sheet
-            } // info for the spiteSheet.
-        );
-        this.load.spritesheet(
-            "wheelBack", // spiteSheet name
-            "/back.png", // spite sheet asset path
-            {
-                frameWidth: 16, // Width of each frame
-                frameHeight: 16, // Height of each frame
                 // endFrame: 23, // Total frames in the sprite sheet
             } // info for the spiteSheet.
         );
@@ -265,18 +245,6 @@ class GameScene extends Phaser.Scene {
             frameRate: 20,
             hideOnComplete: true,
             // repeat: -1,
-            // duration: 2000,
-        });
-
-        this.anims.create({
-            key: "rotateWheel", // this create animation key not the pre load invock key.
-            frames: this.anims.generateFrameNumbers(
-                "wheelFront"
-                // {start: 0, end: 23}
-            ),
-            frameRate: 15,
-            hideOnComplete: true,
-            // repeat: 0,
             // duration: 2000,
         });
 
@@ -555,6 +523,92 @@ class GameScene extends Phaser.Scene {
 
             this.textM.setText(`$${multiplayerTextValue.toFixed(2)}`);
             // this.levelText.setText(`Lavel :- ${this.gameLevel}`);
+        }
+    }
+
+    adjustDifficulty(globalAvgScore, currentLevel) {
+        // The average score goal is 0.92
+        const maxAverageScore = 0.92;
+
+        // Adjust difficulty based on how close we are to the average score limit
+        let difficultyMultiplier;
+        if (globalAvgScore < maxAverageScore) {
+            // Easier levels (more cash pots, slower barrels)
+            difficultyMultiplier = Math.max(1 - globalAvgScore, 0.1); // Ensures we never go below 0.1 difficulty.
+        } else {
+            // Harder levels (faster barrels, fewer cash pots)
+            difficultyMultiplier = 1 + (globalAvgScore - maxAverageScore);
+        }
+
+        // Adjust game parameters dynamically:
+        const barrelSpeed = 200 + 50 * currentLevel * difficultyMultiplier; // Base speed + difficulty scale
+        const barrelSpawnRate = 1000 / difficultyMultiplier; // Base rate adjusted for difficulty
+
+        return {
+            barrelSpeed: Math.min(barrelSpeed, 600), // Limit max speed to 600
+            barrelSpawnRate: Math.max(barrelSpawnRate, 500), // Limit min spawn rate to 500 ms
+        };
+    }
+
+    levelUp(currentLevel, globalAvgScore) {
+        const difficultySettings = this.adjustDifficulty(globalAvgScore, currentLevel);
+
+        // Each level adjusts the barrel speed and spawn rate
+        return {
+            newLevel: currentLevel + 1,
+            barrelSpeed: difficultySettings.barrelSpeed,
+            barrelSpawnRate: difficultySettings.barrelSpawnRate,
+        };
+    }
+    spawnCashPot_y(globalAvgScore, currentLevel) {
+        const maxAverageScore = 0.92;
+        const basePotSpawnChance = 1 - globalAvgScore; // Lower chance as global average approaches max score
+        const decayRate = Math.min(1, 0.1 + 0.05 * currentLevel); // Increase decay rate with each level
+
+        // Apply decay to the spawn chance so that at higher levels, the spawn chance is lower
+        const potSpawnChance = Math.max(0.1, basePotSpawnChance * Math.exp(-decayRate * currentLevel));
+
+        if (Math.random() < potSpawnChance) {
+            // If a cash pot spawns, select a value based on difficulty (higher levels, more limited values)
+            const cashPotValues = getCashPotValuesForLevel(currentLevel);
+            const randomIndex = Math.floor(Math.random() * cashPotValues.length);
+            return cashPotValues[randomIndex];
+        }
+        return null; // No cash pot spawned
+    }
+    getCashPotValuesForLevel(level) {
+        if (level <= 3) {
+            return [2, 3, 5, 7]; // Early levels, lower values only
+        } else if (level <= 6) {
+            return [2, 3, 5, 7, 15, 25]; // Mid levels, mid-range values
+        } else {
+            return [2, 3, 5, 7, 15, 25, 50]; // Higher levels, allow a few high values
+        }
+    }
+
+    increaseDifficulty(level) {
+        // Increase barrel speed and spawn rate with each level
+        const difficultySettings = adjustDifficulty(globalAvgScore, level);
+
+        barrelSpeed = difficultySettings.barrelSpeed;
+        barrelSpawnRate = difficultySettings.barrelSpawnRate;
+
+        // Adjust cash pot and bomb barrel frequency
+        if (level >= 3) {
+            cashPotFrequency *= 0.8; // Decrease frequency to make cash pots rarer
+            bombBarrelFrequency *= 1.2; // Increase bomb barrel frequency
+        }
+    }
+
+    //     const levelThresholds = [10, 25, 50, 100];  // Score milestones for each level
+    // let currentLevel = 1;
+    // let playerScore = 0;
+    
+    checkForLevelUp() {
+        if (currentLevel < levelThresholds.length && playerScore >= levelThresholds[currentLevel - 1]) {
+            currentLevel++; // Advance to the next level
+            increaseDifficulty(currentLevel); // Adjust difficulty based on the new level
+            console.log(`Level Up! Now at Level ${currentLevel}`);
         }
     }
 

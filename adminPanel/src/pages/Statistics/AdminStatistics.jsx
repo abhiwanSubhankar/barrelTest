@@ -7,9 +7,13 @@ import { toast } from "react-hot-toast";
 const AdminStatistics = () => {
   const [selectedRange, setSelectedRange] = useState(100);
   const [data, setData] = useState({
+    weightedRTP: 0.00,
     avgScore: 0.00,
     totalPayOut: 0.00,
-    totalReceived: 0.00
+    totalReceived: 0.00,
+    standardDeviation: 0.00,
+    avgCashPotMultiPlayerValue: 0.00,
+    payOutByHitingCashPotPercentage: 0.00
   });
   const token = JSON.parse(sessionStorage.getItem("token"));
 
@@ -82,8 +86,8 @@ const AdminStatistics = () => {
       <div className={styles.mainContent}>
         <div className={styles.data}>
           <img src="/average.png" alt="data icon" className={styles.dataIcon} />
-          <h2>Average Score for latest {selectedRange} plays </h2>
-          <h3> $ {data?.avgScore}</h3>
+          <h2>weighted RTP plays </h2>
+          <h3>  {data?.weightedRTP}</h3>
         </div>
 
         <div className={styles.data}>
@@ -97,6 +101,25 @@ const AdminStatistics = () => {
           <h2>Total Received for latest {selectedRange} plays </h2>
           <h3> $ {data?.totalReceived}</h3>
         </div>
+
+        <div className={styles.data}>
+          <img src="/payout.png" alt="data icon" className={styles.dataIcon} />
+          <h2>Average CashPot MultiPlayer Value </h2>
+          <h3> $ {data?.avgCashPotMultiPlayerValue}</h3>
+        </div>
+
+        <div className={styles.data}>
+          <img src="/average.png" alt="data icon" className={styles.dataIcon} />
+          <h2>  Standard deviation for last {selectedRange} plays </h2>
+          <h3>  {data?.standardDeviation}</h3>
+        </div>
+
+        <div className={styles.data}>
+          <img src="/payout.png" alt="data icon" className={styles.dataIcon} />
+          <h2>Percentage of PayOut by hitting cashpot</h2>
+          <h3>:- {data?.payOutByHitingCashPotPercentage.toFixed(2)} %</h3>
+        </div>
+
       </div>
     </div>
   );

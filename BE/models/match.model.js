@@ -6,6 +6,7 @@ const matchSchema = new Schema(
         level: {type: Number, required: true},
         betAmount: {type: Number, required: true},
         score: {type: Number, required: true},
+        cashPotHits: [{type: Number}],
     },
     {timestamps: true, versionKey: false}
 );

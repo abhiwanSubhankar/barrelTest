@@ -36,7 +36,7 @@ const ConnectWallet = ({ isOpen, onClose, connectWallet }) => {
 
 
     return <div className={styles.modalOverlay} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalContent}>
+        <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <h2 className={styles.heading}>Connect Wallet</h2>
 
             <button className={styles.closeButton} onClick={onClose}>
@@ -72,12 +72,7 @@ const ConnectWallet = ({ isOpen, onClose, connectWallet }) => {
                 </div> */}
 
                 {/* submit */}
-
                 <div className={styles.btnOuterDivI}>
-                    {/* <button className={styles.button} onClick={() => { }}>
-
-                    </button> */}
-
                     <button className={styles.button} type="submit" >
                         Connect Wallet
                     </button>

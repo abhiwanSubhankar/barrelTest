@@ -7,7 +7,7 @@ import {ErrorHandler} from "../utils/utility.js";
 
 const saveGameScore = tryCatch(async (req, res, next) => {
     let data = req?.body;
-    let {userId, level, betAmount, score} = data;
+    let {userId, level, betAmount, score, cashPotHits} = data;
 
     //  add wining amount to the user
     let user = await User.findById(userId);
@@ -87,13 +87,18 @@ const saveBetAmount = tryCatch(async (req, res, next) => {
 
 const getAvgScore = tryCatch(async (req, res, next) => {
     const result = await Match.aggregate([
+        
         {
             $group: {
                 _id: null,
                 averageScore: {$avg: "$score"},
+                betSizes: {$sum: "$betAmount"},
+                betSizesT: {$sum: {$multiply: ["$betAmount", "$score"]}},
             },
         },
     ]);
+
+    let weightedAverageScore = (result[0].betSizesT / result[0].betSizes).toFixed(2);
 
     // Access the average score
     if (result.length > 0) {
@@ -101,7 +106,11 @@ const getAvgScore = tryCatch(async (req, res, next) => {
 
         return res.status(200).send({
             status: "success.",
-            data: {averageScore: result[0].averageScore.toFixed(2)},
+            data: {
+                averageScore: result[0].averageScore.toFixed(2),
+                betSizes: result[0].betSizes.toFixed(2),
+                weightedAverageScore,
+            },
         });
     } else {
         console.log("No records found.");

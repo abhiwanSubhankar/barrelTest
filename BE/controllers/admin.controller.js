@@ -97,6 +97,19 @@ const getAllMatches = tryCatch(async (req, res, next) => {
 const getStatistics = tryCatch(async (req, res, next) => {
     let {range} = req?.body;
 
+    const result = await Match.aggregate([
+        {
+            $group: {
+                _id: null,
+                averageScore: {$avg: "$score"},
+                betSizes: {$sum: "$betAmount"},
+                betSizesT: {$sum: {$multiply: ["$betAmount", "$score"]}},
+            },
+        },
+    ]);
+
+    let weightedRTP = (result[0].betSizesT / result[0].betSizes).toFixed(2);
+
     const calculateStatisticsPromise = [
         Match.aggregate([
             {
@@ -160,12 +173,117 @@ const getStatistics = tryCatch(async (req, res, next) => {
 
     let [avgScoreData, totalPayOutData, totalReceivedData] = await Promise.all(calculateStatisticsPromise);
 
+    let standardDeviation = await Match.aggregate([
+        {
+            $sort: {
+                createdAt: -1,
+            },
+        },
+        {$limit: 30},
+        {
+            $group: {
+                _id: null,
+                avgScore: {$avg: "$score"},
+                count: {$sum: 1},
+                scores: {$push: "$score"},
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                avgScore: 1,
+                stdDev: {
+                    $sqrt: {
+                        $divide: [
+                            {
+                                $sum: {
+                                    $map: {
+                                        input: "$scores",
+                                        as: "score",
+                                        in: {
+                                            $pow: [
+                                                {
+                                                    $subtract: ["$$score", "$avgScore"],
+                                                },
+                                                2,
+                                            ],
+                                        },
+                                    },
+                                },
+                            },
+                            {$subtract: ["$count", 1]},
+                        ],
+                    },
+                },
+            },
+        },
+    ]);
+    let avgCashPotMultiPlayerValue = await Match.aggregate(
+        //     [
+        //     {
+        //         $group: {
+        //             _id: null,
+        //             total: {
+        //                 $sum: {
+        //                     $sum: "$cashPotHits",
+        //                 },
+        //             },
+        //             game: {
+        //                 $count: {},
+        //             },
+        //         },
+        //     },
+        //     {
+        //         $project: {
+        //             avgCashPotMultiplayer: {$divide: [{$multiply: ["$game", "$total"]}, 100]},
+        //             _id: 0,
+        //         },
+        //     },
+        // ]
+        [
+            {
+                $unwind: "$cashPotHits",
+            },
+            {
+                $group: {
+                    _id: "$_id",
+                    avgCashPotHits: {$avg: "$cashPotHits"},
+                },
+            },
+        ]
+    );
+    let payOutByHitingCashPot = await Match.aggregate([
+        {
+            $unwind: "$cashPotHits",
+        },
+        {
+            $group: {
+                _id: "null",
+                avgCashPotHits: {$avg: "$cashPotHits"},
+                avg: {$sum: {$multiply: ["$cashPotHits", "$score"]}},
+            },
+        },
+        {
+            $project: {
+                avg: 1,
+                _id: 0,
+            },
+        },
+    ]);
+
+    let payOutByHitingCashPotPercentage = (payOutByHitingCashPot[0].avg / totalPayOutData[0].totalPayOut) * 100;
+
     return res.status(200).send({
         status: "Statistics get successful.",
         data: {
+            weightedRTP,
             avgScore: avgScoreData[0].avgScore.toFixed(2),
             totalPayOut: totalPayOutData[0].totalPayOut,
             totalReceived: totalReceivedData[0].totalReceived,
+            // avgCashPotMultiPlayerValue: avgCashPotMultiPlayerValue[0].avgCashPotMultiplayer,
+            avgCashPotMultiPlayerValue: avgCashPotMultiPlayerValue[0].avgCashPotHits,
+            standardDeviation: standardDeviation[0].stdDev,
+            payOutByHitingCashPotPercentage,
         },
     });
 });
