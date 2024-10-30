@@ -193,22 +193,35 @@ function App() {
           toast.error("Bet Placed Unsuccessfull...", { id: toastId })
           console.log(er);
         }).finally(() => {
+
           setIsLoading(false);
+
+          publish(startGame, {
+            started: true,
+          });
+
+          if (deviceType === "mobile") {
+            navigate("/loading")
+          }
+
         })
 
       }).catch((er) => {
         toast.error("Bet Placed Unsuccessfull...", { id: toastId })
         console.log(er);
       })
+    } else {
+
+      publish(startGame, {
+        started: true,
+      });
+
+      if (deviceType === "mobile") {
+        navigate("/loading")
+      }
     }
 
-    publish(startGame, {
-      started: true,
-    });
 
-    if (deviceType === "mobile") {
-      navigate("/loading")
-    }
   }
 
   const updateScoreCB = useCallback((data) => {

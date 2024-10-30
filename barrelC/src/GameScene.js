@@ -411,7 +411,7 @@ class GameScene extends Phaser.Scene {
 
         @Delta (delta parameter) The delta parameter, on the other hand, represents the time difference in milliseconds between the current frame and the previous frame. In other words, it's the time elapsed since the last update call. This value is useful for creating smooth animations and movements, as it allows you to update your game objects based on the time that has passed since the last update.
        */
-        console.log("spawn Speed", this.spawnSpeed, this.setVelocityY, this.weightedAverageScore);
+        // console.log("spawn Speed", this.spawnSpeed, this.setVelocityY, this.weightedAverageScore);
 
         // Player movement
         if (this.cursors.left.isDown || this.keyA.isDown || this.isMovingLeft) {
