@@ -7,9 +7,11 @@ class GameScene extends Phaser.Scene {
     constructor() {
         super({key: "GameScene"});
         //  game Lavel
-        // this.gameLevel = localStorage.getItem("baseLevel") || 1;
         this.weightedAverageScore = localStorage.getItem("weightedAverageScore");
-        this.gameLevel = Math.floor(JSON.parse(localStorage.getItem("weightedAverageScore")) * 10) + 1 || 1;
+        this.gameLevel =
+            Math.floor(JSON.parse(localStorage.getItem("weightedAverageScore")) * 10) + 1 <= 7
+                ? 3
+                : Math.floor(JSON.parse(localStorage.getItem("weightedAverageScore")) * 10) + 1;
         this.gamePreviousLevel = this.gameLevel;
         this.gameSpeed = 1 + this.gameLevel / 10;
         this.spawnSpeed = this.gameLevel < 6 ? 850 : this.gameLevel > 6 || this.gameLevel < 9 ? 600 : 450; // fall of rate
@@ -23,9 +25,10 @@ class GameScene extends Phaser.Scene {
         this.gameEnd = false;
         this.lastSpawnX = null;
         this.minSpawnDistance = 80;
+
         // cashpod
         this.barrelsBlustAfterMinReqLevel = false;
-        this.cashPotAppendLevel = [7, 8, 12, 16, 18, 21, 24, 27, 29, 33, 35];
+        this.cashPotAppendLevel = [8, 12, 16, 18, 21, 24, 27, 29, 33, 35];
         this.cashPotAppendCurrentLevel = null;
 
         // Cooldown bar setup
@@ -408,6 +411,7 @@ class GameScene extends Phaser.Scene {
 
         @Delta (delta parameter) The delta parameter, on the other hand, represents the time difference in milliseconds between the current frame and the previous frame. In other words, it's the time elapsed since the last update call. This value is useful for creating smooth animations and movements, as it allows you to update your game objects based on the time that has passed since the last update.
        */
+        console.log("spawn Speed", this.spawnSpeed, this.setVelocityY, this.weightedAverageScore);
 
         // Player movement
         if (this.cursors.left.isDown || this.keyA.isDown || this.isMovingLeft) {
@@ -564,15 +568,6 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    // Function to calculate spawn rates
-    getCashBarrelSpawnRate(M, λ, α) {
-        return λ / Math.pow(M, α);
-    }
-
-    getDeathBarrelSpawnRate(cashSpawnRate, γ) {
-        return γ * cashSpawnRate;
-    }
-
     calculateWeightedAvgScore() {
         let totalBetSizes = localStorage.getItem("totalBetSizes");
         let betAmount = JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount;
@@ -582,8 +577,7 @@ class GameScene extends Phaser.Scene {
 
     spawnEntry() {
         let width = this.game.config.width - 50;
-
-        let baseLevel = +localStorage.getItem("baseLevel");
+        // let baseLevel = +localStorage.getItem("baseLevel");
 
         // between 1 to 10 getting 1 is 10% chance
         let spawnCashPot = Phaser.Math.Between(1, 25); // 95% chance
@@ -608,32 +602,45 @@ class GameScene extends Phaser.Scene {
         this.saveGameState();
     }
 
-    adjustDifficulty(currentLevel) {
+    adjustDifficulty() {
         const percentageChange = Math.floor(this.score * 10) / 10;
         const levelMultiplier = 1 + percentageChange;
-        // const levelMultiplier = 1 + percentageChange * currentLevel;
-        this.spawnSpeed = this.spawnSpeed / levelMultiplier; // Decrease spawn interval
-        // this.setVelocityY = this.setVelocityY * levelMultiplier; // Increase falling speed
-        // this.shootingInterval = this.shootingInterval / levelMultiplier;
-        this.setVelocityY += 3 * this.gameLevel;
-        this.shootingInterval -= this.gameLevel * 3;
+
+        // // const levelMultiplier = 1 + percentageChange * currentLevel;
+        // this.spawnSpeed = this.spawnSpeed / levelMultiplier; // Decrease spawn interval
+        // // this.setVelocityY = this.setVelocityY * levelMultiplier; // Increase falling speed
+        // // this.shootingInterval = this.shootingInterval / levelMultiplier;
+
+        // this.setVelocityY += 3 * this.gameLevel;
+        // this.shootingInterval -= this.gameLevel * 3;
+
+        // -----------------------
+
+        if (this.weightedAverageScore < 0.92) {
+            // Easier difficulty: spawn interval decreases at a slower rate
+            this.spawnSpeed = this.spawnSpeed / (levelMultiplier * 0.9);
+        } else {
+            // Harder difficulty: spawn interval decreases more quickly
+            this.spawnSpeed = this.spawnSpeed / (levelMultiplier * 1.2);
+        }
+
+        this.setVelocityY += this.gameLevel * (this.weightedAverageScore < 0.92 ? 2 : 4);
+        this.shootingInterval -= this.gameLevel * (this.weightedAverageScore < 0.92 ? 2 : 4);
     }
 
     updateLevel() {
         const score = this.score;
-
         const baseLevel = Math.floor(JSON.parse(localStorage.getItem("weightedAverageScore")) * 10) + 1;
         this.gameLevel = baseLevel + (Math.floor(score * 10) + 1);
-        this.adjustDifficulty(this.gameLevel);
-        console.log("level cahnge not called");
+
         if (this.gameLevel !== this.gamePreviousLevel) {
             //  increasing game speed and spawning object by game lavel.
             // this.spawnSpeed -= this.gameSpeed * this.gameLevel;
             // set fall velocity
             // this.setVelocityY += this.gameSpeed * this.gameLevel;
             // this.setVelocityY += 5 * this.gameLevel;
-
             // this.shootingInterval -= this.gameLevel * 5;
+            this.adjustDifficulty(this.gameLevel);
 
             // update the exesting falling objects velocity
             this.updateExistingBarrelCashpotBombsVelocityY();
@@ -671,8 +678,6 @@ class GameScene extends Phaser.Scene {
         this.cashPots.getChildren().map((cashPot) => {
             cashPot.setVelocityY(this.setVelocityY);
         });
-
-        
     }
 
     spawnCashPot(width) {
@@ -714,6 +719,7 @@ class GameScene extends Phaser.Scene {
             //     // Scale it to the range [0.01, 0.25]
             //     return (0.01 + randomNum * (0.25 - 0.01)).toFixed(2);
             // }
+
             function getRandomNumber() {
                 let randomNum = Math.random();
                 return Math.floor(0 + randomNum * values.length);
@@ -864,6 +870,9 @@ class GameScene extends Phaser.Scene {
         cashPot.strengthText.destroy();
         let gameMode = sessionStorage.getItem("gameMode");
         gameMode !== "practice" && this.updateLevel();
+
+        this.spawnSpeed = 10;
+        this.spawnObject.delay = this.spawnSpeed;
     }
 
     hitBomb(bullet, bomb) {
@@ -951,7 +960,11 @@ class GameScene extends Phaser.Scene {
 
         // resetting game Lavel
         this.weightedAverageScore = localStorage.getItem("weightedAverageScore");
-        this.gameLevel = Math.floor(JSON.parse(localStorage.getItem("weightedAverageScore")) * 10) + 1 || 1;
+        // this.weightedAverageScore = 1;
+        this.gameLevel =
+            Math.floor(JSON.parse(localStorage.getItem("weightedAverageScore")) * 10) + 1 <= 7
+                ? 3
+                : Math.floor(JSON.parse(localStorage.getItem("weightedAverageScore")) * 10) + 1;
         this.gamePreviousLevel = this.gameLevel - 1;
         this.gameSpeed = 1 + this.gameLevel / 10;
         this.spawnSpeed = this.gameLevel < 6 ? 850 : this.gameLevel > 6 || this.gameLevel < 9 ? 600 : 450; // fall of rate

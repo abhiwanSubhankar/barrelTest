@@ -45,16 +45,14 @@ function App() {
   }
 
   const updateLocalUserBalance = useCallback((type, amount) => {
-    console.log("update local user ballance called");
+    const userData = JSON.parse(localStorage.getItem("userData"));
     if (userData) {
       let updatedUserData = { ...userData, balance: type === "add" ? userData.balance + amount : userData.balance - amount };
       localStorage.setItem("userData", JSON.stringify(updatedUserData));
     }
-  }, [userData]);
+  }, []);
 
   const connectWallet = async (walletAddress) => {
-    console.log(walletAddress);
-
     let response = await connectCreateWallet(walletAddress);
     console.log(response);
 
@@ -111,11 +109,10 @@ function App() {
       console.log("Device is a mobile/tablet");
       setDevicType("mobile");
     }
-  }, []);
+  }, [setDevicType]);
 
   useEffect(() => {
     if (deviceType === "desktop") {
-
       let gameCanvas = document.getElementById("gameCanvas");
 
       const config = {
@@ -130,7 +127,6 @@ function App() {
             debug: false
           }
         },
-        // scene: [PreStartScene, GameScene, EndScenePopup],
         scene: [PreStartScene, GameScene, EndScene],
       };
       game = new Phaser.Game(config);
@@ -141,12 +137,10 @@ function App() {
     }
   }, [sizes, deviceType]);
 
-
   // set window size by device window
   useEffect(() => {
-    // console.log(gameState)
     window.addEventListener("resize", () => {
-      console.log("window height and width ", window.innerWidth, window.innerHeight)
+      // console.log("window height and width ", window.innerWidth, window.innerHeight)
       setSizes({
         height: window.innerHeight,
         width: window.innerWidth,
@@ -161,17 +155,14 @@ function App() {
   const handlePlaceBet = () => {
 
     if (gameMode !== "practice") {
-
       if (betAmount.betAmount < 1) {
         toast.error("Bet Amount should be more than 1 or 1");
         return;
       }
-
       if (betAmount.betAmount > currentCoins) {
         toast.error("You don't have sufficient balance to Place the bet !");
         return;
       }
-
       if (!userData) {
         toast.error("Wallet is not Connected! please connect before Bet.")
         return
@@ -181,16 +172,12 @@ function App() {
       setIsLoading(true);
       let toastId = toast.loading("Payment is under process. please Don't close or reload tab.");
 
-
       getAvgScore().then((res) => {
-
         console.log("baselevel", res.data.data.averageScore, Math.floor(res.data.data.averageScore * 10) + 1);
+
         localStorage.setItem("baseLevel", Math.floor(res.data.data.averageScore * 10) + 1);
         localStorage.setItem("totalBetSizes", res.data.data.betSizes);
         localStorage.setItem("weightedAverageScore", res.data.data.weightedAverageScore);
-
-        console.log("placeBEt", betAmount);
-
 
         placeBet(userData._id, betAmount.betAmount).then(() => {
           toast.success("Bet Placed Successfully!..", { id: toastId });
@@ -213,9 +200,7 @@ function App() {
         toast.error("Bet Placed Unsuccessfull...", { id: toastId })
         console.log(er);
       })
-      // console.log(userData);
     }
-
 
     publish(startGame, {
       started: true,
@@ -225,8 +210,6 @@ function App() {
       navigate("/loading")
     }
   }
-
-
 
   const updateScoreCB = useCallback((data) => {
     console.log(data);
@@ -252,8 +235,6 @@ function App() {
       setCurrentCoins(pre => pre + +finalScore);
       updateLocalUserBalance("add", +finalScore);
       localStorage.removeItem("cashPotHits")
-      console.log("score", toBeSavedData)
-      console.log(betAmount, finalScore);
     } else {
       localStorage.removeItem("cashPotHits")
     }
@@ -322,8 +303,6 @@ function App() {
   if (deviceType === "desktop") {
     return (
       <div className="App">
-
-
         <div className='sidebar'>
           <div>
             <img src="/lOGO.svg" alt="logo" width={"80%"} draggable={false} />
@@ -401,10 +380,10 @@ function App() {
         </div>
 
         <canvas id='gameCanvas' width={sizes.width} height={sizes.height} ></canvas>
-
-
-
-        {showConnectModal && <ConnectWallet isOpen={showConnectModal} onClose={handleCloaseConnectModal} connectWallet={connectWallet} />}
+        {
+          showConnectModal &&
+          <ConnectWallet isOpen={showConnectModal} onClose={handleCloaseConnectModal} connectWallet={connectWallet} />
+        }
         <Toaster />
       </div>
     );
@@ -440,10 +419,7 @@ function App() {
       <Route path='/game' element={
         <GameSceneM />
       }></Route>
-
-
     </Routes>
-
   </div>
 }
 

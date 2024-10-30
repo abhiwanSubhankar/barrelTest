@@ -110,17 +110,3 @@ const saveScore = async (data) => {
 };
 
 export {placeBet, getBalance, updatePlayerBalance, saveScore, connectCreateWallet, getAvgScore};
-
-// const response = await fetch(URL, {
-//     method: "POST",
-//     mode: "cors",
-//     headers: {
-//         "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({
-//         user: username,
-//         score: score.toString(),
-//     }),
-// });
-// const result = response.json();
-// return result;
