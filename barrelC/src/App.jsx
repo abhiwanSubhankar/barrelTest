@@ -7,23 +7,24 @@ import PreStartScene from './scenes/preStart';
 import GameSceneM from './Mobile/GameSceneM.jsx';
 import toast, { Toaster } from 'react-hot-toast';
 import SplashScreen from './components/SplashScreen';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Routes, Route, useNavigate } from "react-router-dom";
 import ConnectWallet from './components/modals/ConnectWallet.jsx';
 import { publish, subscribe, unsubscribe } from './CustomEvents/events';
 import { endGame, startGame, updateScore } from './CustomEvents/eventKeys';
 import { connectCreateWallet, getAvgScore, placeBet, saveScore } from './Api/api.js';
+import Confirm from "./components/modals/Confirm.jsx";
 
 
 function App() {
-  let game;
+  let game = useRef(null);
   const navigate = useNavigate();
   const [deviceType, setDevicType] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showConnectModal, setShowConnectModal] = useState(false);
   const [gameMode, setGameMode] = useState(sessionStorage.getItem("gameMode") || "");
   const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("userData")) || null);
-  const [currentCoins, setCurrentCoins] = useState(userData?.balance || 500);
+  const [currentCoins, setCurrentCoins] = useState(userData?.balance || 0);
   const [started, setStarted] = useState(JSON.parse(sessionStorage.getItem("phaserGameState")) ? true : false);
   const [betAmount, setBetAmount] = useState({
     betAmount: JSON.parse(sessionStorage.getItem("betAmount"))?.betAmount || 0,
@@ -33,6 +34,8 @@ function App() {
     height: window.innerHeight,
     width: window.innerWidth,
   });// game window size
+  const [showCNFModal, setShowCNFModal] = useState(false);
+
 
   const handleCloaseConnectModal = () => {
     setShowConnectModal(false);
@@ -63,6 +66,23 @@ function App() {
     toast.success("wallet Connected Successfully!");
   }
 
+  const openCNFModal = () => {
+    setShowCNFModal(true);
+    sessionStorage.setItem("isOpenConnectModal", true);
+  }
+  const closeCNFModal = () => {
+    setShowCNFModal(false);
+    sessionStorage.setItem("isOpenConnectModal", false);
+  }
+
+  const disconnectWallet = () => {
+    setUserData(null);
+    localStorage.removeItem("userData");
+    setCurrentCoins(0);
+    setShowCNFModal(false);
+    toast.success("wallet Disconnected Successfully!..");
+  }
+
   const saveGameScore = (data) => {
     saveScore(data)
       .then((res) => {
@@ -75,6 +95,7 @@ function App() {
   }
 
   const handleChange = (e) => {
+
     let val = e.target.value;
     if (val === '0') {
       // Prevent a single '0' from being input
@@ -83,15 +104,20 @@ function App() {
         betAmount: ""
       });
     } else {
+
+      let decVal = val.split(".");
+      if (decVal.length >= 2 && decVal[1].length > 2) {
+        return;
+      }
+
       // Strip any leading zeros
       setBetAmount({
         ...betAmount,
         betAmount: val.replace(/^0+/, '')
       });
     }
-    console.log(betAmount)
   }
-
+  // console.log(betAmount)
 
   useEffect(() => {
     function isDesktop() {
@@ -112,7 +138,8 @@ function App() {
   }, [setDevicType]);
 
   useEffect(() => {
-    if (deviceType === "desktop") {
+    if (deviceType === "desktop" && game.current === null) {
+
       let gameCanvas = document.getElementById("gameCanvas");
 
       const config = {
@@ -129,7 +156,7 @@ function App() {
         },
         scene: [PreStartScene, GameScene, EndScene],
       };
-      game = new Phaser.Game(config);
+      game.current = new Phaser.Game(config);
 
       return () => {
         game.destroy(true);
@@ -155,17 +182,19 @@ function App() {
   const handlePlaceBet = () => {
 
     if (gameMode !== "practice") {
+      if (!userData) {
+        toast.error("Wallet is not Connected! please connect before Bet.")
+        return
+      }
+
       if (betAmount.betAmount < 1) {
         toast.error("Bet Amount should be more than 1 or 1");
         return;
       }
+
       if (betAmount.betAmount > currentCoins) {
         toast.error("You don't have sufficient balance to Place the bet !");
         return;
-      }
-      if (!userData) {
-        toast.error("Wallet is not Connected! please connect before Bet.")
-        return
       }
 
       // let betData ={userId, betAmount}
@@ -351,7 +380,7 @@ function App() {
                   step="1"
                   onKeyDown={(e) => {
                     // Prevent the 'e' key from being typed
-                    if (e.key === 'e' || e.key === 'E' || e.key === "-" || e.key === ".") {
+                    if (e.key === 'e' || e.key === 'E' || e.key === "-") {
                       e.preventDefault();
                     }
 
@@ -371,9 +400,18 @@ function App() {
             <br />
             {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started || isLoading || betAmount.status}>{isLoading ? "Placing Bet..." : "PLACE BET"}</button>}
 
-            <button
+            {userData === null ? <button
               onClick={handleShowConnectModal}
-              className='button' disabled={userData}>CONNECT WALLET</button>
+              className='button' disabled={userData}
+            >
+              {userData ? "WALLET CONNECTED" : "CONNECT WALLET"}
+            </button> :
+              <button
+                onClick={openCNFModal}
+                className='buttonDisconnect'
+              >
+                DISCONNECT WALLET
+              </button>}
 
             <div>
               <h4>SELECTED GAME MODE :- {gameMode === "normal" ? "NORMAL" : "PRACTICE"}</h4>
@@ -397,6 +435,10 @@ function App() {
           showConnectModal &&
           <ConnectWallet isOpen={showConnectModal} onClose={handleCloaseConnectModal} connectWallet={connectWallet} />
         }
+        {
+          showCNFModal &&
+          <Confirm isOpen={showCNFModal} onClose={closeCNFModal} confirm={disconnectWallet} />
+        }
         <Toaster />
       </div>
     );
@@ -406,7 +448,15 @@ function App() {
   // if in mobile show the routes
   return <div className="App">
     <Toaster />
-    {showConnectModal && <ConnectWallet isOpen={showConnectModal} onClose={handleCloaseConnectModal} connectWallet={connectWallet} />}
+    {
+      showConnectModal &&
+      <ConnectWallet isOpen={showConnectModal} onClose={handleCloaseConnectModal} connectWallet={connectWallet} />
+    }
+
+    {
+      showCNFModal &&
+      <Confirm isOpen={showCNFModal} onClose={closeCNFModal} confirm={disconnectWallet} />
+    }
 
     <Routes>
       <Route path='/' element={
@@ -422,6 +472,7 @@ function App() {
           handleChange={handleChange}
           handleShowConnectModal={handleShowConnectModal}
           userData={userData}
+          openCNFModal={openCNFModal}
         ></BetMenuM>
       }></Route>
 

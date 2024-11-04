@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import styles from "./connectModal.module.css";
 import toast from "react-hot-toast";
@@ -58,25 +57,11 @@ const ConnectWallet = ({ isOpen, onClose, connectWallet }) => {
                     />
                 </div>
 
-                {/* <div>
-                    <label htmlFor="price">Price:</label>
-                    <input
-                        className={styles.input}
-                        type="number"
-                        id="price"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleChange}
-                        required
-                    />
-                </div> */}
-
                 {/* submit */}
                 <div className={styles.btnOuterDivI}>
                     <button className={styles.button} type="submit" >
                         Connect Wallet
                     </button>
-
                 </div>
             </form>
 

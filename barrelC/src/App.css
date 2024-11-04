@@ -70,6 +70,22 @@ h3 {
     display: block;
     margin: 30px auto;
 }
+.buttonDisconnect{
+    background: rgb(226, 68, 63);
+    background: linear-gradient(59deg, rgb(240, 107, 77) 22%, rgb(214, 54, 29) 60%);
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 5px 20px;
+    color: rgb(231, 231, 231);
+    text-shadow: 1px 1px #262626;
+    border: none;
+    margin-bottom: 30px;
+    cursor: pointer;
+    transition: all 0.5s;
+    display: block;
+    margin: 30px auto;
+}
 
 .button:active {
     background: linear-gradient(59deg, rgba(241, 164, 88, 1) 22%, rgb(240, 215, 77) 60%);

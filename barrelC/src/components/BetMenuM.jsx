@@ -1,4 +1,3 @@
-
 const BetMenuM = ({
     currentCoins,
     gameMode,
@@ -11,6 +10,7 @@ const BetMenuM = ({
     handleChange,
     handleShowConnectModal,
     userData,
+    openCNFModal,
 }) => {
 
 
@@ -48,8 +48,7 @@ const BetMenuM = ({
                         value={betAmount.betAmount}
                         step="1"
                         onKeyDown={(e) => {
-                            // Prevent the 'e' key from being typed
-                            if (e.key === 'e' || e.key === 'E' || e.key === "-" || e.key === ".") {
+                            if (e.key === 'e' || e.key === 'E' || e.key === "-") {
                                 e.preventDefault();
                             }
                         }}
@@ -66,14 +65,37 @@ const BetMenuM = ({
             </div>
 
             <br />
-            {gameMode !== "practice" && <button onClick={handlePlaceBet} className='button' disabled={started || betAmount?.status}>PLACE BET</button>}
+            {
+                gameMode !== "practice" &&
+                <button onClick={handlePlaceBet} className='button' disabled={started || betAmount?.status}>
+                    PLACE BET
+                </button>
+            }
 
-            {gameMode === "practice" && deviceType === "mobile" && <button onClick={handlePlaceBet} className='button' disabled={started}>START PLAY</button>}
+            {
+                gameMode === "practice" &&
+                deviceType === "mobile" &&
+                <button onClick={handlePlaceBet} className='button' disabled={started}>
+                    START PLAY
+                </button>
+            }
 
-            <button
-                onClick={handleShowConnectModal}
-                disabled={userData ? true : false}
-                className='button'>CONNECT WALLET</button>
+            {
+                userData === null ?
+                    <button
+                        onClick={handleShowConnectModal}
+                        className='button' disabled={userData}
+                    >
+                        {userData ? "WALLET CONNECTED" : "CONNECT WALLET"}
+                    </button> :
+                    <button
+                        onClick={openCNFModal}
+                        className='buttonDisconnect'
+                    >
+                        DISCONNECT WALLET
+                    </button>
+            }
+
 
             <div>
                 <h4>SELECTED GAME MODE :- {gameMode === "normal" ? "NORMAL" : "PRACTICE"}</h4>
