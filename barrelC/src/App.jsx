@@ -79,7 +79,7 @@ function App() {
     setUserData(null);
     localStorage.removeItem("userData");
     setCurrentCoins(0);
-    setShowCNFModal(false);
+    closeCNFModal();
     toast.success("wallet Disconnected Successfully!..");
   }
 
