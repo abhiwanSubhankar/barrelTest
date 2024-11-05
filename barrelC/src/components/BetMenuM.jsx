@@ -11,6 +11,7 @@ const BetMenuM = ({
     handleShowConnectModal,
     userData,
     openCNFModal,
+    isLoading
 }) => {
 
 
@@ -31,7 +32,7 @@ const BetMenuM = ({
 
                 {gameMode !== "practice" && <div className='betAmountWrapper'>
 
-                    <button className='incdecButton' disabled={started || betAmount.status} onClick={() => {
+                    <button className='incdecButton' disabled={started || isLoading || betAmount.status} onClick={() => {
                         betAmount.betAmount > 0 && setBetAmount((pre) => { return { ...betAmount, betAmount: +pre.betAmount - 1 } })
                     }}>
                         <img src="/minus.svg" alt="plus" />
@@ -44,7 +45,7 @@ const BetMenuM = ({
                         placeholder='Enter Bet Amount'
                         min={1}
                         max={10000000}
-                        disabled={started || betAmount.status}
+                        disabled={started || isLoading || betAmount.status}
                         value={betAmount.betAmount}
                         step="1"
                         onKeyDown={(e) => {
@@ -55,7 +56,7 @@ const BetMenuM = ({
                         onChange={(e) => handleChange(e)}
                     />
 
-                    <button className='incdecButton' disabled={started || betAmount.status} onClick={() => {
+                    <button className='incdecButton' disabled={started || isLoading || betAmount.status} onClick={() => {
                         setBetAmount((pre) => { return { ...betAmount, betAmount: +pre.betAmount + 1 } })
                     }}>
                         <img src="/plus.svg" alt="plus" />
@@ -100,7 +101,7 @@ const BetMenuM = ({
             <div>
                 <h4>SELECTED GAME MODE :- {gameMode === "normal" ? "NORMAL" : "PRACTICE"}</h4>
                 <select name="" id="" className='balance'
-                    disabled={started}
+                    disabled={started || isLoading || betAmount.status}
                     value={gameMode}
                     onChange={(e) => {
                         setGameMode(e.target.value)
